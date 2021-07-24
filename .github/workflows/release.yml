@@ -20,7 +20,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
       - name: Configure Git User
         run: |
-          git config --global user.email "ci@backyard.io"
+          git config --global user.email "security@elwood.technology"
           git config --global user.name "@$GITHUB_ACTOR"
       - run: yarn
       - run: yarn compile

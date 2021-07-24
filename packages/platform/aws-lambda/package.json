@@ -19,7 +19,8 @@
   },
   "devDependencies": {
     "@backyard/tools-typescript": "*",
-    "@backyard/types": "*"
+    "@backyard/types": "*",
+    "@types/zip-webpack-plugin": "^3.0.3"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
