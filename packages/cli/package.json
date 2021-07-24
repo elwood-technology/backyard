@@ -15,6 +15,7 @@
   "dependencies": {
     "@backyard/common": "^0.1.15",
     "@backyard/context": "^0.1.15",
+    "@backyard/dev-server": "^0.1.15",
     "dotenv": "^10.0.0",
     "find-up": "^5.0.0",
     "gluegun": "^4.6.1",
@@ -26,7 +27,8 @@
   "devDependencies": {
     "@backyard/tools-typescript": "^0.1.15",
     "@backyard/types": "^0.1.15",
-    "@types/jsonwebtoken": "^8.5.1"
+    "@types/jsonwebtoken": "^8.5.1",
+    "@types/package-json": "^5.0.1"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [

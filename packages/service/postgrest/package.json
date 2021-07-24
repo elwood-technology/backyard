@@ -1,5 +1,5 @@
 {
-  "name": "@backyard/service-postgrest",
+  "name": "@backyard/service-admin",
   "version": "0.1.15",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",

@@ -18,18 +18,8 @@
     "zip-webpack-plugin": "^4.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.14.6",
-    "@backyard/platform-aws-ecs": "*",
-    "@backyard/platform-terraform": "*",
     "@backyard/tools-typescript": "^0.1.15",
-    "@backyard/types": "^0.1.15",
-    "@types/aws-lambda": "^8.10.77",
-    "@types/koa": "^2.13.3",
-    "@types/koa__router": "^8.0.4",
-    "@types/nodemon": "^1.19.0",
-    "@types/zip-webpack-plugin": "^3.0.2",
-    "webpack": "^5.43.0",
-    "webpack-sources": "^2.3.0"
+    "@backyard/types": "^0.1.15"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [

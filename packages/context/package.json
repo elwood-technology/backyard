@@ -23,11 +23,7 @@
   "devDependencies": {
     "@backyard/tools-test": "^0.1.15",
     "@backyard/types": "^0.1.15",
-    "@types/fs-extra": "^9.0.11",
-    "@types/lodash.defaultsdeep": "^4.6.6",
-    "@types/lodash.reduce": "^4.6.6",
-    "@types/lodash.template": "^4.5.0",
-    "@types/which": "^2.0.0"
+    "@types/fs-extra": "^9.0.11"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
