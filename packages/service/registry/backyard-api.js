@@ -1,1 +1,1 @@
-module.exports = require('./lib/api')
+module.exports = require(__dirname + '/lib/api');

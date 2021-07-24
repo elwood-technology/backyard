@@ -1,27 +1,42 @@
 {
   "name": "@backyard/platform-aws-lambda",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "main": "lib/index.js",
-  "author": "Travis Kuhl <travis.kuhl@gmail.com>",
+  "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
   "scripts": {
     "watch": "yarn compile --watch",
     "compile": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@types/aws-lambda": "^8.10.77"
+    "@backyard/platform-node": "*",
+    "@koa/router": "^10.0.0",
+    "babel-loader": "^8.2.2",
+    "babel-preset-env": "^1.7.0",
+    "koa": "^2.13.1",
+    "nodemon": "^2.0.9",
+    "zip-webpack-plugin": "^4.0.1"
   },
   "devDependencies": {
-    "@backyard/tools-typescript": "^0.1.14",
-    "@backyard/types": "^0.1.14"
+    "@babel/core": "^7.14.6",
+    "@backyard/platform-aws-ecs": "*",
+    "@backyard/platform-terraform": "*",
+    "@backyard/tools-typescript": "^0.1.15",
+    "@backyard/types": "^0.1.15",
+    "@types/aws-lambda": "^8.10.77",
+    "@types/koa": "^2.13.3",
+    "@types/koa__router": "^8.0.4",
+    "@types/nodemon": "^1.19.0",
+    "@types/zip-webpack-plugin": "^3.0.2",
+    "webpack": "^5.43.0",
+    "webpack-sources": "^2.3.0"
   },
-  "repository": "git@github.com:backyard-hq/backyard.git",
+  "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
     "lib",
-    "bin",
+    "handler.js",
     "package.json"
   ],
-  "gitHead": "6d457e8676d539cb6ab52a129aea2300445edc1f",
   "publishConfig": {
     "access": "public"
   }

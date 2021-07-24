@@ -1,0 +1,35 @@
+{
+  "name": "@backyard/service-zuul",
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "author": "Travis Kuhl <travis@elwood.technology>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "backyard-ui-dev-server",
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json"
+  },
+  "dependencies": {
+    "@backyard/common": "*",
+    "@backyard/platform-node": "*",
+    "node-fetch": "^2.6.1",
+    "@backyard/ui-react": "*"
+  },
+  "devDependencies": {
+    "@backyard/ui-dev-server": "*",
+    "@backyard/ui-webpack": "*",
+    "@backyard/types": "^0.1.15",
+    "@types/node-fetch": "^2.5.11"
+  },
+  "repository": "git@github.com:elwood-technology/backyard.git",
+  "files": [
+    "lib",
+    "backyard-service.js",
+    "backyard-api.js",
+    "backyard-ui.js",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

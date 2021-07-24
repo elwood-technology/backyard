@@ -1,10 +1,14 @@
-import { ServiceRequest, ServiceResponse } from '@backyard/types';
+import { readFileSync } from 'fs';
 
-export async function handler(ctx: ServiceRequest): Promise<ServiceResponse> {
-  const { backyard } = ctx;
+import type { ServiceRequest, ServiceResponse } from '@backyard/types';
+
+export async function handler(_ctx: ServiceRequest): Promise<ServiceResponse> {
+  const { services } = JSON.parse(readFileSync('./state.json').toString());
+
   return {
+    type: 'json',
     body: {
-      services: backyard.services,
+      services,
     },
   };
 }

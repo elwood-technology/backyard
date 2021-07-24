@@ -1,23 +1,34 @@
 import { join } from 'path';
 
+import { Configuration } from '@backyard/types';
+
+import { coreServiceProviders } from '../service/core';
 import { createContext } from '../create';
-import {
-  createDevCoreServiceSettings,
-  createBuildCoreServiceSettings,
-} from '../mode';
-import { coreServices } from '../services';
 import helper from './helpers';
 
 describe('create', () => {
   beforeEach(helper.setCleanTestCwd);
   afterEach(helper.switchBackToCorrectCwd);
 
+  const initialConfig: Configuration = {
+    platform: {
+      local: join(__dirname, './fixtures/platform.ts'),
+      remote: join(__dirname, './fixtures/platform.ts'),
+    },
+    services: Object.keys(coreServiceProviders).map((name) => {
+      return {
+        name,
+        provider: join(__dirname, './fixtures/service.ts'),
+      };
+    }),
+  };
+
   describe('#createContext', () => {
     test('should fail if cwd does not exist', async () => {
       const cwd = Math.random().toString();
       await expect(
         createContext({
-          mode: 'dev',
+          mode: 'local',
           cwd,
         }),
       ).rejects.toThrow('Current working directory');
@@ -27,43 +38,35 @@ describe('create', () => {
       const cwd = Math.random().toString();
       await expect(
         createContext({
-          mode: 'dev',
+          mode: 'local',
           cwd,
+          initialConfig,
         }),
       ).rejects.toThrow('Current working directory');
     });
 
-    test('should create .dir', async () => {
+    test('should create local', async () => {
       const ctx = await createContext({
-        mode: 'dev',
+        mode: 'local',
+        initialConfig,
       });
 
       expect(ctx.dir.root).toEqual(process.cwd());
       expect(ctx.dir.backyard).toEqual(join(process.cwd(), '.backyard'));
       expect(ctx.dir.source).toEqual(join(process.cwd()));
-      expect(ctx.dir.dest).toEqual(join(process.cwd(), '.backyard/dev'));
+      expect(ctx.dir.stage).toEqual(join(process.cwd(), '.backyard/local'));
     });
 
     test('should add core services', async () => {
-      const dev = await createContext({
-        mode: 'dev',
+      const local = await createContext({
+        mode: 'local',
+        initialConfig,
       });
 
-      coreServices.forEach((name) => {
-        expect(dev.coreServiceSettings[name]).toEqual(
-          createDevCoreServiceSettings()[name],
-        );
-      });
-
-      const build = await createContext({
-        mode: 'build',
-      });
-
-      coreServices.forEach((name) => {
-        expect(build.coreServiceSettings[name]).toEqual(
-          createBuildCoreServiceSettings()[name],
-        );
-      });
+      expect(local.services.has('gateway')).toBeTruthy();
+      expect(local.services.has('db')).toBeTruthy();
+      expect(local.services.has('auth')).toBeTruthy();
+      expect(local.services.has('something')).toBeFalsy();
     });
   });
 });

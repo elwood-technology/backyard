@@ -1,5 +1,15 @@
 {
   "extends": "./config/tsconfig.base.json",
-  "include": [".eslintrc.js", "packages/**/src/**/*"],
-  "exclude": ["tmp", "temp", "build", "node_modules"]
+  "include": [
+    ".eslintrc.js",
+    "backyard.ts",
+    "backyard.js",
+    "packages/**/src/**/*",
+    "**/server.d.ts",
+    "**/backyard-api.*",
+    "**/backyard-service.*",
+    "**/backyard-ui.*",
+    "**/config/*"
+  ],
+  "exclude": ["tmp", "temp", "build", "templates", "docs", "node_modules"]
 }

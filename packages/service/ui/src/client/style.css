@@ -1,0 +1,13 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+body {
+  overflow: hidden;
+}
+
+@layer components {
+  .btn {
+    @apply py-1 px-3 bg-white shadow-sm border border-gray-100 text-gray-500 font-semibold rounded-md;
+  }
+}

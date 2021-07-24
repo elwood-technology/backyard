@@ -30,19 +30,15 @@
       "prepend": false
     },
     {
-      "path": "./dev-server",
-      "prepend": false
-    },
-    {
-      "path": "./react",
-      "prepend": false
-    },
-    {
       "path": "./context",
       "prepend": false
     },
     {
       "path": "./platform",
+      "prepend": false
+    },
+    {
+      "path": "./ui",
       "prepend": false
     }
   ]

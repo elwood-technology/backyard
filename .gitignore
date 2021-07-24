@@ -1,12 +1,14 @@
 dist/
 build/
 lib/
+tmp/
 .terraform-*
 *.zip
 .DS_Store
 .dev-db
 .backyard
 backyard.ts
+backyard.js
 
 # Logs
 logs

@@ -9,6 +9,14 @@
     {
       "path": "../../types",
       "prepend": false
+    },
+    {
+      "path": "../../common",
+      "prepend": false
+    },
+    {
+      "path": "../node",
+      "prepend": false
     }
   ]
 }

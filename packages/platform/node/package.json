@@ -1,0 +1,38 @@
+{
+  "name": "@backyard/platform-node",
+  "version": "0.1.15",
+  "main": "lib/index.js",
+  "author": "Travis Kuhl <travis@elwood.technology>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json"
+  },
+  "dependencies": {
+    "@koa/router": "^10.0.0",
+    "babel-loader": "^8.2.2",
+    "babel-preset-env": "^1.7.0",
+    "koa": "^2.13.1",
+    "nodemon": "^2.0.9"
+  },
+  "devDependencies": {
+    "@backyard/platform-aws-ecs": "*",
+    "@backyard/platform-terraform": "*",
+    "@backyard/tools-typescript": "^0.1.15",
+    "@backyard/types": "^0.1.15",
+    "@types/aws-lambda": "^8.10.77",
+    "@types/koa": "^2.13.3",
+    "@types/koa__router": "^8.0.4",
+    "@types/nodemon": "^1.19.0"
+  },
+  "repository": "git@github.com:elwood-technology/backyard.git",
+  "files": [
+    "lib",
+    "dev-server.js",
+    "dev-server.d.ts",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

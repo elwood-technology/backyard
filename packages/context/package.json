@@ -1,8 +1,8 @@
 {
   "name": "@backyard/context",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "main": "lib/index.js",
-  "author": "Travis Kuhl <travis.kuhl@gmail.com>",
+  "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
   "scripts": {
     "watch": "yarn compile --watch",
@@ -10,22 +10,30 @@
     "test": "backyard-tools-jest --config=./config/jest.js"
   },
   "dependencies": {
-    "@backyard/common": "^0.1.14",
+    "@backyard/common": "^0.1.15",
     "find-up": "^5.0.0",
     "fs-jetpack": "^4.1.0",
-    "joi": "^17.4.0"
+    "joi": "^17.4.0",
+    "lodash.defaultsdeep": "^4.6.1",
+    "lodash.reduce": "^4.6.0",
+    "lodash.template": "^4.5.0",
+    "which": "^2.0.2",
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "@backyard/tools-test": "^0.1.14",
-    "@backyard/types": "^0.1.14",
-    "@types/fs-extra": "^9.0.11"
+    "@backyard/tools-test": "^0.1.15",
+    "@backyard/types": "^0.1.15",
+    "@types/fs-extra": "^9.0.11",
+    "@types/lodash.defaultsdeep": "^4.6.6",
+    "@types/lodash.reduce": "^4.6.6",
+    "@types/lodash.template": "^4.5.0",
+    "@types/which": "^2.0.0"
   },
-  "repository": "git@github.com:backyard-hq/backyard.git",
+  "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
     "lib",
     "package.json"
   ],
-  "gitHead": "6d457e8676d539cb6ab52a129aea2300445edc1f",
   "publishConfig": {
     "access": "public"
   }

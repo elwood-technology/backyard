@@ -1,0 +1,37 @@
+{
+  "name": "@backyard/service-notifications",
+  "version": "0.0.0",
+  "main": "lib/index.js",
+  "author": "Travis Kuhl <travis@elwood.technology>",
+  "license": "MIT",
+  "sideEffects": false,
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json",
+    "dev": "NODE_ENV=development webpack serve --config=./config/webpack.js",
+    "dist": "rm -rf ./dist && NODE_ENV=production webpack --config=./config/webpack.js --mode=production"
+  },
+  "dependencies": {
+    "@backyard/common": "*",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@backyard/ui-dev-server": "*",
+    "@backyard/types": "^0.1.15",
+    "@types/react-dom": "^17.0.8",
+    "@types/react": "^17.0.8"
+  },
+  "repository": "git@github.com:elwood-technology/backyard.git",
+  "files": [
+    "lib",
+    "dist",
+    "backyard-api.js",
+    "backyard-ui.js",
+    "backyard-service.js",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

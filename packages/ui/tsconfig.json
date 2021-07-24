@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {},
+  "references": [
+    {
+      "path": "./react",
+      "prepend": false
+    },
+    {
+      "path": "./dev-server",
+      "prepend": false
+    },
+    {
+      "path": "./webpack",
+      "prepend": false
+    }
+  ]
+}

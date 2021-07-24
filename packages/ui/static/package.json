@@ -1,0 +1,17 @@
+{
+  "name": "@backyard/ui-static",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "Travis Kuhl <travis@elwood.technology>",
+  "license": "MIT",
+  "scripts": {},
+  "dependencies": {},
+  "repository": "git@github.com:elwood-technology/backyard.git",
+  "files": [
+    "public-channel.html",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

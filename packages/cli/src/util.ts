@@ -3,6 +3,8 @@ import { FullVersion } from 'package-json';
 import { filesystem } from 'gluegun';
 import findUp from 'find-up';
 import { join } from 'path';
+import { JsonObject } from 'packages/types/src/scalar';
+import { DockerComposeService } from './types';
 
 export async function findPackageJson(
   root: string | undefined,

@@ -11,10 +11,6 @@
       "prepend": false
     },
     {
-      "path": "../dev-server",
-      "prepend": false
-    },
-    {
       "path": "../common",
       "prepend": false
     },

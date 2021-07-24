@@ -1,10 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: [
-    '@typescript-eslint',
-    'react'
-  ],
+  plugins: ['@typescript-eslint', 'react'],
   extends: ['plugin:prettier/recommended'],
   env: {
     node: true,
@@ -14,13 +11,12 @@ module.exports = {
   parserOptions: {
     project: ['tsconfig.eslint.json'],
     tsconfigRootDir: __dirname,
-    sourceType: "module",
+    sourceType: 'module',
     ecmaFeatures: {
-      jsx: true
-    }
+      jsx: true,
+    },
   },
   settings: {
-
     react: {
       pragma: 'React',
       version: 'detect',
@@ -36,5 +32,5 @@ module.exports = {
         argsIgnorePattern: '^_',
       },
     ],
-  }
+  },
 };

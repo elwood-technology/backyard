@@ -1,4 +1,4 @@
 import type { ContextMode } from '@backyard/types';
 
-export const ContextModeDev: ContextMode = 'dev';
-export const ContextModeBuild: ContextMode = 'build';
+export const ContextModeLocal: ContextMode = 'local';
+export const ContextModeRemote: ContextMode = 'remote';

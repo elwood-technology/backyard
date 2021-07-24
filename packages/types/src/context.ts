@@ -1,29 +1,47 @@
+import type * as filesystem from 'fs-jetpack';
+import type { default as which } from 'which';
+
 import {
   FullConfiguration,
-  ConfigurationService,
-  ConfigurationServiceRealtimeSettings,
-  ConfigurationServiceKongSettings,
-  ConfigurationServiceAuthSettings,
-  ConfigurationServiceDatabaseSettings,
-  ConfigurationServiceStorageSettings,
-  ConfigurationServiceRestSettings,
-  ConfigurationServiceDevServerSettings,
   ConfigurationSite,
+  ConfigurationService,
+  ConfigurationServiceContainer,
+  ConfigurationServiceSettings,
+  ConfigurationServiceGateway,
 } from './configuration';
+import { Json, JsonObject } from './scalar';
+import { ServiceHooks, ServiceName } from './service';
+import { RemotePlatform, LocalPlatform } from './platform';
 
-import { ServiceName } from './service';
+export type ContextMode = 'local' | 'remote';
 
-export type ContextMode = 'dev' | 'build';
+export interface ContextServiceContainer extends ConfigurationServiceContainer {
+  enabled: boolean;
+}
 
 export interface ContextService<
-  Config extends ConfigurationService = ConfigurationService,
+  Settings extends ConfigurationServiceSettings = ConfigurationServiceSettings,
 > {
   name: string;
-  type: 'local' | 'package';
+  type?: string;
   moduleRootPath: string;
   apiModulePath?: string;
   uiModulePath?: string;
-  config: Config;
+  config: ConfigurationService<Settings>;
+  init(): Promise<void>;
+  gateway: ConfigurationServiceGateway | undefined;
+  container: ConfigurationServiceContainer | undefined;
+  stage(dir: string): Promise<void>;
+  hook(name: string, args?: JsonObject): Promise<Json>;
+  platform?: {
+    gateway: ConfigurationServiceGateway | undefined;
+    container: ConfigurationServiceContainer | undefined;
+    stage(dir: string): Promise<void>;
+    hook(name: string, args?: JsonObject): Promise<Json>;
+  };
+  getHooks(): ServiceHooks;
+  getPlatformHooks(): ServiceHooks;
+  setPlatformHooks(hooks: ServiceHooks): void;
 }
 
 export interface ContextSite {
@@ -33,18 +51,8 @@ export interface ContextSite {
   port: number;
 }
 
-export type ContextUserServicesMap = Map<ServiceName, ContextService>;
+export type ContextServicesMap = Map<ServiceName, ContextService>;
 export type ContextSitesMap = Map<string, ContextSite>;
-
-export interface ContextCoreServicesSettingsMap {
-  kong: Required<ConfigurationServiceKongSettings>;
-  auth: Required<ConfigurationServiceAuthSettings>;
-  db: Required<ConfigurationServiceDatabaseSettings>;
-  storage: Required<ConfigurationServiceStorageSettings>;
-  rest: Required<ConfigurationServiceRestSettings>;
-  realtime: Required<ConfigurationServiceRealtimeSettings>;
-  devServer?: Required<ConfigurationServiceDevServerSettings>;
-}
 
 export interface Context {
   mode: ContextMode;
@@ -52,16 +60,32 @@ export interface Context {
     cwd: string;
     root: string;
     backyard: string;
-    dest: string;
+    stage: string;
     source: string;
+    state: string;
   };
   config: FullConfiguration;
-  dbUri: string;
   sitesMap: ContextSitesMap;
-  userServices: ContextUserServicesMap;
-  coreServiceSettings: ContextCoreServicesSettingsMap;
+  services: ContextServicesMap;
   keys: {
     anon: string;
     service: string;
   };
+  platforms: {
+    local: LocalPlatform;
+    remote: RemotePlatform;
+  };
+  tools: {
+    filesystem: typeof filesystem;
+    which: typeof which;
+  };
+  settings: JsonObject & {
+    certPath?: string;
+    certKeyPath?: string;
+  };
+  log(msg: string): void;
+  createDbUrl(): string;
+  addService(config: ConfigurationService): Promise<void>;
+  serviceExternalUrl(name: string): string;
+  serviceInternalUrl(name: string): string;
 }

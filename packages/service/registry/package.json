@@ -1,22 +1,24 @@
 {
   "name": "@backyard/service-registry",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "main": "lib/index.js",
-  "author": "Travis Kuhl <travis.kuhl@gmail.com>",
+  "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
   "scripts": {
     "watch": "yarn compile --watch",
     "compile": "tsc -b ./tsconfig.json"
   },
-  "devDependencies": {
-    "@backyard/types": "^0.1.14"
+  "dependencies": {
+    "@backyard/common": "*"
   },
-  "repository": "git@github.com:backyard-hq/backyard.git",
+  "devDependencies": {
+    "@backyard/types": "^0.1.15"
+  },
+  "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
     "lib",
     "package.json"
   ],
-  "gitHead": "6d457e8676d539cb6ab52a129aea2300445edc1f",
   "publishConfig": {
     "access": "public"
   }

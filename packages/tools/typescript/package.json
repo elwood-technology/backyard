@@ -1,7 +1,7 @@
 {
   "name": "@backyard/tools-typescript",
   "private": true,
-  "version": "0.1.14",
+  "version": "0.1.15",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -19,9 +19,8 @@
     "tsconfig-paths": "^3.9.0",
     "typescript": "^4.0.5"
   },
-  "repository": "git@github.com:backyard-hq/backyard.git",
+  "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
     "package.json"
-  ],
-  "gitHead": "6d457e8676d539cb6ab52a129aea2300445edc1f"
+  ]
 }

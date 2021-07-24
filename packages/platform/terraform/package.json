@@ -1,0 +1,28 @@
+{
+  "name": "@backyard/platform-terraform",
+  "version": "0.1.15",
+  "main": "lib/index.js",
+  "author": "Travis Kuhl <travis@elwood.technology>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json"
+  },
+  "dependencies": {
+    "terraform-generator": "^5.0.0",
+    "@backyard/common": "*"
+  },
+  "devDependencies": {
+    "@backyard/tools-typescript": "^0.1.15",
+    "@backyard/types": "^0.1.15"
+  },
+  "repository": "git@github.com:elwood-technology/backyard.git",
+  "files": [
+    "lib",
+    "bin",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

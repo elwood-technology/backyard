@@ -1,28 +1,39 @@
 import { join, resolve } from 'path';
 
+import which from 'which';
 import * as filesystem from 'fs-jetpack';
 import jwt from 'jsonwebtoken';
 import { config as loadDotEnv } from 'dotenv';
 
-import { invariant } from '@backyard/common';
+import {
+  invariant,
+  requireModule,
+  createDbUrlFromContext,
+} from '@backyard/common';
 import type {
-  ConfigurationServiceDatabaseSettings,
+  RemotePlatform,
+  Configuration,
   Context,
   ContextMode,
+  LocalPlatform,
   FullConfiguration,
 } from '@backyard/types';
 
-import { loadAndNormalizeConfiguration } from './configuration';
-import { buildUserServicesMap, buildCoreServicesSettingsMap } from './services';
-import { createSitesMap } from './sites';
+import { loadAndNormalizeConfiguration } from './config';
 import {
-  createBuildCoreServiceSettings,
-  createDevCoreServiceSettings,
-} from './mode';
+  Service,
+  addServiceToContext,
+  readCoreServicesFromConfiguration,
+  readServicesFromSource,
+  readUsersServicesFromConfiguration,
+} from './service';
 
 export type CreateContextArgs = {
   mode: ContextMode;
   cwd?: string;
+  log?: Context['log'];
+  initialConfig?: Configuration;
+  settings?: Context['settings'];
 };
 
 enum EnvName {
@@ -31,8 +42,14 @@ enum EnvName {
   Backyard = 'BACKYARD_BY_DIR',
 }
 
+function defaultLogger(msg: string): void {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(msg);
+  }
+}
+
 export async function createContext(args: CreateContextArgs): Promise<Context> {
-  const { mode } = args;
+  const { mode, log = defaultLogger, settings = {}, initialConfig = {} } = args;
   const { BACKYARD_CWD } = process.env ?? {};
 
   const cwd = resolve(BACKYARD_CWD ?? args.cwd ?? process.cwd());
@@ -48,7 +65,7 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
     });
   }
 
-  const config = await loadAndNormalizeConfiguration(cwd);
+  const config = await loadAndNormalizeConfiguration(cwd, initialConfig);
   const rootDir = getRootDir(config, cwd);
 
   invariant(
@@ -57,54 +74,90 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
   );
 
   const backyardDir = getBackyardDir(config, rootDir);
-
   const destDir = join(backyardDir, mode);
   const sourceDir = getSourceDir(config, rootDir);
+  const stateDir = join(backyardDir, 'state');
 
-  const userServices = await buildUserServicesMap(config, sourceDir);
-  const coreServiceSettings = await buildCoreServicesSettingsMap(
-    config,
-    mode === 'dev'
-      ? createDevCoreServiceSettings()
-      : createBuildCoreServiceSettings(),
-  );
-  const sitesMap = await createSitesMap(
-    config,
-    sourceDir,
-    coreServiceSettings.devServer?.port ?? 3000,
-  );
+  const services = new Map<string, Service>();
 
-  return {
+  const context: Context = {
+    log,
     mode,
     config,
-    dbUri: createDbUri(coreServiceSettings.db),
-    userServices,
-    coreServiceSettings,
-    sitesMap,
+    services,
+    settings,
+    sitesMap: new Map(),
     dir: {
       cwd,
       root: rootDir,
       source: sourceDir,
       backyard: backyardDir,
-      dest: destDir,
+      stage: destDir,
+      state: stateDir,
     },
-    keys: createKeys(destDir, config.jwt.secret),
+    keys: createKeys(destDir, config),
+    tools: {
+      filesystem,
+      which,
+    },
+    platforms: loadPlatforms(config),
+    createDbUrl() {
+      return createDbUrlFromContext(context);
+    },
+    async addService(config) {
+      addServiceToContext(context, config, true);
+    },
+    serviceInternalUrl(serviceName: string) {
+      const gateway = context.services.get('gateway');
+      return `http://${gateway?.container?.host}:${gateway?.container?.port}/${serviceName}/v1`;
+    },
+    serviceExternalUrl(serviceName: string) {
+      const gateway = context.services.get('gateway');
+      const host = gateway?.container?.externalHost ?? '0.0.0.0';
+
+      if (serviceName === 'gateway') {
+        return `http://${host}:${gateway?.container?.externalPort}`;
+      }
+
+      return `http://${host}:${gateway?.container?.externalPort}/${serviceName}/v1`;
+    },
   };
+
+  const allServices = [
+    ...(await readCoreServicesFromConfiguration(config)),
+    ...(await readServicesFromSource(sourceDir)),
+    ...(await readUsersServicesFromConfiguration(config)),
+  ].filter((item) => item.enabled !== false);
+
+  await Promise.all(
+    allServices.map(async (serviceConfig) => {
+      await addServiceToContext(context, serviceConfig);
+    }),
+  );
+
+  for (const [_, service] of services) {
+    await service.init();
+  }
+
+  for (const [_, service] of services) {
+    await service.finalize();
+  }
+
+  return context;
 }
 
-export function createDbUri(db: ConfigurationServiceDatabaseSettings): string {
-  return `postgres://${db.user}:${db.password}@${db.containerHost}:${db.port}/${db.name}?sslmode=disable`;
-}
-
-export function createKeys(destDir: string, secret: string): Context['keys'] {
+export function createKeys(
+  destDir: string,
+  config: Configuration,
+): Context['keys'] {
   const keysFile = join(destDir, 'keys.json');
+  const secret = String(config.jwt?.secret);
+  const iat = config.jwt?.iat ?? new Date().getTime() / 1000;
+  const exp = config.jwt?.exp ?? iat + 60 * 60 * 24 * 365 * 50;
 
   if (filesystem.exists(keysFile)) {
     return filesystem.read(keysFile, 'json') as Context['keys'];
   }
-
-  const iat = new Date().getTime() / 1000;
-  const exp = iat + 60 * 60 * 24 * 365 * 50;
 
   const anonKey = jwt.sign(
     {
@@ -132,6 +185,25 @@ export function createKeys(destDir: string, secret: string): Context['keys'] {
   return {
     anon: anonKey,
     service: serviceKey,
+  };
+}
+
+export function loadPlatforms(config: Configuration): Context['platforms'] {
+  const localPlatform = config.platform?.local ?? '@backyard/platform-docker';
+  const RemotePlatform =
+    config.platform?.remote ?? '@backyard/platform-aws-ecs';
+
+  const { local } =
+    requireModule<{ local: LocalPlatform }>(localPlatform) ?? {};
+  const { remote } =
+    requireModule<{ remote: RemotePlatform }>(RemotePlatform) ?? {};
+
+  invariant(local, 'Unable to load local platform');
+  invariant(remote, 'Unable to load remote platform');
+
+  return {
+    local,
+    remote,
   };
 }
 

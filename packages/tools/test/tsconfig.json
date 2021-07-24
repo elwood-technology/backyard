@@ -5,14 +5,5 @@
     "outDir": "./lib"
   },
   "include": ["src"],
-  "references": [
-    {
-      "path": "../../common",
-      "prepend": false
-    },
-    {
-      "path": "../../types",
-      "prepend": false
-    }
-  ]
+  "references": []
 }

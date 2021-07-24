@@ -7,7 +7,35 @@
       "prepend": false
     },
     {
-      "path": "./admin",
+      "path": "./kong",
+      "prepend": false
+    },
+    {
+      "path": "./gotrue",
+      "prepend": false
+    },
+    {
+      "path": "./postgresql",
+      "prepend": false
+    },
+    {
+      "path": "./postgresql-migrate",
+      "prepend": false
+    },
+    {
+      "path": "./postgrest",
+      "prepend": false
+    },
+    {
+      "path": "./zuul",
+      "prepend": false
+    },
+    {
+      "path": "./ui",
+      "prepend": false
+    },
+    {
+      "path": "./notifications",
       "prepend": false
     }
   ]

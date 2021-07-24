@@ -2,12 +2,36 @@
 
 An opinioned microservices platform.
 
+## Status
+:warning: Not Stable :warning:
+
+Backyard is still under heavy development. The documentation is mostly not available but constantly being written. You're welcome to try it, but expect some breaking changes.
+
 ## Overview
+Backyard eases the development and deployment of microservices by providing an opinionated platform for business tool API & UI and static frontends.
+
+### Core Services
+- [Database](https://github.com/supabase/postgres)
+- [API Gateway](https://github.com/Kong/kong)
+- [Rest API](https://github.com/PostgREST/postgrest)
+- [Auth](https://github.com/netlify/gotrue)
+
+### Additional Services
+ - [File System](./packages/service/fs)
+ - [Event Bus](./packages/service/events)
+ - [Messages](./packages/services/messages)
 
 ## Installation
 
 ```bash
-yarn install @backyard/cli
+# typescript
+yarn create backyard -ts
+
+# javascript
+yarn create backyard
+
+# NPM
+npx create-backyard
 ```
 
 ## Usage

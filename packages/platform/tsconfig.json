@@ -7,7 +7,23 @@
   "include": ["src"],
   "references": [
     {
+      "path": "./aws-ecs",
+      "prepend": false
+    },
+    {
       "path": "./aws-lambda",
+      "prepend": false
+    },
+    {
+      "path": "./docker",
+      "prepend": false
+    },
+    {
+      "path": "./terraform",
+      "prepend": false
+    },
+    {
+      "path": "./node",
       "prepend": false
     }
   ]

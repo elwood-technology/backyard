@@ -36,9 +36,6 @@ export function createHandler(service: { handler: ServiceHandler }): {
 
       const result = await service.handler({
         request,
-        backyard: {
-          services: [],
-        },
       });
 
       const type = result.type ?? 'json';

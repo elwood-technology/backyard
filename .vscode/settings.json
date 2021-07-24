@@ -5,15 +5,16 @@
   "editor.wordWrapColumn": 80,
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
-  "typescript.tsdk": "./node_modules/typescript/lib",
   "[javascript]": {
     "editor.formatOnSave": true
   },
   "[typescript]": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.autoClosingBrackets": "languageDefined"
   },
   "[typescriptreact]": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.autoClosingBrackets": "languageDefined"
   },
   "[json]": {
     "editor.formatOnSave": true
