@@ -1,6 +1,6 @@
 {
   "name": "@backyard/platform-aws-lambda",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis.kuhl@gmail.com>",
   "license": "MIT",
@@ -12,8 +12,8 @@
     "@types/aws-lambda": "^8.10.77"
   },
   "devDependencies": {
-    "@backyard/tools-typescript": "^0.1.14",
-    "@backyard/types": "^0.1.14"
+    "@backyard/tools-typescript": "^0.1.15",
+    "@backyard/types": "^0.1.15"
   },
   "repository": "git@github.com:backyard-hq/backyard.git",
   "files": [

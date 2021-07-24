@@ -1,6 +1,6 @@
 {
   "name": "@backyard/dev-server",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis.kuhl@gmail.com>",
   "license": "MIT",
@@ -13,8 +13,8 @@
     "compile": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@backyard/common": "^0.1.14",
-    "@backyard/context": "^0.1.14",
+    "@backyard/common": "^0.1.15",
+    "@backyard/context": "^0.1.15",
     "@koa/router": "^10.0.0",
     "@webpack-cli/serve": "^1.4.0",
     "fs-jetpack": "^4.1.0",
@@ -25,8 +25,8 @@
     "webpack-dev-server": "^3.11.2"
   },
   "devDependencies": {
-    "@backyard/tools-typescript": "^0.1.14",
-    "@backyard/types": "^0.1.14",
+    "@backyard/tools-typescript": "^0.1.15",
+    "@backyard/types": "^0.1.15",
     "@types/koa": "^2.13.1",
     "@types/koa__router": "^8.0.4",
     "@types/nodemon": "^1.19.0",
