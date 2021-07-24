@@ -1,0 +1,27 @@
+{
+  "name": "@backyard/tools-typescript",
+  "private": true,
+  "version": "0.1.14",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json"
+  },
+  "bin": {
+    "backyard-tools-tsc": "./node_modules/.bin/tsc",
+    "backyard-tools-ts-node": "./node_modules/.bin/ts-node -r tsconfig-paths/register",
+    "backyard-tools-ts-node-dev": "./node_modules/.bin/ts-node-dev"
+  },
+  "dependencies": {
+    "ts-node": "^10.0.0",
+    "ts-node-dev": "^1.0.0",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^4.0.5"
+  },
+  "repository": "git@github.com:backyard-hq/backyard.git",
+  "files": [
+    "package.json"
+  ],
+  "gitHead": "6d457e8676d539cb6ab52a129aea2300445edc1f"
+}

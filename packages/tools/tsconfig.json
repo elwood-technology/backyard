@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {},
+  "references": [
+    {
+      "path": "./test",
+      "prepend": false
+    }
+  ]
+}

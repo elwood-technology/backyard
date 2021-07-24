@@ -1,0 +1,30 @@
+{
+  "name": "@backyard/react",
+  "version": "0.1.14",
+  "main": "lib/index.js",
+  "repository": "git@github.com:backyard-hq/backyard.git",
+  "author": "Travis Kuhl <travis.kuhl@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^1.13.1",
+    "react": "^17.0.2",
+    "react-supabase": "^0.1.9"
+  },
+  "devDependencies": {
+    "@backyard/tools-typescript": "^0.1.14",
+    "@backyard/types": "^0.1.14",
+    "@types/react": "^17.0.9"
+  },
+  "files": [
+    "lib",
+    "package.json"
+  ],
+  "gitHead": "6d457e8676d539cb6ab52a129aea2300445edc1f",
+  "publishConfig": {
+    "access": "public"
+  }
+}

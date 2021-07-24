@@ -1,0 +1,28 @@
+{
+  "name": "@backyard/platform-aws-lambda",
+  "version": "0.1.14",
+  "main": "lib/index.js",
+  "author": "Travis Kuhl <travis.kuhl@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json"
+  },
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.77"
+  },
+  "devDependencies": {
+    "@backyard/tools-typescript": "^0.1.14",
+    "@backyard/types": "^0.1.14"
+  },
+  "repository": "git@github.com:backyard-hq/backyard.git",
+  "files": [
+    "lib",
+    "bin",
+    "package.json"
+  ],
+  "gitHead": "6d457e8676d539cb6ab52a129aea2300445edc1f",
+  "publishConfig": {
+    "access": "public"
+  }
+}

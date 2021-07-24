@@ -1,0 +1,27 @@
+{
+  "name": "@backyard/types",
+  "version": "0.1.14",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "backyard-tools-tsc -b ./tsconfig.json",
+    "test": "backyard-tools-jest --config=./config/jest.js"
+  },
+  "dependencies": {
+    "webpack": "*"
+  },
+  "devDependencies": {
+    "@backyard/tools-typescript": "^0.1.14",
+    "ts-essentials": "^7.0.1"
+  },
+  "repository": "git@github.com:backyard-hq/backyard.git",
+  "files": [
+    "lib",
+    "package.json"
+  ],
+  "gitHead": "6d457e8676d539cb6ab52a129aea2300445edc1f",
+  "publishConfig": {
+    "access": "public"
+  }
+}

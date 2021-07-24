@@ -1,0 +1,18 @@
+{
+  "extends": "../../../config/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./lib"
+  },
+  "include": ["src"],
+  "references": [
+    {
+      "path": "../../common",
+      "prepend": false
+    },
+    {
+      "path": "../../types",
+      "prepend": false
+    }
+  ]
+}

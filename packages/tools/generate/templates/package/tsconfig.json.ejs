@@ -1,0 +1,12 @@
+{
+  "extends": "<%- fileFolderRelativeToRoot %>/config/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./lib"
+  },
+  "include": ["src"],
+  "references": [{
+    "path": "<%- fileFolderRelativeToPackages %>/common",
+    "prepend": false
+  }]
+}

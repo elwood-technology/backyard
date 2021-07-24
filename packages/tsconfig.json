@@ -1,0 +1,49 @@
+{
+  "extends": "../config/tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "incremental": true,
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true
+  },
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./common",
+      "prepend": false
+    },
+    {
+      "path": "./types",
+      "prepend": false
+    },
+    {
+      "path": "./tools",
+      "prepend": false
+    },
+    {
+      "path": "./cli",
+      "prepend": false
+    },
+    {
+      "path": "./service",
+      "prepend": false
+    },
+    {
+      "path": "./dev-server",
+      "prepend": false
+    },
+    {
+      "path": "./react",
+      "prepend": false
+    },
+    {
+      "path": "./context",
+      "prepend": false
+    },
+    {
+      "path": "./platform",
+      "prepend": false
+    }
+  ]
+}

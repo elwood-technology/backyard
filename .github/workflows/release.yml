@@ -1,0 +1,31 @@
+name: Release
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          always-auth: true
+          node-version: "12.x"
+          registry-url: https://registry.npmjs.org
+          scope: "@backyard"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - name: Configure Git User
+        run: |
+          git config --global user.email "ci@backyard.io"
+          git config --global user.name "@$GITHUB_ACTOR"
+      - run: yarn
+      - run: yarn compile
+      - run: yarn test
+        env:
+          CI: true
+      - run: ./node_modules/.bin/lerna run build
+      - run: ./node_modules/.bin/lerna version patch --yes
+      - run: ./node_modules/.bin/lerna publish from-package --yes --no-verify-access
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

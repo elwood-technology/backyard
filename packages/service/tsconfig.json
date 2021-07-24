@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {},
+  "references": [
+    {
+      "path": "./registry",
+      "prepend": false
+    },
+    {
+      "path": "./admin",
+      "prepend": false
+    }
+  ]
+}
