@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@backyard/common": "*",
-    "@backyard/service-ui": "*",
     "@backyard/ui-webpack": "*",
     "@backyard/ui-static": "*",
     "express": "^4.17.1",
@@ -25,7 +24,7 @@
     "webpack-hot-middleware": "^2.25.0"
   },
   "devDependencies": {
-    "@backyard/types": "^0.1.15",
+    "@backyard/types": "*",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
     "@types/webpack-dev-middleware": "^5.0.1",
     "dotenv": "^10.0.0",

@@ -21,7 +21,7 @@
     "webpack-dev-middleware": "^5.0.0"
   },
   "devDependencies": {
-    "@backyard/types": "^0.1.15",
+    "@backyard/types": "*",
     "@backyard/ui-react": "*",
     "@backyard/ui-dev-server": "*",
     "@headlessui/react": "^1.2.0",

@@ -14,8 +14,8 @@
     "react-router-dom": "^5.2.0"
   },
   "devDependencies": {
-    "@backyard/tools-typescript": "^0.1.15",
-    "@backyard/types": "^0.1.15",
+    "@backyard/tools-typescript": "*",
+    "@backyard/types": "*",
     "@types/react": "^17.0.9"
   },
   "files": [

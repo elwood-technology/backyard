@@ -12,7 +12,7 @@
     "@backyard/common": "*"
   },
   "devDependencies": {
-    "@backyard/types": "^0.1.15"
+    "@backyard/types": "*"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [

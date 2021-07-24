@@ -16,7 +16,7 @@
     "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "@backyard/types": "^0.1.15",
+    "@backyard/types": "*",
     "@types/lodash.defaultsdeep": "^4.6.6",
     "@types/lodash.get": "^4.4.6"
   },

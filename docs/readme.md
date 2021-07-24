@@ -6,7 +6,7 @@
   - [Installation](./start/install.md)
   - [Configuration](./start/configuration.md)
   - [Services](./start/services.md)
-- [Reference]
+- Reference
   - [CLI](./reference/cli/cli.md)
     - [Local](./reference/cli/local.md)
     - [Remote](./reference/cli/remote.md)
