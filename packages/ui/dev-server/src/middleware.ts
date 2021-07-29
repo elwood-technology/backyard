@@ -41,6 +41,36 @@ export async function getWebpackConfig(
   });
 }
 
+export async function appendUiDevServerWebpackMiddleware(
+  app: Application,
+  rootWebpackConfig: webpack.Configuration,
+): Promise<Application> {
+  const entry = (rootWebpackConfig.entry || {}) as JsonObject;
+
+  const webpackConfig = {
+    ...rootWebpackConfig,
+    entry: Object.keys(entry).reduce((current, key) => {
+      return {
+        ...current,
+        [key]: [
+          'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
+          entry[key],
+        ],
+      };
+    }, {}),
+    devServer: {
+      hot: true,
+      historyApiFallback: true,
+    },
+  } as webpack.Configuration;
+  const compiler = webpack(webpackConfig);
+
+  app.use(webpackDevMiddleware(compiler));
+  app.use(webpackHotMiddleware(compiler, { reload: true, heartbeat: 2000 }));
+
+  return app;
+}
+
 export async function appendUiDevSeverMiddleware(
   app: Application,
   options: Options,
@@ -66,28 +96,8 @@ export async function appendUiDevSeverMiddleware(
     cwd,
     `./${backyardUiFile}`,
   );
-  const entry = (rootWebpackConfig.entry || {}) as JsonObject;
 
-  const webpackConfig = {
-    ...rootWebpackConfig,
-    entry: Object.keys(entry).reduce((current, key) => {
-      return {
-        ...current,
-        [key]: [
-          'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000',
-          entry[key],
-        ],
-      };
-    }, {}),
-    devServer: {
-      hot: true,
-      historyApiFallback: true,
-    },
-  } as webpack.Configuration;
-  const compiler = webpack(webpackConfig);
-
-  app.use(webpackDevMiddleware(compiler));
-  app.use(webpackHotMiddleware(compiler, { reload: true, heartbeat: 2000 }));
+  await appendUiDevServerWebpackMiddleware(app, rootWebpackConfig);
 
   app.get('/authz/v1/services', async (_, res) => {
     res.json({
@@ -122,6 +132,12 @@ export async function appendUiDevSeverMiddleware(
     res.sendFile(join(dist, 'index.html'));
   });
 
+  return app;
+}
+
+export async function appendUiDevSeverMockMiddleware(
+  app: Application,
+): Promise<Application> {
   mocks.forEach((endpoint) => {
     app[endpoint.method](endpoint.path, function (_req, res) {
       res.json(endpoint.data);

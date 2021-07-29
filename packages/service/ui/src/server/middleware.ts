@@ -40,6 +40,7 @@ export async function applyStateMiddleware(
         return {
           name: item.name,
           frameUrl: `http://0.0.0.0:${item.port}`,
+          scriptUrl: `http://0.0.0.0:${item.port}/main.js`,
         };
       }),
     });

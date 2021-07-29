@@ -57,6 +57,7 @@ export interface ConfigurationService<
   settings?: Settings;
   gateway?: ConfigurationServiceGateway;
   container?: ConfigurationServiceContainer;
+  dependencies?: Array<string>;
 }
 
 export type ConfigurationServiceOptions =

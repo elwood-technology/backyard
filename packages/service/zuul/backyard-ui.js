@@ -1,1 +1,1 @@
-module.exports = require('./src/client/entry.tsx');
+module.exports = require('./lib/client/entry.js');
