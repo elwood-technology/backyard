@@ -13,7 +13,8 @@
     "@backyard/common": "*",
     "@backyard/platform-node": "*",
     "node-fetch": "^2.6.1",
-    "@backyard/ui-react": "*"
+    "@backyard/ui-react": "*",
+    "@backyard/ui-components": "*"
   },
   "devDependencies": {
     "@backyard/ui-dev-server": "*",

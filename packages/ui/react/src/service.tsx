@@ -12,6 +12,7 @@ export type UiReactCreateServiceCanvasFactory = {
 };
 
 export type UiReactCreateServiceOptions = {
+  title?: string;
   before?(): Promise<void>;
   after?(): Promise<void>;
   canvas(): Promise<UiReactCreateServiceCanvasFactory>;
@@ -38,7 +39,7 @@ function parseEvent(data: string): EventMessage | undefined {
   };
 }
 
-let currentChannel: Channel;
+let currentChannel: Channel | undefined = undefined;
 
 /**
  *
@@ -79,7 +80,7 @@ export async function createService(
 
       const { type, payload, token } = event;
 
-      if (type === 'canvas.render') {
+      function createChannel(): Channel {
         if (!payload.token) {
           throw new Error('No Token');
         }
@@ -88,17 +89,31 @@ export async function createService(
           throw new Error('Handle has already rendered');
         }
 
-        currentChannel = new Channel(window.parent, origin, payload.token);
+        return (currentChannel = new Channel(
+          window.parent,
+          origin,
+          payload.token,
+        ));
+      }
 
-        return renderCanvas(options.canvas, currentChannel);
+      if (type === 'canvas.render') {
+        return renderCanvas(options.canvas, createChannel());
       }
 
       if (type === 'data.init') {
-        if (currentChannel) {
-          throw new Error('Handle has already rendered');
+        createChannel();
+
+        if (options.title && currentChannel) {
+          currentChannel.sendMessage('set-display-title', {
+            title: options.title,
+          });
         }
 
         return;
+      }
+
+      if (!currentChannel) {
+        throw new Error('No Channel Exists');
       }
 
       if (currentChannel.token !== token) {

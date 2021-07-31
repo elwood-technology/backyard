@@ -1,11 +1,13 @@
 import React from 'react';
 
+import './style.css';
+
 import { CanvasRoute, CanvasTitle, CanvasShortcuts } from '@backyard/ui-react';
 
 export default function Canvas(): JSX.Element {
   return (
     <>
-      <CanvasTitle title="Hello World 1" />
+      <CanvasTitle title="Authorization" />
       <CanvasShortcuts
         shortcuts={[
           {

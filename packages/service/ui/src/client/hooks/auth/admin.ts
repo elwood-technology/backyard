@@ -32,7 +32,7 @@ export function useAuthAdminCreateUser(): AuthAdminCreateUserState {
           authorization: `Bearer ${opToken}`,
           'content-type': 'application/json',
         },
-        body: JSON.stringify({ email, password, confirm: true }),
+        body: JSON.stringify({ email, password, role: 'admin', confirm: true }),
       });
     } catch (err) {
       console.log(err);

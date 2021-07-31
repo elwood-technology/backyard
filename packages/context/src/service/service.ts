@@ -55,6 +55,10 @@ export class Service implements ContextService {
     this.#platformHooks = platformHooks;
   }
 
+  getInitialConfig(): ConfigurationService {
+    return this.#initialConfig;
+  }
+
   setContext(context: Context): void {
     this.#context = context;
   }
@@ -219,12 +223,12 @@ export class Service implements ContextService {
     return result as R;
   };
 
-  getGatewayUrl(): string {
+  getContainerUrl(): string {
     const gateway = this.getContext().services.get('gateway');
     return `http://${gateway?.container?.host}:${gateway?.container?.port}/${this.name}/v1`;
   }
 
-  getContainerUrl(): string {
+  getGatewayUrl(): string {
     const gateway = this.getContext().services.get('gateway');
     const host = gateway?.container?.externalHost ?? '0.0.0.0';
 

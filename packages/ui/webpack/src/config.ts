@@ -55,7 +55,18 @@ export async function createWebpackConfig(
         },
         {
           test: /\.css$/i,
-          use: ['style-loader', 'css-loader'],
+          use: [
+            'style-loader',
+            'css-loader',
+            {
+              loader: 'postcss-loader',
+              // options: {
+              //   postcssOptions: {
+              //     config: resolve(__dirname, 'postcss.config.js'),
+              //   },
+              // },
+            },
+          ],
         },
       ],
     },

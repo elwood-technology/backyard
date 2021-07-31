@@ -43,7 +43,7 @@ export function config(
         GOTRUE_JWT_EXP:
           '<%= await context.getService("gateway").hook("jwtExp") %>',
         GOTRUE_JWT_DEFAULT_GROUP_NAME:
-          '<%= await context.getService("gateway").hook("jtwGroup") %>',
+          '<%= await context.getService("gateway").hook("jwtGroup") %>',
         GOTRUE_DB_DRIVER: 'postgres',
         DB_NAMESPACE: 'auth',
         API_EXTERNAL_URL: config.settings?.externalUrl ?? 'localhost',

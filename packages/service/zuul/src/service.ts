@@ -18,8 +18,8 @@ export async function config(
       environment: {
         SERVICE_KEY:
           '<%= await context.getService("gateway").hook("serviceKey") %>',
-        AUTH_URL: '<%= context.getService("auth").getGatewayUrl() %>',
-        STORE_URL: '<%= context.getService("api").getGatewayUrl() %>',
+        AUTH_URL: '<%= context.getService("auth").getContainerUrl() %>',
+        STORE_URL: '<%= context.getService("api").getContainerUrl() %>',
       },
     },
   };

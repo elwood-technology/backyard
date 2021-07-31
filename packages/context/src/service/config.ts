@@ -38,7 +38,7 @@ export async function resolveServiceConfig(
     config = defaults(await hooks.config(context, config), config);
   }
 
-  return defaults(config, {
+  return defaults(initialConfig, config, {
     settings: {},
     gateway: {
       enabled: service.apiModulePath && true,

@@ -29,6 +29,7 @@ export class UiService extends AbstractService {
       container: {
         ...container,
         externalPort: 8080,
+        externalHost: 'localhost',
         port: 8080,
         meta: {
           dockerCompose: {

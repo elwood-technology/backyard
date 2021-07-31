@@ -45,6 +45,7 @@ export interface ContextService<
   getGatewayUrl(): string;
   getContainerUrl(): string;
   getResolvedConfig(): ConfigurationService | undefined;
+  getInitialConfig(): ConfigurationService;
 }
 
 export interface ContextSite {
