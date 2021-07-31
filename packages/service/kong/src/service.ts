@@ -1,11 +1,19 @@
 import { join } from 'path';
+import { randomBytes, createHash } from 'crypto';
 
 import { stringify as yaml } from 'yaml';
 
-import { ConfigurationService, Context } from '@backyard/types';
+import {
+  ConfigurationService,
+  Context,
+  ServiceHookProviderArgs,
+} from '@backyard/types';
+import { ContextModeRemote, invariant } from '@backyard/common';
 
 import { createKongConfig } from './config';
-import { ContextModeRemote } from 'packages/common/src/constants';
+
+import { generateKeys } from './keys';
+import { KongContextService, KongKeys, KongSettings } from './types';
 
 export const kongPlugins = [
   'request-transformer',
@@ -18,9 +26,19 @@ export const kongPlugins = [
 
 export function config(
   context: Context,
-  _config: ConfigurationService,
+  _config: ConfigurationService<KongSettings>,
 ): Partial<ConfigurationService> {
+  const iat = 384584607;
+
   return {
+    settings: {
+      jwt: {
+        iat,
+        groupName: 'backyard',
+        exp: iat + 60 * 60 * 24 * 365 * 50,
+        secret: createHash('md5').update(randomBytes(64)).digest('hex'),
+      },
+    },
     gateway: {
       enabled: false,
     },
@@ -41,12 +59,16 @@ export function config(
   };
 }
 
-export async function stage(dir: string, context: Context): Promise<void> {
+export async function stage(
+  dir: string,
+  context: Context,
+  service: KongContextService,
+): Promise<void> {
   const { filesystem } = context.tools;
 
   await filesystem.writeAsync(
     join(dir, 'config.yml'),
-    yaml(await createKongConfig(context)),
+    yaml(await createKongConfig(context, service)),
   );
 
   await filesystem.writeAsync(
@@ -67,4 +89,54 @@ ENV KONG_DECLARATIVE_CONFIG=$build_KONG_DECLARATIVE_CONFIG
 
 EXPOSE 8000`,
   );
+}
+
+export async function keys({
+  service,
+}: ServiceHookProviderArgs): Promise<KongKeys> {
+  return generateKeys(service.config as ConfigurationService<KongSettings>);
+}
+
+export async function anonymousKey(
+  args: ServiceHookProviderArgs,
+): Promise<string> {
+  return (await keys(args)).anonymousKey;
+}
+
+export async function serviceKey(
+  args: ServiceHookProviderArgs,
+): Promise<string> {
+  return (await keys(args)).serviceKey;
+}
+
+export async function jwtSecret({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  const { secret } = service.config?.settings?.jwt || {};
+  invariant(secret, 'No JWT Secret in Kong');
+  return secret;
+}
+
+export async function jwtExp({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  const { exp } = service.config?.settings?.jwt || {};
+  invariant(exp, 'No JWT exp in Kong');
+  return exp;
+}
+
+export async function jwtIat({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  const { iat } = service.config?.settings?.jwt || {};
+  invariant(iat, 'No JWT iat in Kong');
+  return iat;
+}
+
+export async function jwtGroup({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  const { groupName } = service.config?.settings?.jwt || {};
+  invariant(groupName, 'No JWT groupName in Kong');
+  return groupName;
 }

@@ -65,8 +65,8 @@ export class UiService extends AbstractService {
 
     const state = JSON.stringify({
       mode: context.mode === 'local' ? 'development' : 'production',
-      gatewayBaseUrl: context.serviceExternalUrl('gateway'),
-      apiAnonKey: context.keys.anon,
+      gatewayBaseUrl: context.getService('gateway').getGatewayUrl(),
+      apiAnonKey: await context.getService('gateway').hook('anonymousKey'),
       webpackContextPath: `/var/app`,
       modules,
     });

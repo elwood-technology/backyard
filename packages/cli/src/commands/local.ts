@@ -138,6 +138,9 @@ export async function init(tools: Toolbox): Promise<void> {
 
   await tools.prepareStage();
 
+  const localTextFilePath = join(context.dir.stage, 'local.txt');
+  const hasLocalText = tools.filesystem.exists(localTextFilePath);
+
   spin.text = 'Building services';
 
   for (const [name, service] of context.services) {
@@ -167,31 +170,49 @@ export async function init(tools: Toolbox): Promise<void> {
       ];
     });
 
+  const operatorToken = await context.getService('auth').hook('operatorToken');
+  const keys = (await context.getService('gateway').hook('keys')) as {
+    anonymousKey: string;
+    serviceKey: string;
+  };
+
   await tools.filesystem.writeAsync(
     join(context.dir.stage, '.env'),
     [
       ...serviceUrls,
       ['GATEWAY_URL', `http://localhost:${gatewayPort}`],
-      ['KEY_ANON', context.keys.anon],
-      ['KEY_SERVER', context.keys.service],
+      ['KEY_ANON', keys.anonymousKey],
+      ['KEY_SERVER', keys.serviceKey],
     ]
       .map(([key, value]) => [`BACKYARD_${key}`, value].join('='))
       .join(EOL),
   );
 
-  await tools.filesystem.writeAsync(
-    join(context.dir.stage, 'local.txt'),
-    [
-      'Welcome To Backyard',
-      '',
-      'Here is some important information',
-      ` Operator Token: ${context.config.operatorToken}`,
-      ` Anonymous Key: ${context.keys.anon}`,
-      ` Service Key: ${context.keys.service}`,
-    ].join(EOL),
-  );
+  const localText: string = [
+    'Welcome To Backyard',
+    '',
+    'Looking for some get started documentation: https://github.com/elwood-technology/backyard/blob/main/docs/start/quick.md',
+    'Have questions, ask them: https://github.com/elwood-technology/backyard/discussions',
+    '',
+    'Here is some important information you may need:',
+    ` Operator Token: ${operatorToken}`,
+    ` Anonymous Key: ${keys.anonymousKey}`,
+    ` Service Key: ${keys.serviceKey}`,
+    '',
+    'Services URLS:',
+    ...serviceUrls.map(([key, value]) => ` ${key}: ${value}`),
+    '',
+    'Configured Services',
+    ...getServices(context).map(({ name }) => ` ${name}`),
+  ].join(EOL);
+
+  await tools.filesystem.writeAsync(localTextFilePath, localText);
 
   spin.succeed();
+
+  if (!hasLocalText) {
+    tools.print.info(localText);
+  }
 }
 
 export async function start(tools: Toolbox): Promise<void> {
