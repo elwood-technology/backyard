@@ -18,7 +18,7 @@ async function main(): Promise<void> {
   const prog = new Command(pkg.name)
     .version(pkg.version)
     .usage(`${green('<project-dir>')} [options]`)
-    .argument('<project-dir>')
+    .arguments('<project-dir>')
     .option('-ts, --typescript')
     .option('-n, --name [name]', 'Project Name')
     .action((dir) => {
@@ -26,7 +26,7 @@ async function main(): Promise<void> {
     })
     .parse(process.argv);
 
-  const { typescript } = prog.opts<Options>();
+  const { typescript } = prog.opts() as Options;
 
   if (!projectDir) {
     console.log();

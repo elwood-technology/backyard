@@ -1,16 +1,13 @@
 import { promises as fs } from 'fs';
-import { dirname, extname, join, relative } from 'path';
+import { dirname, join } from 'path';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
 
-import {
-  dirAsync,
-  existsAsync,
-  copyAsync,
-  findAsync,
-  writeAsync,
-  removeAsync,
-} from 'fs-jetpack';
+import unzip from 'unzipper';
+import fetch from 'node-fetch';
+import { exists, tmpDirAsync, findAsync } from 'fs-jetpack';
 
-import { WriteAccessError, InvalidateTemplate } from './error';
+import { WriteAccessError } from './error';
 
 export type CreateBackyardOptions = {
   projectDir: string;
@@ -18,13 +15,22 @@ export type CreateBackyardOptions = {
   template: string;
 };
 
+const templates: Record<string, string> = {
+  default:
+    'https://github.com/elwood-technology/backyard-project-ts/archive/refs/heads/master.zip',
+  ts: 'https://github.com/elwood-technology/backyard-project-ts/archive/refs/heads/master.zip',
+};
+
 export async function createBackyard(
   options: CreateBackyardOptions,
 ): Promise<void> {
-  const { projectDir, projectName, template } = options;
+  const { projectDir, projectName: _, template } = options;
+
+  if (exists(projectDir)) {
+    throw new Error('Project Dir already exists');
+  }
 
   const rootDir = dirname(projectDir);
-  const templateDir = join(__dirname, '../templates', template);
 
   try {
     await fs.access(rootDir);
@@ -32,32 +38,40 @@ export async function createBackyard(
     throw new WriteAccessError(rootDir);
   }
 
-  if (!(await existsAsync(templateDir))) {
-    throw new InvalidateTemplate(template);
-  }
+  const templateUrl = templates[template] ?? template;
+  const tmp = await tmpDirAsync({
+    prefix: 'backyard-',
+  });
+  const streamPipeline = promisify(pipeline);
+  const response = await fetch(templateUrl);
 
-  await removeAsync(projectDir);
+  if (!response.ok)
+    throw new Error(`unexpected response ${response.statusText}`);
 
-  dirAsync(projectDir);
+  await streamPipeline(response.body, unzip.Extract({ path: tmp.cwd() }));
 
-  const templateFiles = await findAsync(templateDir, {
-    matching: ['**/*', '!**/node_modules/**'],
+  const tmpDirRoot = await tmp.findAsync({
+    matching: '*',
+    recursive: false,
+    directories: true,
+    files: false,
   });
 
-  for (const file of templateFiles) {
-    const destFileName = relative(templateDir, file);
-    const destName =
-      extname(destFileName) === '.tpl'
-        ? destFileName.replace('.tpl', '')
-        : destFileName;
+  const srcDir = join(tmp.cwd(), tmpDirRoot[0]);
 
-    await copyAsync(file, join(projectDir, destName));
+  const files = await findAsync(srcDir, {
+    matching: ['**/*', '*'],
+    recursive: true,
+    directories: true,
+    files: true,
+  });
+
+  for (const file of files) {
+    console.log(
+      `copying ${file}`,
+      join(projectDir, file.substr(srcDir.length)),
+    );
+
+    // await copyAsync(file, join(projectDir, file.substr(srcDir.length)));
   }
-
-  const projectPackageFile = join(projectDir, 'package.json');
-  const projectPackage = require(projectPackageFile);
-
-  projectPackage.name = projectName;
-
-  await writeAsync(projectPackageFile, JSON.stringify(projectPackage, null, 2));
 }
