@@ -1,7 +1,10 @@
 import express, { Application } from 'express';
 
+import { appendUiDevSeverMockMiddleware } from '@backyard/ui-dev-server';
+
 import type { UiServerOptions } from './types';
 import { applyStateMiddleware, applyStaticMiddleware } from './middleware';
+import { startServicesWebpack } from './webpack';
 
 export function createServer(): Promise<Application> {
   return new Promise((resolve) => {
@@ -11,8 +14,10 @@ export function createServer(): Promise<Application> {
 
 export function boot(options: UiServerOptions): Promise<Application> {
   return createServer().then(async (app) => {
+    await appendUiDevSeverMockMiddleware(app);
+
     if (options.mode === 'development') {
-      // await startServicesWebpack(options);
+      await startServicesWebpack(options);
       await applyStateMiddleware(app, options);
     }
 

@@ -43,6 +43,13 @@ export function addService(
   const canvasRef = createRef<HTMLIFrameElement>();
   const dataRef = createRef<HTMLIFrameElement>();
   const channelExchangeToken = uuid();
+  const serviceInBackyardState = state.backyardStateServices.find(
+    (item) => item.name === payload.name,
+  );
+  const scriptUrl = serviceInBackyardState?.scriptUrl ?? 'main.js';
+  const channelUrl =
+    serviceInBackyardState?.frameUrl ??
+    'https://backyard-public.s3.us-west-1.amazonaws.com/public-channel-v0.html?asdasd';
 
   function sendMessage(
     to: 'data' | 'canvas',
@@ -56,7 +63,13 @@ export function addService(
 
     const frame = to === 'data' ? dataRef.current : canvasRef.current;
 
-    console.log('Send Message to %s. %s(%o)', to, type, payload);
+    console.log(
+      'Send Message to %s. %s(%o) %s',
+      to,
+      type,
+      payload,
+      new URL(channelUrl).origin,
+    );
 
     frame!.contentWindow?.postMessage(
       JSON.stringify({
@@ -64,18 +77,9 @@ export function addService(
         payload: payload,
         token: channelExchangeToken,
       }),
-      new URL(frame!.src).origin,
+      new URL(channelUrl).origin,
     );
   }
-
-  const serviceInBackyardState = state.backyardStateServices.find(
-    (item) => item.name === payload.name,
-  );
-
-  const channelUrl =
-    serviceInBackyardState?.frameUrl ??
-    'https://backyard-public.s3.us-west-1.amazonaws.com/public-channel-v0.html?asdasd';
-  const scriptUrl = serviceInBackyardState?.scriptUrl ?? 'main.js';
 
   return {
     ...state,

@@ -26,22 +26,31 @@
       - [`typescript` (@backyard/tool-typescript)](#typescript-backyardtool-typescript)
     - [`types` (@backyard/types)](#types-backyardtypes)
     - [UI (`ui/`)](#ui-ui)
+      - [`dev-server` (@backyard/ui-dev-server)](#dev-server-backyardui-dev-server)
       - [`react` (@backyard/ui-react)](#react-backyardui-react)
+      - [`static` (@backyard/ui-static)](#static-backyardui-static)
+      - [`webpack` (@backyard/ui-webpack)](#webpack-backyardui-webpack)
 
 ## Folder Structure & Packages
 
 ### `cli` (@backyard/cli)
 Command line interface. Installs to `backyard` and `by`
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/cli)
+
 ---
 
 ### `common` (@backyard/common)
 Shared utility code. Also exports standard packages like `ts-invariant`, `uuid` and `debug` that are used by multiple child packages
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/common)
+
 ---
 
 ### `context` (@backyard/context)
 Context represents a Backyard workspace. It handles reading configuration, building & managing the `.bacyard/` folder, and initializing services & maintaining state of services.
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/context)
 
 ---
 
@@ -51,13 +60,23 @@ Platforms define infrastructure and runtime environments for `local` and `remote
 #### `docker` (@backyard/platform-docker)
 Used as the default platform for `local` development
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-docker)
+
 #### `node` (@backyard/platform-node)
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-node)
 
 #### `aws-ecs` (@backyard/platform-aws-ecs)
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-aws-ecs)
+
 #### `aws-lambda` (@backyard/platform-aws-lambda)
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-aws-lambda)
+
 #### `terraform` (@backyard/platform-terraform)
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-terraform)
 
 ---
 
@@ -67,23 +86,37 @@ Core maintained services
 #### `gotrue` (@backyard/service-gotrue)
 Default `auth` services
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-gotrue)
+
 #### `kong` (@backyard/service-kong)
 Default `gateway` service
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-kong)
 
 #### `postgresql` (@backyrad/service-postgresql)
 Default `db` service
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgresql)
+
 #### `postgresql-migrate` (@backyrad/service-postgresql-migrate)
 Used to initialize `local` and `remote` databases
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgresql-migrate)
 
 #### `postgrest` (@backyrad/service-postgrest)
 Default `store` service
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgrest)
+
 #### `ui` (@backyrad/service-ui)
 UI service
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-ui)
+
 #### `zuul` (@backyrad/service-zuul)
 Default `authz` service
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-zuul)
 
 ---
 
@@ -92,6 +125,8 @@ Tools provide utilities and packages for building Backyard
 
 #### `create` (create-backyard)
 `create-backyard` package that powers `npx create-backyard` & `yarn create backyard`
+
+![npm (scoped)](https://img.shields.io/npm/v/create-backyard)
 
 #### `docs-web` (@backyard/tool-docs-web)
 Docusaurus configuration and source for build `<root>/docs` folder. Lives at https://backyard.io/docs`
@@ -116,6 +151,7 @@ Meta package for `typescript` & `ts-node`. Provides shortcuts for:
 ### `types` (@backyard/types)
 Provides global types for Backyard.
 
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/types)
 
 
 ---
@@ -123,5 +159,24 @@ Provides global types for Backyard.
 ### UI (`ui/`)
 Packages to build a Backyard Service UI
 
+#### `dev-server` (@backyard/ui-dev-server)
+Server for developing UI applications locally
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/ui-dev-server)
+
+
 #### `react` (@backyard/ui-react)
 React containers & hooks to connect a Backyard Service UI
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/ui-react)
+
+
+#### `static` (@backyard/ui-static)
+Static files used for UI Services
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/ui-static)
+
+#### `webpack` (@backyard/ui-webpack)
+Webpack configuration files for UI Services
+
+![npm (scoped)](https://img.shields.io/npm/v/@backyard/ui-webpack)
