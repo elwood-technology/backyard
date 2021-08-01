@@ -28,7 +28,7 @@ jobs:
         env:
           CI: true
       - run: ./node_modules/.bin/lerna run build
-      - run: ./node_modules/.bin/lerna version patch
+      - run: ./node_modules/.bin/lerna version patch --yes
       - run: ./node_modules/.bin/lerna publish from-package --yes --no-verify-access
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
