@@ -1,7 +1,5 @@
 import { promises as fs } from 'fs';
-import { basename, dirname, join } from 'path';
-import { pipeline } from 'stream';
-import { promisify } from 'util';
+import { dirname, join } from 'path';
 import { EOL } from 'os';
 import { randomBytes } from 'crypto';
 
@@ -10,9 +8,9 @@ import fetch from 'node-fetch';
 import {
   exists,
   writeAsync,
-  // existsAsync,
-  // moveAsync,
-  findAsync,
+  dirAsync,
+  createWriteStream,
+  dir,
 } from 'fs-jetpack';
 
 import { WriteAccessError } from './error';
@@ -46,44 +44,29 @@ export async function createBackyard(
     throw new WriteAccessError(rootDir);
   }
 
-  const _projectDirName = dirname(projectDir);
   const templateUrl = templates[template] ?? template;
-  const streamPipeline = promisify(pipeline);
   const response = await fetch(templateUrl);
 
   if (!response.ok)
     throw new Error(`unexpected response ${response.statusText}`);
 
-  await streamPipeline(
-    response.body,
-    unzip.Extract({ path: rootDir }).on('entry', (file) => {
-      console.log(file);
-    }),
-  );
+  await dirAsync(projectDir);
 
-  // await new Promise((resolve) => {
-  //   response.body.pipe(unzipper.Parse()).on('entry', function (entry) {
-  //     const fileName = entry.path;
-  //     const type = entry.type; // 'Directory' or 'File'
-  //     const size = entry.vars.uncompressedSize; // There is also compressedSize;
-  //     if (fileName === "this IS the file I'm looking for") {
-  //       entry.pipe(fs.createWriteStream('output/path'));
-  //     } else {
-  //       entry.autodrain();
-  //     }
-  //   });
-  // });
+  await new Promise((resolve, reject) => {
+    response.body
+      .pipe(unzip.Parse())
+      .on('entry', function (entry) {
+        const root = entry.path.split('/').shift();
+        const out = join(projectDir, entry.path.replace(root, ''));
+        dir(dirname(out));
 
-  const zip = await findAsync(rootDir, {
-    matching: '*',
-    directories: false,
-    files: true,
-    recursive: false,
+        if (entry.type === 'File') {
+          entry.pipe(createWriteStream(out));
+        }
+      })
+      .on('close', resolve)
+      .on('error', reject);
   });
-
-  console.log(zip, basename(templateUrl));
-
-  // await moveAsync(join(rootDir, zip[0]), join(rootDir, projectDirName));
 
   await writeAsync(
     join(projectDir, 'local.env'),
@@ -91,17 +74,17 @@ export async function createBackyard(
       `MODE = local`,
       `OPERATOR_TOKEN = ${randomBytes(100).toString('hex')}`,
       `JWT_SECRET = ${randomBytes(32).toString('hex')}`,
-      `JWT_IAT = ${Date.now() / 1000}`,
+      `JWT_IAT = ${Date.now()}`,
     ].join(EOL),
   );
 
-  // await writeAsync(
-  //   join(projectDir, 'remote.env'),
-  //   [
-  //     `MODE = remote`,
-  //     `OPERATOR_TOKEN = ${randomBytes(100).toString('hex')}`,
-  //     `JWT_SECRET = ${randomBytes(32).toString('hex')}`,
-  //     `JWT_IAT = ${Date.now() / 1000}`,
-  //   ].join(EOL),
-  // );
+  await writeAsync(
+    join(projectDir, 'remote.env.example'),
+    [
+      `MODE = remote`,
+      `OPERATOR_TOKEN = ${randomBytes(100).toString('hex')}`,
+      `JWT_SECRET = ${randomBytes(32).toString('hex')}`,
+      `JWT_IAT = ${Date.now()}`,
+    ].join(EOL),
+  );
 }
