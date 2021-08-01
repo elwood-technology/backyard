@@ -1,6 +1,6 @@
 {
   "name": "@backyard/tools-test",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "main": "index.js",
   "license": "MIT",
@@ -13,13 +13,13 @@
     "backyard-tools-ts-jest": "./node_modules/.bin/ts-jest"
   },
   "dependencies": {
-    "@backyard/common": "^0.2.1",
+    "@backyard/common": "^0.2.2",
     "jest": "^27.0.1",
     "jest-config": "^27.0.1",
     "ts-jest": "^27.0.0"
   },
   "devDependencies": {
-    "@backyard/types": "^0.2.1",
+    "@backyard/types": "^0.2.2",
     "@types/jest": "^26.0.15"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
