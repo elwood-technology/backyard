@@ -15,9 +15,8 @@
     "unzipper": "^0.10.11"
   },
   "files": [
-    "./bin",
-    "./templates",
-    "./lib",
+    "bin",
+    "lib",
     "package.json"
   ],
   "devDependencies": {

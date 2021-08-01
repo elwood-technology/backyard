@@ -17,6 +17,7 @@
     "@backyard/tools-typescript": "^0.2.1",
     "ts-essentials": "^7.0.1"
   },
+  "homepage": "https://github.com/elwood-technology/backyard/tree/main/packages/types",
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
     "lib",

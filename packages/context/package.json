@@ -27,6 +27,7 @@
     "@types/fs-extra": "^9.0.11",
     "@types/which": "^2.0.1"
   },
+  "homepage": "https://github.com/elwood-technology/backyard/tree/main/packages/context",
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
     "lib",
