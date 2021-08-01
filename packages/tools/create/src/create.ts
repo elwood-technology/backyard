@@ -23,8 +23,8 @@ export type CreateBackyardOptions = {
 
 const templates: Record<string, string> = {
   default:
-    'https://github.com/elwood-technology/backyard-project-ts/archive/refs/heads/master.zip',
-  ts: 'https://github.com/elwood-technology/backyard-project-ts/archive/refs/heads/master.zip',
+    'https://github.com/elwood-technology/backyard-workspace/archive/refs/heads/master.zip',
+  ts: 'https://github.com/elwood-technology/backyard-workspace-ts/archive/refs/heads/master.zip',
 };
 
 export async function createBackyard(
