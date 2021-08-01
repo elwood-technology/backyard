@@ -1,6 +1,6 @@
 {
   "name": "@backyard/service-registry",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
@@ -9,10 +9,10 @@
     "compile": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@backyard/common": "*"
+    "@backyard/common": "^0.2.1"
   },
   "devDependencies": {
-    "@backyard/types": "*"
+    "@backyard/types": "^0.2.1"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
