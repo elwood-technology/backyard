@@ -1,11 +1,19 @@
 import { promises as fs } from 'fs';
-import { dirname, join } from 'path';
+import { basename, dirname, join } from 'path';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
+import { EOL } from 'os';
+import { randomBytes } from 'crypto';
 
 import unzip from 'unzipper';
 import fetch from 'node-fetch';
-import { exists, tmpDirAsync, findAsync } from 'fs-jetpack';
+import {
+  exists,
+  writeAsync,
+  // existsAsync,
+  // moveAsync,
+  findAsync,
+} from 'fs-jetpack';
 
 import { WriteAccessError } from './error';
 
@@ -38,40 +46,62 @@ export async function createBackyard(
     throw new WriteAccessError(rootDir);
   }
 
+  const _projectDirName = dirname(projectDir);
   const templateUrl = templates[template] ?? template;
-  const tmp = await tmpDirAsync({
-    prefix: 'backyard-',
-  });
   const streamPipeline = promisify(pipeline);
   const response = await fetch(templateUrl);
 
   if (!response.ok)
     throw new Error(`unexpected response ${response.statusText}`);
 
-  await streamPipeline(response.body, unzip.Extract({ path: tmp.cwd() }));
+  await streamPipeline(
+    response.body,
+    unzip.Extract({ path: rootDir }).on('entry', (file) => {
+      console.log(file);
+    }),
+  );
 
-  const tmpDirRoot = await tmp.findAsync({
+  // await new Promise((resolve) => {
+  //   response.body.pipe(unzipper.Parse()).on('entry', function (entry) {
+  //     const fileName = entry.path;
+  //     const type = entry.type; // 'Directory' or 'File'
+  //     const size = entry.vars.uncompressedSize; // There is also compressedSize;
+  //     if (fileName === "this IS the file I'm looking for") {
+  //       entry.pipe(fs.createWriteStream('output/path'));
+  //     } else {
+  //       entry.autodrain();
+  //     }
+  //   });
+  // });
+
+  const zip = await findAsync(rootDir, {
     matching: '*',
-    recursive: false,
-    directories: true,
-    files: false,
-  });
-
-  const srcDir = join(tmp.cwd(), tmpDirRoot[0]);
-
-  const files = await findAsync(srcDir, {
-    matching: ['**/*', '*'],
-    recursive: true,
-    directories: true,
+    directories: false,
     files: true,
+    recursive: false,
   });
 
-  for (const file of files) {
-    console.log(
-      `copying ${file}`,
-      join(projectDir, file.substr(srcDir.length)),
-    );
+  console.log(zip, basename(templateUrl));
 
-    // await copyAsync(file, join(projectDir, file.substr(srcDir.length)));
-  }
+  // await moveAsync(join(rootDir, zip[0]), join(rootDir, projectDirName));
+
+  await writeAsync(
+    join(projectDir, 'local.env'),
+    [
+      `MODE = local`,
+      `OPERATOR_TOKEN = ${randomBytes(100).toString('hex')}`,
+      `JWT_SECRET = ${randomBytes(32).toString('hex')}`,
+      `JWT_IAT = ${Date.now() / 1000}`,
+    ].join(EOL),
+  );
+
+  // await writeAsync(
+  //   join(projectDir, 'remote.env'),
+  //   [
+  //     `MODE = remote`,
+  //     `OPERATOR_TOKEN = ${randomBytes(100).toString('hex')}`,
+  //     `JWT_SECRET = ${randomBytes(32).toString('hex')}`,
+  //     `JWT_IAT = ${Date.now() / 1000}`,
+  //   ].join(EOL),
+  // );
 }

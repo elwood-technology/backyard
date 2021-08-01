@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './style.css';
+import '../../style.css';
 
 import { CanvasRoute, CanvasTitle, CanvasShortcuts } from '@backyard/ui-react';
 
