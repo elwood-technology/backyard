@@ -25,7 +25,7 @@ export function config(
         context: `./db-migrate`,
       },
       environment: {
-        POSTGRES_URI: '<%= context.createDbUrl() %>',
+        POSTGRES_URI: '<%= await context.getService("db").hook("uri") %>',
       },
       meta: {
         dockerCompose: {
@@ -37,6 +37,7 @@ export function config(
 }
 
 export async function stage(dir: string, context: Context): Promise<void> {
+  const uri = await context.getService('db').hook('uri');
   await context.tools.filesystem.writeAsync(
     join(dir, 'Dockerfile'),
     `
@@ -46,7 +47,7 @@ RUN apk --no-cache add postgresql-client
 COPY schema.sql /var/schema.sql
 COPY run.sh /var/run.sh
 
-ARG build_POSTGRES_URI=${context.createDbUrl()}
+ARG build_POSTGRES_URI=${uri}
 ENV POSTGRES_URI=$build_POSTGRES_URI
 WORKDIR /var
 CMD ["/bin/sh", "/var/run.sh"]

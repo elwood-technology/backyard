@@ -57,6 +57,7 @@ export interface ConfigurationService<
   settings?: Settings;
   gateway?: ConfigurationServiceGateway;
   container?: ConfigurationServiceContainer;
+  dependencies?: Array<string>;
 }
 
 export type ConfigurationServiceOptions =
@@ -68,13 +69,6 @@ export type ConfigurationServiceOptions =
     };
 
 export interface ConfigurationServiceSettings extends JsonObject {}
-
-export type ConfigurationJwt = {
-  iat?: number;
-  secret?: string;
-  groupName?: string;
-  exp?: number;
-};
 
 export type ConfigurationSite = {
   name: string;
@@ -90,8 +84,6 @@ export type ConfigurationResolve = {
 export type Configuration = {
   root?: string;
   resolve?: ConfigurationResolve;
-  operatorToken?: string;
-  jwt?: ConfigurationJwt;
   services?: ConfigurationServiceOptions[];
   sites?: ConfigurationSite[];
   platform?: {

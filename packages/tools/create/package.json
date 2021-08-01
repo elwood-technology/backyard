@@ -11,12 +11,16 @@
   "dependencies": {
     "chalk": "^4.1.1",
     "commander": "^8.0.0",
-    "fs-jetpack": "^4.1.0"
+    "fs-jetpack": "^4.1.0",
+    "unzipper": "^0.10.11"
   },
   "files": [
     "./bin",
     "./templates",
     "./lib",
     "package.json"
-  ]
+  ],
+  "devDependencies": {
+    "@types/unzipper": "^0.10.4"
+  }
 }

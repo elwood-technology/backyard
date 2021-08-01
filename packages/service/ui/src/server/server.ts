@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 
 import type { UiServerOptions } from './types';
 import { applyStateMiddleware, applyStaticMiddleware } from './middleware';
+import { startServicesWebpack } from './webpack';
 
 export function createServer(): Promise<Application> {
   return new Promise((resolve) => {
@@ -9,10 +10,10 @@ export function createServer(): Promise<Application> {
   });
 }
 
-export function boot(options: UiServerOptions): Promise<Application> {
+export async function boot(options: UiServerOptions): Promise<Application> {
   return createServer().then(async (app) => {
     if (options.mode === 'development') {
-      // await startServicesWebpack(options);
+      await startServicesWebpack(options);
       await applyStateMiddleware(app, options);
     }
 

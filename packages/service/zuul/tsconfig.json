@@ -26,6 +26,10 @@
     {
       "path": "../../ui/webpack",
       "prepend": false
+    },
+    {
+      "path": "../../ui/components",
+      "prepend": false
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { existsSync } from 'fs';
-import { join, resolve, dirname } from 'path';
+import { join, resolve, dirname, extname } from 'path';
 
 import webpack, {
   optimize,
@@ -9,6 +9,8 @@ import webpack, {
 } from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
+const ext = extname(__filename);
+
 export type UiWebpackCreateWebpackConfigOptions = {
   mode: 'development' | 'production';
   entry: string;
@@ -16,6 +18,8 @@ export type UiWebpackCreateWebpackConfigOptions = {
   typescript?: boolean;
   final?(config: Configuration): Configuration;
 };
+
+console.log(resolve(__dirname, `postcss${ext}`));
 
 export async function createWebpackConfig(
   options: UiWebpackCreateWebpackConfigOptions,
@@ -55,7 +59,22 @@ export async function createWebpackConfig(
         },
         {
           test: /\.css$/i,
-          use: ['style-loader', 'css-loader'],
+          use: [
+            'style-loader',
+            'css-loader',
+            {
+              loader: 'postcss-loader',
+              options: {
+                postcssOptions: {
+                  plugins: [
+                    require('postcss-import'),
+                    require('tailwindcss')(join(__dirname, `./tailwind${ext}`)),
+                    require('autoprefixer'),
+                  ],
+                },
+              },
+            },
+          ],
         },
       ],
     },

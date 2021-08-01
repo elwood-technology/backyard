@@ -16,9 +16,10 @@ export async function config(
       port: 3000,
       externalPort: 9990,
       environment: {
-        SERVICE_KEY: '<%= context.keys.service %>',
-        AUTH_URL: '<%= context.serviceInternalUrl("auth") %>',
-        STORE_URL: '<%= context.serviceInternalUrl("store") %>',
+        SERVICE_KEY:
+          '<%= await context.getService("gateway").hook("serviceKey") %>',
+        AUTH_URL: '<%= context.getService("auth").getContainerUrl() %>',
+        STORE_URL: '<%= context.getService("api").getContainerUrl() %>',
       },
     },
   };
@@ -30,7 +31,7 @@ export async function stage(dir: string, context: Context): Promise<void> {
     services: getServices(context).map((item) => {
       return {
         name: item.name,
-        url: context.serviceExternalUrl(item.name),
+        url: context.getService(item.name).getGatewayUrl(),
         ui: !!item.uiModulePath,
         api: !!item.apiModulePath,
       };

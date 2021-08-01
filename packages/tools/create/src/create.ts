@@ -1,16 +1,19 @@
 import { promises as fs } from 'fs';
-import { dirname, extname, join, relative } from 'path';
+import { dirname, join } from 'path';
+import { EOL } from 'os';
+import { randomBytes } from 'crypto';
 
+import unzip from 'unzipper';
+import fetch from 'node-fetch';
 import {
-  dirAsync,
-  existsAsync,
-  copyAsync,
-  findAsync,
+  exists,
   writeAsync,
-  removeAsync,
+  dirAsync,
+  createWriteStream,
+  dir,
 } from 'fs-jetpack';
 
-import { WriteAccessError, InvalidateTemplate } from './error';
+import { WriteAccessError } from './error';
 
 export type CreateBackyardOptions = {
   projectDir: string;
@@ -18,13 +21,22 @@ export type CreateBackyardOptions = {
   template: string;
 };
 
+const templates: Record<string, string> = {
+  default:
+    'https://github.com/elwood-technology/backyard-project-ts/archive/refs/heads/master.zip',
+  ts: 'https://github.com/elwood-technology/backyard-project-ts/archive/refs/heads/master.zip',
+};
+
 export async function createBackyard(
   options: CreateBackyardOptions,
 ): Promise<void> {
-  const { projectDir, projectName, template } = options;
+  const { projectDir, projectName: _, template } = options;
+
+  if (exists(projectDir)) {
+    throw new Error('Project Dir already exists');
+  }
 
   const rootDir = dirname(projectDir);
-  const templateDir = join(__dirname, '../templates', template);
 
   try {
     await fs.access(rootDir);
@@ -32,32 +44,47 @@ export async function createBackyard(
     throw new WriteAccessError(rootDir);
   }
 
-  if (!(await existsAsync(templateDir))) {
-    throw new InvalidateTemplate(template);
-  }
+  const templateUrl = templates[template] ?? template;
+  const response = await fetch(templateUrl);
 
-  await removeAsync(projectDir);
+  if (!response.ok)
+    throw new Error(`unexpected response ${response.statusText}`);
 
-  dirAsync(projectDir);
+  await dirAsync(projectDir);
 
-  const templateFiles = await findAsync(templateDir, {
-    matching: ['**/*', '!**/node_modules/**'],
+  await new Promise((resolve, reject) => {
+    response.body
+      .pipe(unzip.Parse())
+      .on('entry', function (entry) {
+        const root = entry.path.split('/').shift();
+        const out = join(projectDir, entry.path.replace(root, ''));
+        dir(dirname(out));
+
+        if (entry.type === 'File') {
+          entry.pipe(createWriteStream(out));
+        }
+      })
+      .on('close', resolve)
+      .on('error', reject);
   });
 
-  for (const file of templateFiles) {
-    const destFileName = relative(templateDir, file);
-    const destName =
-      extname(destFileName) === '.tpl'
-        ? destFileName.replace('.tpl', '')
-        : destFileName;
+  await writeAsync(
+    join(projectDir, 'local.env'),
+    [
+      `MODE = local`,
+      `OPERATOR_TOKEN = ${randomBytes(100).toString('hex')}`,
+      `JWT_SECRET = ${randomBytes(32).toString('hex')}`,
+      `JWT_IAT = ${Date.now()}`,
+    ].join(EOL),
+  );
 
-    await copyAsync(file, join(projectDir, destName));
-  }
-
-  const projectPackageFile = join(projectDir, 'package.json');
-  const projectPackage = require(projectPackageFile);
-
-  projectPackage.name = projectName;
-
-  await writeAsync(projectPackageFile, JSON.stringify(projectPackage, null, 2));
+  await writeAsync(
+    join(projectDir, 'remote.env.example'),
+    [
+      `MODE = remote`,
+      `OPERATOR_TOKEN = ${randomBytes(100).toString('hex')}`,
+      `JWT_SECRET = ${randomBytes(32).toString('hex')}`,
+      `JWT_IAT = ${Date.now()}`,
+    ].join(EOL),
+  );
 }

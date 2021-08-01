@@ -16,6 +16,7 @@ export function createDockerCompose(
     version: '3.6',
     services: services.reduce((current, service) => {
       if (!service.container || service.container?.enabled === false) {
+        console.log(service.name, service.container);
         return current;
       }
 

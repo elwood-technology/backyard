@@ -9,7 +9,7 @@ import type {
 } from '@backyard/types';
 import { requireModule, silentResolve } from '@backyard/common';
 
-import { coreServiceProviders } from './core';
+import { coreServiceProviders } from '../core-services';
 
 export function normalizeServices(
   services: ConfigurationService[] = [],

@@ -1,6 +1,11 @@
-import { ContextModeLocal } from '@backyard/common';
+import { ContextModeLocal, invariant } from '@backyard/common';
 
-import { ConfigurationService, Context, ContextService } from '@backyard/types';
+import type {
+  ConfigurationService,
+  Context,
+  ContextService,
+  ServiceHookProviderArgs,
+} from '@backyard/types';
 
 export function config(
   context: Context,
@@ -39,4 +44,18 @@ export async function init(
     name: `${service.name}-migrate`,
     provider: '@backyard/service-postgresql-migrate',
   });
+}
+
+export async function uri({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  const { user, password, name } = service.config?.settings || {};
+
+  invariant(user, 'No user in db settings');
+  invariant(password, 'No password in db settings');
+  invariant(name, 'No name in db settings');
+  invariant(service.container?.host, 'Missing db[container.host]');
+  invariant(service.container.port, 'Missing db[container.port]');
+
+  return `postgres://${user}:${password}@${service.container.host}:${service.container.port}/${name}?sslmode=disable`;
 }

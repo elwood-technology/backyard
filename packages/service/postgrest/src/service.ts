@@ -22,10 +22,11 @@ export function config(
       externalPort: 4000,
       host: context.mode === ContextModeLocal ? 'rest' : '0.0.0.0',
       environment: {
-        PGRST_DB_URI: '<%= context.createDbUrl() %>',
+        PGRST_DB_URI: '<%= await context.getService("db").hook("uri") %>',
         PGRST_DB_SCHEMA: config.settings?.schema ?? 'public',
         PGRST_DB_ANON_ROLE: config.settings?.anonRole ?? 'anon',
-        PGRST_JWT_SECRET: context.config.jwt.secret,
+        PGRST_JWT_SECRET:
+          '<%= await context.getService("gateway").hook("jwtSecret") %>',
       },
       meta: {
         dockerCompose: {

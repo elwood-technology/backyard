@@ -1,7 +1,9 @@
 import type { Context, ContextService, JsonObject } from '@backyard/types';
 import { ContextModeLocal, getServices, invariant } from '@backyard/common';
 
-import { KongConfig, KongService } from './types';
+import { KongConfig, KongContextService, KongService } from './types';
+
+import { keys } from './service';
 
 export function shouldEnableService(
   context: Context,
@@ -20,7 +22,12 @@ export function shouldEnableService(
   return true;
 }
 
-export async function createKongConfig(context: Context): Promise<KongConfig> {
+export async function createKongConfig(
+  context: Context,
+  service: KongContextService,
+): Promise<KongConfig> {
+  const key = await keys({ context, service });
+
   const coreServices = await Promise.all(
     getServices(context).map(async (service) => {
       const gateway = service.gateway;
@@ -86,7 +93,7 @@ export async function createKongConfig(context: Context): Promise<KongConfig> {
         username: 'anon-key',
         keyauth_credentials: [
           {
-            key: context.keys.anon,
+            key: key.anonymousKey,
           },
         ],
       },
@@ -94,7 +101,7 @@ export async function createKongConfig(context: Context): Promise<KongConfig> {
         username: 'service-key',
         keyauth_credentials: [
           {
-            key: context.keys.service,
+            key: key.serviceKey,
           },
         ],
       },

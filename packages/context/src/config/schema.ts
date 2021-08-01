@@ -3,7 +3,6 @@ import { string, number, object, array, alternatives } from 'joi';
 import {
   Configuration,
   ConfigurationResolve,
-  ConfigurationJwt,
   ConfigurationSite,
 } from '@backyard/types';
 
@@ -28,18 +27,9 @@ export const configurationResolveSchema = object<ConfigurationResolve>({
   modules: array().items(string()),
 });
 
-export const configurationJsonWebTokenSchema = object<ConfigurationJwt>({
-  secret: string().length(32),
-  groupName: string(),
-  exp: number(),
-  iat: number(),
-});
-
 export const configurationSchema = object<Configuration>({
   root: string(),
   resolve: configurationResolveSchema.default({}),
-  operatorToken: string().min(32),
-  jwt: configurationJsonWebTokenSchema.default({}),
   services: array().items(configurationServiceSchema).default([]),
   sites: array().items(configurationSiteSchema).default([]),
 });

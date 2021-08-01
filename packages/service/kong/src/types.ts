@@ -1,4 +1,8 @@
-import type { JsonObject } from '@backyard/types';
+import type {
+  ConfigurationServiceSettings,
+  ContextService,
+  JsonObject,
+} from '@backyard/types';
 
 export interface KongService {
   name: string;
@@ -16,3 +20,21 @@ export interface KongConfig {
   services: KongService[];
   consumers: Array<{ username: string; keyauth_credentials: JsonObject }>;
 }
+
+export interface KongKeys {
+  anonymousKey: string;
+  serviceKey: string;
+}
+
+export interface KongSettings extends ConfigurationServiceSettings {
+  jwt: {
+    iat?: number;
+    secret?: string;
+    groupName?: string;
+    exp?: number;
+  };
+  anonymousKey: string;
+  serviceKey: string;
+}
+
+export type KongContextService = ContextService<KongSettings>;

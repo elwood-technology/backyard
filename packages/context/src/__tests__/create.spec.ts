@@ -2,7 +2,7 @@ import { join } from 'path';
 
 import { Configuration } from '@backyard/types';
 
-import { coreServiceProviders } from '../service/core';
+import { coreServiceProviders } from '../core-services';
 import { createContext } from '../create';
 import helper from './helpers';
 

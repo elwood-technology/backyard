@@ -1,6 +1,7 @@
 import { createService } from '@backyard/ui-react';
 
 createService({
+  title: 'Authorization',
   data: () => import('./data'),
   canvas: () => import('./canvas'),
 });

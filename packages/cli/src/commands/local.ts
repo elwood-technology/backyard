@@ -130,6 +130,8 @@ export async function help(tools: Toolbox): Promise<void> {
 export async function init(tools: Toolbox): Promise<void> {
   const { context } = tools;
   const platform = context.platforms.local;
+  const localTextFilePath = join(context.dir.stage, 'local.txt');
+  const hasLocalText = tools.filesystem.exists(localTextFilePath);
 
   const spin = tools.print.spin();
   spin.start('Initalizing...');
@@ -167,31 +169,72 @@ export async function init(tools: Toolbox): Promise<void> {
       ];
     });
 
+  const operatorToken = await context.getService('auth').hook('operatorToken');
+  const keys = (await context.getService('gateway').hook('keys')) as {
+    anonymousKey: string;
+    serviceKey: string;
+  };
+
   await tools.filesystem.writeAsync(
     join(context.dir.stage, '.env'),
     [
       ...serviceUrls,
       ['GATEWAY_URL', `http://localhost:${gatewayPort}`],
-      ['KEY_ANON', context.keys.anon],
-      ['KEY_SERVER', context.keys.service],
+      ['KEY_ANON', keys.anonymousKey],
+      ['KEY_SERVER', keys.serviceKey],
     ]
       .map(([key, value]) => [`BACKYARD_${key}`, value].join('='))
       .join(EOL),
   );
 
+  const uiService = getServices(context).find((item) => item.name === 'ui');
+  const localText: string = [
+    'Welcome To Backyard',
+    ' ',
+    'Looking for some get started documentation: https://github.com/elwood-technology/backyard/blob/main/docs/start/quick.md',
+    'Have questions, ask them: https://github.com/elwood-technology/backyard/discussions',
+    ' ',
+    uiService && 'UI Service is installed. If you have not setup the Auth ',
+    uiService &&
+      'Service yet, you will need to visit the Setup url to get started',
+    uiService &&
+      ` Entry: http://${uiService.container?.externalHost}:${uiService.container?.externalPort}/`,
+    uiService &&
+      ` Setup: http://${uiService.container?.externalHost}:${uiService.container?.externalPort}/auth/setup`,
+    uiService && ' ',
+    'Here is some important information you may need:',
+    ` Operator Token: ${operatorToken}`,
+    ` Anonymous Key: ${keys.anonymousKey}`,
+    ` Service Key: ${keys.serviceKey}`,
+    ' ',
+    'Services URLS:',
+    ...serviceUrls.map(([key, value]) => ` ${key}: ${value}`),
+    ' ',
+    'Configured Services',
+    ...getServices(context).map(
+      (item) => ` ${item.name} (${item.getInitialConfig().provider})`,
+    ),
+  ]
+    .filter(Boolean)
+    .join(EOL);
+
+  await tools.filesystem.writeAsync(localTextFilePath, localText);
+
   await tools.filesystem.writeAsync(
-    join(context.dir.stage, 'local.txt'),
-    [
-      'Welcome To Backyard',
-      '',
-      'Here is some important information',
-      ` Operator Token: ${context.config.operatorToken}`,
-      ` Anonymous Key: ${context.keys.anon}`,
-      ` Service Key: ${context.keys.service}`,
-    ].join(EOL),
+    join(context.dir.stage, 'settings.json'),
+    getServices(context).map((item) => {
+      return {
+        name: item.name,
+        config: item.config,
+      };
+    }),
   );
 
   spin.succeed();
+
+  if (!hasLocalText) {
+    tools.print.info(localText);
+  }
 }
 
 export async function start(tools: Toolbox): Promise<void> {

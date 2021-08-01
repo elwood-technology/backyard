@@ -1,0 +1,28 @@
+{
+  "name": "@backyard/ui-components",
+  "version": "0.2.0",
+  "main": "lib/index.js",
+  "repository": "git@github.com:elwood-technology/backyard.git",
+  "author": "Travis Kuhl <travis@elwood.technology>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json"
+  },
+  "dependencies": {
+    "daisyui": "^1.10.0",
+    "react": "^17.0.2"
+  },
+  "devDependencies": {
+    "@backyard/tools-typescript": "*",
+    "@backyard/types": "*",
+    "@types/react": "^17.0.9"
+  },
+  "files": [
+    "lib",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

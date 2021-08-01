@@ -1,5 +1,12 @@
-import { Context, ConfigurationService, JsonObject } from '@backyard/types';
-import { ContextModeLocal } from '@backyard/common';
+import { randomBytes } from 'crypto';
+
+import {
+  Context,
+  ConfigurationService,
+  JsonObject,
+  ServiceHookProviderArgs,
+} from '@backyard/types';
+import { ContextModeLocal, invariant } from '@backyard/common';
 
 export function config(
   context: Context,
@@ -7,6 +14,7 @@ export function config(
 ): Partial<ConfigurationService> {
   return {
     settings: {
+      operatorToken: randomBytes(100).toString('hex'),
       disableSignUp: context.mode === 'remote',
       externalUrl: 'localhost',
       logLevel: 'DEBUG',
@@ -30,9 +38,12 @@ export function config(
       imageName: 'supabase/gotrue:latest',
       host: context.mode === ContextModeLocal ? 'auth' : '0.0.0.0',
       environment: {
-        GOTRUE_JWT_SECRET: context.config.jwt.secret,
-        GOTRUE_JWT_EXP: String(context.config.jwt.exp),
-        GOTRUE_JWT_DEFAULT_GROUP_NAME: context.config.jwt.groupName,
+        GOTRUE_JWT_SECRET:
+          '<%= await context.getService("gateway").hook("jwtSecret") %>',
+        GOTRUE_JWT_EXP:
+          '<%= await context.getService("gateway").hook("jwtExp") %>',
+        GOTRUE_JWT_DEFAULT_GROUP_NAME:
+          '<%= await context.getService("gateway").hook("jwtGroup") %>',
         GOTRUE_DB_DRIVER: 'postgres',
         DB_NAMESPACE: 'auth',
         API_EXTERNAL_URL: config.settings?.externalUrl ?? 'localhost',
@@ -48,8 +59,9 @@ export function config(
           config.settings?.mailerAutoConfirm ?? true,
         ),
         GOTRUE_LOG_LEVEL: config.settings?.logLevel ?? '',
-        GOTRUE_OPERATOR_TOKEN: context.config.operatorToken,
-        DATABASE_URL: '<%= context.createDbUrl() %>',
+        GOTRUE_OPERATOR_TOKEN:
+          '<%= await context.getService("auth").hook("operatorToken") %>',
+        DATABASE_URL: '<%= await context.getService("db").hook("uri") %>',
       },
       meta: {
         dockerCompose: {
@@ -58,6 +70,15 @@ export function config(
       },
     },
   };
+}
+
+export async function operatorToken({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  const { operatorToken } = service.config?.settings || {};
+  invariant(operatorToken, 'No operatorToken in gotrue config');
+
+  return operatorToken;
 }
 
 export async function stage(_dir: string, __context: Context): Promise<void> {}

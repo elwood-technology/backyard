@@ -1,4 +1,4 @@
-import template from 'lodash.template';
+import { compile as template } from 'ejs';
 
 import type {
   ConfigurationService,
@@ -11,10 +11,12 @@ import type {
   Json,
 } from '@backyard/types';
 
-import { invariant, isFunction } from '@backyard/common';
+import { invariant, debug, isFunction } from '@backyard/common';
 
 import { loadService } from './load';
 import { resolveServiceConfig } from './config';
+
+const log = debug('backyard:context:service');
 
 export class Service implements ContextService {
   readonly #initialConfig: ConfigurationService;
@@ -35,6 +37,7 @@ export class Service implements ContextService {
   }
 
   async load(): Promise<void> {
+    log(`${this.name}.load()`);
     const {
       hooks,
       moduleRootPath,
@@ -50,6 +53,10 @@ export class Service implements ContextService {
     this.#type = type;
     this.#hooks = hooks;
     this.#platformHooks = platformHooks;
+  }
+
+  getInitialConfig(): ConfigurationService {
+    return this.#initialConfig;
   }
 
   setContext(context: Context): void {
@@ -74,6 +81,8 @@ export class Service implements ContextService {
   }
 
   async init(): Promise<void> {
+    log(`${this.name}.init()`);
+
     if (this.#hasInitialized) {
       return;
     }
@@ -91,33 +100,48 @@ export class Service implements ContextService {
     );
   }
 
-  private replaceConfig = (obj: JsonObject, key: string): JsonObject => {
-    if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-      return {
-        ...obj,
-        [key]: Object.keys(obj[key]).reduce(this.replaceConfig, obj[key]),
-      };
+  private async replaceConfig(obj: Json): Promise<Json> {
+    if (typeof obj === 'string') {
+      const tpl = template(obj, { async: true });
+
+      return await tpl({
+        context: this.getContext(),
+      });
     }
 
-    if (typeof obj[key] === 'string') {
-      const tpl = template(obj[key]);
-
-      return {
-        ...obj,
-        [key]: tpl({
-          context: this.getContext(),
-        }),
-      };
+    if (Array.isArray(obj) || typeof obj === 'object') {
+      for (const item in obj) {
+        obj[item] = await this.replaceConfig(obj[item]);
+      }
     }
 
     return obj;
-  };
+  }
 
   async finalize(): Promise<void> {
-    this.#resolvedConfig = Object.keys(this.#resolvedConfig || {}).reduce(
-      this.replaceConfig,
-      this.#resolvedConfig || {},
-    ) as ConfigurationService;
+    log(`${this.name}.finalize()`);
+
+    try {
+      this.#resolvedConfig = await this.replaceConfig(
+        this.#resolvedConfig || {},
+      );
+    } catch (err) {
+      throw new Error(
+        `Unable to finalize configuration for "${this.name}. Error: ${err.message}"`,
+      );
+    }
+
+    const depend = this.#resolvedConfig?.dependencies ?? [];
+
+    for (const dependServiceName of depend) {
+      try {
+        this.getContext().getService(dependServiceName);
+      } catch (err) {
+        throw new Error(`
+          Service "${this.name}" depends on "${dependServiceName}" which is not loaded.
+        `);
+      }
+    }
   }
 
   get name(): string {
@@ -140,6 +164,10 @@ export class Service implements ContextService {
     return this.#uiModulePath;
   }
 
+  getResolvedConfig(): ConfigurationService | undefined {
+    return this.#resolvedConfig;
+  }
+
   get config(): ConfigurationService {
     invariant(this.#resolvedConfig);
     return this.#resolvedConfig;
@@ -158,6 +186,8 @@ export class Service implements ContextService {
   }
 
   async stage(dir: string): Promise<void> {
+    log(`${this.name}.stage()`);
+
     if (isFunction(this.#platformHooks.stage)) {
       this.#platformHooks.stage(dir, this.getContext(), this);
     }
@@ -167,7 +197,7 @@ export class Service implements ContextService {
     }
   }
 
-  async hook(name: string, args: JsonObject): Promise<Json> {
+  hook = async <R = Json>(name: string, args: JsonObject): Promise<R> => {
     let result: Json = undefined;
 
     if (
@@ -190,6 +220,22 @@ export class Service implements ContextService {
       });
     }
 
-    return result;
+    return result as R;
+  };
+
+  getContainerUrl(): string {
+    const gateway = this.getContext().services.get('gateway');
+    return `http://${gateway?.container?.host}:${gateway?.container?.port}/${this.name}/v1`;
+  }
+
+  getGatewayUrl(): string {
+    const gateway = this.getContext().services.get('gateway');
+    const host = gateway?.container?.externalHost ?? '0.0.0.0';
+
+    if (this.name === 'gateway') {
+      return `http://${host}:${gateway?.container?.externalPort}`;
+    }
+
+    return `http://${host}:${gateway?.container?.externalPort}/${this.name}/v1`;
   }
 }

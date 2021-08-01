@@ -29,6 +29,8 @@ export class UiService extends AbstractService {
       container: {
         ...container,
         externalPort: 8080,
+        externalHost: 'localhost',
+        port: 8080,
         meta: {
           dockerCompose: {
             ...(container?.meta?.dockerCompose ?? {}),
@@ -36,6 +38,7 @@ export class UiService extends AbstractService {
           },
         },
       },
+      dependencies: ['db', 'api', 'auth', 'authz'],
     };
   }
 
@@ -63,8 +66,8 @@ export class UiService extends AbstractService {
 
     const state = JSON.stringify({
       mode: context.mode === 'local' ? 'development' : 'production',
-      gatewayBaseUrl: context.serviceExternalUrl('gateway'),
-      apiAnonKey: context.keys.anon,
+      gatewayBaseUrl: context.getService('gateway').getGatewayUrl(),
+      apiAnonKey: await context.getService('gateway').hook('anonymousKey'),
       webpackContextPath: `/var/app`,
       modules,
     });

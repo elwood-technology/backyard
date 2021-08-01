@@ -32,7 +32,7 @@ export interface ContextService<
   gateway: ConfigurationServiceGateway | undefined;
   container: ConfigurationServiceContainer | undefined;
   stage(dir: string): Promise<void>;
-  hook(name: string, args?: JsonObject): Promise<Json>;
+  hook<R = Json>(name: string, args?: JsonObject): Promise<R>;
   platform?: {
     gateway: ConfigurationServiceGateway | undefined;
     container: ConfigurationServiceContainer | undefined;
@@ -42,6 +42,10 @@ export interface ContextService<
   getHooks(): ServiceHooks;
   getPlatformHooks(): ServiceHooks;
   setPlatformHooks(hooks: ServiceHooks): void;
+  getGatewayUrl(): string;
+  getContainerUrl(): string;
+  getResolvedConfig(): ConfigurationService | undefined;
+  getInitialConfig(): ConfigurationService;
 }
 
 export interface ContextSite {
@@ -65,12 +69,7 @@ export interface Context {
     state: string;
   };
   config: FullConfiguration;
-  sitesMap: ContextSitesMap;
   services: ContextServicesMap;
-  keys: {
-    anon: string;
-    service: string;
-  };
   platforms: {
     local: LocalPlatform;
     remote: RemotePlatform;
@@ -84,8 +83,6 @@ export interface Context {
     certKeyPath?: string;
   };
   log(msg: string): void;
-  createDbUrl(): string;
   addService(config: ConfigurationService): Promise<void>;
-  serviceExternalUrl(name: string): string;
-  serviceInternalUrl(name: string): string;
+  getService(name: string): ContextService;
 }

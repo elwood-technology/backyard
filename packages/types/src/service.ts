@@ -52,9 +52,9 @@ export interface ServiceHookProviderArgs extends JsonObject {
   parent?: Json;
 }
 
-export type ServiceHookProvider = (
+export type ServiceHookProvider = <R = Json>(
   args: ServiceHookProviderArgs,
-) => Promise<Json>;
+) => Promise<R>;
 
 export interface ServiceHooks {
   config?(

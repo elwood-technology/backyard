@@ -2,14 +2,9 @@ import { join, resolve } from 'path';
 
 import which from 'which';
 import * as filesystem from 'fs-jetpack';
-import jwt from 'jsonwebtoken';
 import { config as loadDotEnv } from 'dotenv';
 
-import {
-  invariant,
-  requireModule,
-  createDbUrlFromContext,
-} from '@backyard/common';
+import { invariant, debug, requireModule } from '@backyard/common';
 import type {
   RemotePlatform,
   Configuration,
@@ -22,11 +17,12 @@ import type {
 import { loadAndNormalizeConfiguration } from './config';
 import {
   Service,
-  addServiceToContext,
   readCoreServicesFromConfiguration,
   readServicesFromSource,
   readUsersServicesFromConfiguration,
 } from './service';
+
+import { ContextState } from './state';
 
 export type CreateContextArgs = {
   mode: ContextMode;
@@ -42,14 +38,12 @@ enum EnvName {
   Backyard = 'BACKYARD_BY_DIR',
 }
 
-function defaultLogger(msg: string): void {
-  if (process.env.NODE_ENV === 'development') {
-    console.log(msg);
-  }
-}
+const log = debug('backyard:context:create');
 
 export async function createContext(args: CreateContextArgs): Promise<Context> {
-  const { mode, log = defaultLogger, settings = {}, initialConfig = {} } = args;
+  log('start');
+
+  const { mode, settings = {}, initialConfig = {} } = args;
   const { BACKYARD_CWD } = process.env ?? {};
 
   const cwd = resolve(BACKYARD_CWD ?? args.cwd ?? process.cwd());
@@ -78,15 +72,11 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
   const sourceDir = getSourceDir(config, rootDir);
   const stateDir = join(backyardDir, 'state');
 
-  const services = new Map<string, Service>();
-
-  const context: Context = {
-    log,
+  const context = new ContextState({
+    log() {},
     mode,
     config,
-    services,
     settings,
-    sitesMap: new Map(),
     dir: {
       cwd,
       root: rootDir,
@@ -95,33 +85,12 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
       stage: destDir,
       state: stateDir,
     },
-    keys: createKeys(destDir, config),
     tools: {
       filesystem,
       which,
     },
     platforms: loadPlatforms(config),
-    createDbUrl() {
-      return createDbUrlFromContext(context);
-    },
-    async addService(config) {
-      addServiceToContext(context, config, true);
-    },
-    serviceInternalUrl(serviceName: string) {
-      const gateway = context.services.get('gateway');
-      return `http://${gateway?.container?.host}:${gateway?.container?.port}/${serviceName}/v1`;
-    },
-    serviceExternalUrl(serviceName: string) {
-      const gateway = context.services.get('gateway');
-      const host = gateway?.container?.externalHost ?? '0.0.0.0';
-
-      if (serviceName === 'gateway') {
-        return `http://${host}:${gateway?.container?.externalPort}`;
-      }
-
-      return `http://${host}:${gateway?.container?.externalPort}/${serviceName}/v1`;
-    },
-  };
+  });
 
   const allServices = [
     ...(await readCoreServicesFromConfiguration(config)),
@@ -129,63 +98,26 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
     ...(await readUsersServicesFromConfiguration(config)),
   ].filter((item) => item.enabled !== false);
 
-  await Promise.all(
-    allServices.map(async (serviceConfig) => {
-      await addServiceToContext(context, serviceConfig);
-    }),
-  );
+  const services: string[] = [];
 
-  for (const [_, service] of services) {
-    await service.init();
+  for (const serviceConfig of allServices) {
+    await context.addService(serviceConfig, false);
+    services.push(serviceConfig.name);
   }
 
-  for (const [_, service] of services) {
-    await service.finalize();
+  log('initalizing services');
+
+  for (const name of services) {
+    await (context.getService(name) as Service).init();
+  }
+
+  log('finalizing services');
+
+  for (const name of services) {
+    await (context.getService(name) as Service).finalize();
   }
 
   return context;
-}
-
-export function createKeys(
-  destDir: string,
-  config: Configuration,
-): Context['keys'] {
-  const keysFile = join(destDir, 'keys.json');
-  const secret = String(config.jwt?.secret);
-  const iat = config.jwt?.iat ?? new Date().getTime() / 1000;
-  const exp = config.jwt?.exp ?? iat + 60 * 60 * 24 * 365 * 50;
-
-  if (filesystem.exists(keysFile)) {
-    return filesystem.read(keysFile, 'json') as Context['keys'];
-  }
-
-  const anonKey = jwt.sign(
-    {
-      iss: 'backyard',
-      iat,
-      exp,
-      aud: '',
-      sub: '',
-      Role: 'anon',
-    },
-    secret,
-  );
-  const serviceKey = jwt.sign(
-    {
-      iss: 'backyard',
-      iat,
-      exp,
-      aud: '',
-      sub: '',
-      Role: 'service_role',
-    },
-    secret,
-  );
-
-  return {
-    anon: anonKey,
-    service: serviceKey,
-  };
 }
 
 export function loadPlatforms(config: Configuration): Context['platforms'] {
