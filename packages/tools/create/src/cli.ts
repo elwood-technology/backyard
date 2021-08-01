@@ -8,6 +8,7 @@ import { createBackyard } from './create';
 type Options = {
   ['project-dir']: string;
   typescript?: boolean;
+  template?: string;
 };
 
 const pkg = require('../package.json');
@@ -20,13 +21,13 @@ async function main(): Promise<void> {
     .usage(`${green('<project-dir>')} [options]`)
     .arguments('<project-dir>')
     .option('-ts, --typescript')
-    .option('-n, --name [name]', 'Project Name')
+    .option('-t, --template [url]', 'Template URL')
     .action((dir) => {
       projectDir = dir;
     })
     .parse(process.argv);
 
-  const { typescript } = prog.opts() as Options;
+  const { typescript, template } = prog.opts() as Options;
 
   if (!projectDir) {
     console.log();
@@ -46,7 +47,7 @@ async function main(): Promise<void> {
   await createBackyard({
     projectDir: absoluteProjectDir,
     projectName,
-    template: typescript ? 'typescript' : 'default',
+    template: template ?? (typescript ? 'typescript' : 'default'),
   });
 }
 
