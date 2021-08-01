@@ -1,6 +1,6 @@
 {
   "name": "@backyard/ui-components",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "lib/index.js",
   "repository": "git@github.com:elwood-technology/backyard.git",
   "author": "Travis Kuhl <travis@elwood.technology>",
@@ -14,8 +14,8 @@
     "react": "^17.0.2"
   },
   "devDependencies": {
-    "@backyard/tools-typescript": "^0.2.2",
-    "@backyard/types": "^0.2.2",
+    "@backyard/tools-typescript": "^0.2.3",
+    "@backyard/types": "^0.2.3",
     "@types/react": "^17.0.9"
   },
   "files": [

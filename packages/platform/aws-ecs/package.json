@@ -1,6 +1,6 @@
 {
   "name": "@backyard/platform-aws-ecs",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
@@ -9,12 +9,12 @@
     "compile": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@backyard/common": "^0.2.2",
-    "@backyard/platform-terraform": "^0.2.2"
+    "@backyard/common": "^0.2.3",
+    "@backyard/platform-terraform": "^0.2.3"
   },
   "devDependencies": {
-    "@backyard/tools-typescript": "^0.2.2",
-    "@backyard/types": "^0.2.2"
+    "@backyard/tools-typescript": "^0.2.3",
+    "@backyard/types": "^0.2.3"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [

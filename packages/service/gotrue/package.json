@@ -1,6 +1,6 @@
 {
   "name": "@backyard/service-gotrue",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
@@ -9,14 +9,14 @@
     "compile": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@backyard/common": "^0.2.2",
+    "@backyard/common": "^0.2.3",
     "fs-jetpack": "^4.1.0",
     "lodash.defaultsdeep": "^4.6.1",
     "lodash.get": "^4.4.2",
     "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "@backyard/types": "^0.2.2",
+    "@backyard/types": "^0.2.3",
     "@types/lodash.defaultsdeep": "^4.6.6",
     "@types/lodash.get": "^4.4.6"
   },
