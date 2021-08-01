@@ -28,6 +28,7 @@
     "@backyard/types": "*",
     "@types/jsonwebtoken": "^8.5.1"
   },
+  "homepage": "https://github.com/elwood-technology/backyard/tree/main/packages/cli",
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
     "lib",
