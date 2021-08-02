@@ -3,6 +3,7 @@ import { dirname, join } from 'path';
 import { EOL } from 'os';
 import { randomBytes } from 'crypto';
 
+import which from 'which';
 import unzip from 'unzipper';
 import fetch from 'node-fetch';
 import {
@@ -14,23 +15,24 @@ import {
 } from 'fs-jetpack';
 
 import { WriteAccessError } from './error';
+import { spawn } from 'child_process';
 
 export type CreateBackyardOptions = {
   projectDir: string;
-  projectName: string;
   template: string;
+  useNpm?: boolean;
 };
 
 const templates: Record<string, string> = {
   default:
-    'https://github.com/elwood-technology/backyard-workspace/archive/refs/heads/master.zip',
-  ts: 'https://github.com/elwood-technology/backyard-workspace-ts/archive/refs/heads/master.zip',
+    'https://github.com/elwood-technology/backyard-workspace/archive/refs/heads/main.zip',
+  ts: 'https://github.com/elwood-technology/backyard-workspace-ts/archive/refs/heads/main.zip',
 };
 
 export async function createBackyard(
   options: CreateBackyardOptions,
 ): Promise<void> {
-  const { projectDir, projectName: _, template } = options;
+  const { projectDir, template, useNpm } = options;
 
   if (exists(projectDir)) {
     throw new Error('Project Dir already exists');
@@ -45,10 +47,16 @@ export async function createBackyard(
   }
 
   const templateUrl = templates[template] ?? template;
+
+  if (!templateUrl.includes('http')) {
+    throw new Error(`Invalid Template Url "${templateUrl}"`);
+  }
+
   const response = await fetch(templateUrl);
 
-  if (!response.ok)
-    throw new Error(`unexpected response ${response.statusText}`);
+  if (!response.ok) {
+    throw new Error(`Unexpected response: ${response.statusText}`);
+  }
 
   await dirAsync(projectDir);
 
@@ -87,4 +95,23 @@ export async function createBackyard(
       `JWT_IAT = ${Date.now()}`,
     ].join(EOL),
   );
+
+  const cmd = useNpm ? await which('npm') : await which('yarn');
+
+  await run(cmd, ['install', '--ignore-scripts'], projectDir);
+}
+
+export async function run(
+  cmd: string,
+  args: string[],
+  cwd: string,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const proc = spawn(cmd, args, {
+      cwd,
+    });
+
+    proc.on('error', reject);
+    proc.on('close', resolve);
+  });
 }
