@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "chalk": "^4.1.1",
+    "cli-table3": "^0.6.0",
     "commander": "^8.0.0",
     "fs-jetpack": "^4.1.0",
-    "unzipper": "^0.10.11"
+    "unzipper": "^0.10.11",
+    "which": "^2.0.2"
   },
   "files": [
     "bin",

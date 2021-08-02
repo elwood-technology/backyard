@@ -1,7 +1,8 @@
-import { basename, resolve } from 'path';
+import { resolve } from 'path';
 
 import { Command } from 'commander';
-import { green, cyan, red } from 'chalk';
+import { green, gray, red, bold } from 'chalk';
+import Table from 'cli-table3';
 
 import { createBackyard } from './create';
 
@@ -19,39 +20,70 @@ async function main(): Promise<void> {
   const prog = new Command(pkg.name)
     .version(pkg.version)
     .usage(`${green('<project-dir>')} [options]`)
-    .arguments('<project-dir>')
-    .option('-ts, --typescript')
-    .option('-t, --template [url]', 'Template URL')
+    .arguments('<project-dir> <template>')
     .action((dir) => {
       projectDir = dir;
     })
     .parse(process.argv);
 
-  const { typescript, template } = prog.opts() as Options;
+  const { template = 'default' } = prog.opts() as Options;
 
   if (!projectDir) {
     console.log();
     console.log('Please specify the project directory:');
-    console.log(`  ${cyan(prog.name())} ${green('<project-dir>')}`);
+    console.log(`  ${gray(prog.name())} ${green('<project-dir>')}`);
     console.log();
     console.log('For example:');
-    console.log(`  ${cyan(prog.name())} ${green('by')}`);
+    console.log(`  ${gray(prog.name())} ${green('by')}`);
     console.log();
-    console.log(`Run ${cyan(`${prog.name()} --help`)} to see all options.`);
+    console.log(`Run ${gray(`${prog.name()} --help`)} to see all options.`);
     process.exit(1);
   }
 
   const absoluteProjectDir = resolve(projectDir);
-  const projectName = basename(absoluteProjectDir);
 
   await createBackyard({
     projectDir: absoluteProjectDir,
-    projectName,
-    template: template ?? (typescript ? 'typescript' : 'default'),
+    template,
   });
+
+  const table = new Table({
+    chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
+    style: { 'padding-left': 2, 'padding-right': 2 },
+  });
+  table.push(
+    [''],
+    [green(bold('Done!'))],
+    ['Welcome to Backyard'],
+    [''],
+    ['Your template is installed and ready to use'],
+    ['start by running:'],
+    [''],
+    ['yarn backyard init'],
+    [' '],
+    [gray('Get some documentation:')],
+    [gray('https://github.com/elwood-technology/backyard/tree/main/docs')],
+    [''],
+    [gray('Ask a question:')],
+    [gray('https://github.com/elwood-technology/backyard/discussions')],
+    [''],
+  );
+  console.log(table.toString());
 }
 
 main().catch((err) => {
-  console.log(red('Unexpected error. Please report it as a bug:'));
-  console.log(err.message);
+  const table = new Table({
+    chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
+    style: { 'padding-left': 2, 'padding-right': 2 },
+  });
+  table.push(
+    [''],
+    [red(bold('Error:'))],
+    [err.message],
+    [''],
+    [gray('Please report it as a bug at ')],
+    [gray('https://github.com/elwood-technology/backyard/issues/new')],
+    [''],
+  );
+  console.log(table.toString());
 });
