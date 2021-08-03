@@ -71,7 +71,11 @@ export async function readServicesFromSource(
   }
 
   const serviceFiles = await filesystem.findAsync(sourceDir, {
-    matching: '**/backyard-service.*',
+    matching: [
+      '**/backyard-service.*',
+      '!**/node_modules/**',
+      '!node_modules/**',
+    ],
   });
 
   return await Promise.all(
