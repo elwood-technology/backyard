@@ -2,7 +2,7 @@
   "lerna": "2.6.0",
   "npmClient": "npm",
   "packages": ["packages/**/*"],
-  "version": "0.2.0",
+  "version": "0.2.5",
   "command": {
     "publish": {
       "access": "public"
