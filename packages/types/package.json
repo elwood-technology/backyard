@@ -1,6 +1,6 @@
 {
   "name": "@backyard/types",
-  "version": "0.2.0",
+  "version": "0.2.5",
   "main": "lib/index.js",
   "license": "MIT",
   "scripts": {
@@ -9,12 +9,12 @@
     "test": "backyard-tools-jest --config=./config/jest.js"
   },
   "dependencies": {
-    "webpack": "*",
+    "fs-jetpack": "^4.1.0",
     "ts-essentials": "^7.0.1",
-    "fs-jetpack": "^4.1.0"
+    "webpack": "*"
   },
   "devDependencies": {
-    "@backyard/tools-typescript": "*",
+    "@backyard/tools-typescript": "^0.2.5",
     "ts-essentials": "^7.0.1"
   },
   "homepage": "https://github.com/elwood-technology/backyard/tree/main/packages/types",

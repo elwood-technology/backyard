@@ -1,6 +1,6 @@
 {
   "name": "@backyard/platform-docker",
-  "version": "0.2.0",
+  "version": "0.2.5",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
@@ -8,10 +8,9 @@
     "watch": "yarn compile --watch",
     "compile": "tsc -b ./tsconfig.json"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@backyard/tools-typescript": "*",
-    "@backyard/types": "*"
+    "@backyard/tools-typescript": "^0.2.5",
+    "@backyard/types": "^0.2.5"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
