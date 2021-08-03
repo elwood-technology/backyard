@@ -1,6 +1,6 @@
 {
   "name": "@backyard/ui-dev-server",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
@@ -10,9 +10,9 @@
     "compile": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@backyard/common": "^0.2.4",
-    "@backyard/ui-static": "^0.2.4",
-    "@backyard/ui-webpack": "^0.2.4",
+    "@backyard/common": "^0.2.5",
+    "@backyard/ui-static": "^0.2.5",
+    "@backyard/ui-webpack": "^0.2.5",
     "express": "^4.17.1",
     "fs-jetpack": "^4.1.0",
     "koa-static": "^5.0.0",
@@ -24,7 +24,7 @@
     "webpack-hot-middleware": "^2.25.0"
   },
   "devDependencies": {
-    "@backyard/types": "^0.2.4",
+    "@backyard/types": "^0.2.5",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
     "@types/webpack-dev-middleware": "^5.0.1",
     "dotenv": "^10.0.0",
