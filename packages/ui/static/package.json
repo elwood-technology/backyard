@@ -1,6 +1,6 @@
 {
   "name": "@backyard/ui-static",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "main": "index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
