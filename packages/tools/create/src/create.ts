@@ -12,6 +12,7 @@ import {
   dirAsync,
   createWriteStream,
   dir,
+  removeAsync,
 } from 'fs-jetpack';
 
 import { WriteAccessError } from './error';
@@ -121,6 +122,9 @@ export async function createBackyard(
       `JWT_IAT = ${Date.now()}`,
     ].join(EOL),
   );
+
+  await removeAsync(join(projectDir, 'yarn.lock'));
+  await removeAsync(join(projectDir, 'package-lock.json'));
 
   const cmd = useNpm ? await which('npm') : await which('yarn');
 
