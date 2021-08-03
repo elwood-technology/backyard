@@ -157,6 +157,10 @@ export function getSourceDir(
     return join(rootDir, 'src');
   }
 
+  if (filesystem.exists(join(rootDir, 'packages'))) {
+    return join(rootDir, 'packages');
+  }
+
   return rootDir;
 }
 
