@@ -1,6 +1,7 @@
 import { join } from 'path';
 import { EOL } from 'os';
 
+import Table from 'cli-table3';
 import {
   invariant,
   ContextModeLocal,
@@ -131,7 +132,7 @@ export async function init(tools: Toolbox): Promise<void> {
   const { context } = tools;
   const platform = context.platforms.local;
   const localTextFilePath = join(context.dir.stage, 'local.txt');
-  const hasLocalText = tools.filesystem.exists(localTextFilePath);
+  // const hasLocalText = tools.filesystem.exists(localTextFilePath);
 
   const spin = tools.print.spin();
   spin.start('Initalizing...');
@@ -188,7 +189,8 @@ export async function init(tools: Toolbox): Promise<void> {
   );
 
   const uiService = getServices(context).find((item) => item.name === 'ui');
-  const localText: string = [
+
+  const localText = [
     'Welcome To Backyard',
     ' ',
     'Looking for some get started documentation: https://github.com/elwood-technology/backyard/blob/main/docs/start/quick.md',
@@ -214,27 +216,20 @@ export async function init(tools: Toolbox): Promise<void> {
     ...getServices(context).map(
       (item) => ` ${item.name} (${item.getInitialConfig().provider})`,
     ),
-  ]
-    .filter(Boolean)
-    .join(EOL);
+  ].filter(Boolean) as string[];
 
-  await tools.filesystem.writeAsync(localTextFilePath, localText);
-
-  await tools.filesystem.writeAsync(
-    join(context.dir.stage, 'settings.json'),
-    getServices(context).map((item) => {
-      return {
-        name: item.name,
-        config: item.config,
-      };
-    }),
-  );
+  await tools.filesystem.writeAsync(localTextFilePath, localText.join(EOL));
 
   spin.succeed();
 
-  if (!hasLocalText) {
-    tools.print.info(localText);
-  }
+  const tbl = new Table({
+    chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
+    style: { 'padding-left': 2, 'padding-right': 2 },
+  });
+
+  tbl.push([''], ...localText.map((line) => [line]), ['']);
+
+  tools.print.info(tbl.toString());
 }
 
 export async function start(tools: Toolbox): Promise<void> {
