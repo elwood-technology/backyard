@@ -1,7 +1,7 @@
 {
   "name": "@backyard/tools-typescript",
   "private": true,
-  "version": "0.2.5",
+  "version": "0.2.10",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
