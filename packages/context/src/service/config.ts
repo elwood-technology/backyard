@@ -1,4 +1,4 @@
-import defaults from 'lodash.defaultsdeep';
+import deepMerge from 'deepmerge';
 import { compile as template } from 'ejs';
 
 import type {
@@ -20,32 +20,28 @@ export async function resolveServiceConfig(
   args: ResolveServiceConfigArgs,
 ): Promise<ConfigurationService> {
   const { initialConfig, context, hooks, platformHooks } = args;
-  let config = defaults({}, initialConfig) as ConfigurationService;
+  let config = deepMerge(
+    {
+      settings: {},
+      gateway: {
+        enabled: false,
+      },
+      container: {
+        enabled: false,
+      },
+    },
+    initialConfig,
+  ) as ConfigurationService;
 
   if (isFunction(hooks.config)) {
-    config = defaults(await hooks.config(context, config), config);
+    config = deepMerge(config, await hooks.config(context, config));
   }
 
   if (isFunction(platformHooks.config)) {
-    config = defaults(await platformHooks.config(context, config), config);
+    config = deepMerge(config, await platformHooks.config(context, config));
   }
 
-  // run the core function again if it exists
-  // this might seem weird, but we want it to be
-  // the last configuration run
-  if (isFunction(hooks.config)) {
-    config = defaults(await hooks.config(context, config), config);
-  }
-
-  return defaults(initialConfig, config, {
-    settings: {},
-    gateway: {
-      enabled: false,
-    },
-    container: {
-      enabled: false,
-    },
-  });
+  return config;
 }
 
 export async function replaceConfigTemplateVariables(

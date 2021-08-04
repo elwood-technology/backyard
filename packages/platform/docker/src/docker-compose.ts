@@ -2,11 +2,14 @@ import { join } from 'path';
 
 import { stringify as yaml } from 'yaml';
 
+import { debug } from '@backyard/common';
 import type {
   ConfigurationServiceContainer,
   ContextService,
   JsonObject,
 } from '@backyard/types';
+
+const log = debug('backyard:platform:docker:compose');
 
 export function createDockerCompose(
   stageDir: string,
@@ -16,9 +19,13 @@ export function createDockerCompose(
     version: '3.6',
     services: services.reduce((current, service) => {
       if (!service.container || service.container?.enabled === false) {
-        console.log(service.name, service.container);
+        log(
+          `skipping service "${service.name}" because container is not enabled`,
+        );
         return current;
       }
+
+      log(`adding service "${service.name}"`);
 
       const serviceDir = join(stageDir, service.name);
       const container = service.container || {};
