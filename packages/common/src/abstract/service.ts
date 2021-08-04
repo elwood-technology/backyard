@@ -6,6 +6,7 @@ import type {
   ContextService,
   ConfigurationServiceGateway,
   ConfigurationServiceContainer,
+  ServiceHookProviderArgs,
 } from '@backyard/types';
 
 export abstract class AbstractService implements Omit<ServiceHooks, 'hooks'> {
@@ -17,11 +18,7 @@ export abstract class AbstractService implements Omit<ServiceHooks, 'hooks'> {
   }
 
   public async init(context: Context, service: ContextService): Promise<void> {}
-  public async stage(
-    dir: string,
-    context: Context,
-    config?: ConfigurationService,
-  ) {}
+  public async stage(args: ServiceHookProviderArgs & { dir: string }) {}
   public async gateway(context: Context, config?: ConfigurationServiceGateway) {
     return config ?? { enabled: false };
   }

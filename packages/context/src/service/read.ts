@@ -33,9 +33,9 @@ export function normalizeServices(
   });
 
   const result = services.map((item) => {
-    if (item.name in coreServiceProviders) {
+    if (item.name! in coreServiceProviders) {
       return {
-        provider: coreServiceProviders[item.name],
+        provider: coreServiceProviders[item.name!],
         ...item,
       };
     }
@@ -53,10 +53,10 @@ export async function readCoreServicesFromConfiguration(
 
   return configServices
     .filter((service) => {
-      return Object.keys(coreServiceProviders).includes(service.name);
+      return Object.keys(coreServiceProviders).includes(service.name!);
     })
     .map((item) => ({
-      provider: coreServiceProviders[item.name],
+      provider: coreServiceProviders[item.name!],
       type: 'core',
       enabled: true,
       ...item,
@@ -83,7 +83,7 @@ export async function readServicesFromSource(
       return {
         ...(requireModule(file) as ConfigurationService),
         type: 'src',
-        provider: file,
+        provider: resolve(sourceDir, file),
       };
     }),
   );
@@ -96,7 +96,7 @@ export async function readUsersServicesFromConfiguration(
 
   return configServices
     .filter((service) => {
-      return !Object.keys(coreServiceProviders).includes(service.name);
+      return !Object.keys(coreServiceProviders).includes(service.name!);
     })
     .map((item) => {
       return {

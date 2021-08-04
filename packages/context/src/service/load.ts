@@ -2,29 +2,27 @@ import { join, dirname } from 'path';
 
 import { filesystem } from 'gluegun';
 import findUp from 'find-up';
+import defaults from 'lodash.defaultsdeep';
 
-import type { ConfigurationService, ServiceHooks } from '@backyard/types';
+import type {
+  Context,
+  ConfigurationService,
+  ContextService,
+} from '@backyard/types';
 
-import { invariant } from '@backyard/common';
+import { invariant, isFunction } from '@backyard/common';
 
+import { resolveServiceConfig } from './config';
+import { ContextServiceState, ContextServiceStateInput } from './state';
 import {
   loadServicesModuleHooks,
   loadServicesModuleHooksFromFile,
 } from './hooks';
 
-export type LoadServiceResult = {
-  name: string;
-  moduleRootPath: string;
-  apiModulePath?: string;
-  uiModulePath?: string;
-  hooks: ServiceHooks;
-  platformHooks: ServiceHooks;
-  type?: string;
-};
-
 export async function loadService(
+  context: Context,
   initialConfig: ConfigurationService,
-): Promise<LoadServiceResult> {
+): Promise<ContextService> {
   invariant(initialConfig.provider, 'Service must have provider');
 
   const pkgFile = await getPackageFilePath(initialConfig.provider);
@@ -52,19 +50,51 @@ export async function loadService(
   invariant(name, `Unable to find name for service in "${moduleRootPath}"`);
 
   const hooks = await loadServicesModuleHooks(moduleRootPath);
-  const config = initialConfig as ConfigurationService & { type?: string };
+  let platformHooks = initialConfig.platform
+    ? loadServicesModuleHooksFromFile(initialConfig.platform)
+    : {};
 
-  return {
-    name,
+  let config = (await resolveServiceConfig({
+    context,
+    initialConfig,
+    hooks,
+    platformHooks,
+  })) as ContextServiceStateInput['config'] & {
+    type?: string;
+  };
+
+  // it's possible that service.config hook set
+  // a platform. we should use that here, and merge it
+  // with what was already set
+  if (config.platform) {
+    const newPlatformHooks = loadServicesModuleHooksFromFile(config.platform);
+
+    platformHooks = {
+      ...newPlatformHooks,
+      ...platformHooks,
+      hooks: {
+        ...newPlatformHooks.hooks,
+        ...platformHooks.hooks,
+      },
+    };
+  }
+
+  // give the platform hooks a chance to update config
+  if (isFunction(platformHooks.config)) {
+    config = defaults(config, await platformHooks.config(context, config));
+  }
+
+  const input: ContextServiceStateInput = {
     type: config.type ?? 'unknown',
     moduleRootPath,
     apiModulePath,
     uiModulePath,
+    config,
     hooks,
-    platformHooks: config.platform
-      ? loadServicesModuleHooksFromFile(config.platform)
-      : {},
+    platformHooks,
   };
+
+  return new ContextServiceState(context, input);
 }
 
 export async function getPackageFilePath(

@@ -1,10 +1,6 @@
 import { string, number, object, array, alternatives } from 'joi';
 
-import {
-  Configuration,
-  ConfigurationResolve,
-  ConfigurationSite,
-} from '@backyard/types';
+import { Configuration, ConfigurationResolve } from '@backyard/types';
 
 export const configurationProviderSchema = alternatives().try(
   string(),
@@ -20,7 +16,6 @@ export const configurationServiceSchema = object({
   settings: object(),
 });
 
-export const configurationSiteSchema = object<ConfigurationSite>({});
 export const configurationResolveSchema = object<ConfigurationResolve>({
   backyard: string(),
   source: string(),
@@ -31,5 +26,4 @@ export const configurationSchema = object<Configuration>({
   root: string(),
   resolve: configurationResolveSchema.default({}),
   services: array().items(configurationServiceSchema).default([]),
-  sites: array().items(configurationSiteSchema).default([]),
 });

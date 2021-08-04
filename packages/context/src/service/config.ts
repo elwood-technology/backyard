@@ -1,30 +1,29 @@
 import defaults from 'lodash.defaultsdeep';
+import { compile as template } from 'ejs';
 
 import type {
   Context,
-  ContextService,
   ConfigurationService,
+  ServiceHooks,
+  Json,
 } from '@backyard/types';
-import { isFunction, isEmptyObject } from '@backyard/common';
+import { isFunction } from '@backyard/common';
 
-import { loadServicesModuleHooksFromFile } from './hooks';
+export type ResolveServiceConfigArgs = {
+  initialConfig: ConfigurationService;
+  context: Context;
+  hooks: ServiceHooks;
+  platformHooks: ServiceHooks;
+};
 
 export async function resolveServiceConfig(
-  context: Context,
-  service: ContextService,
-  initialConfig: ConfigurationService,
+  args: ResolveServiceConfigArgs,
 ): Promise<ConfigurationService> {
-  const hooks = service.getHooks();
-  let platformHooks = service.getPlatformHooks();
+  const { initialConfig, context, hooks, platformHooks } = args;
   let config = defaults({}, initialConfig) as ConfigurationService;
 
   if (isFunction(hooks.config)) {
     config = defaults(await hooks.config(context, config), config);
-  }
-
-  if (isEmptyObject(platformHooks) && config.platform) {
-    platformHooks = loadServicesModuleHooksFromFile(config.platform);
-    service.setPlatformHooks(platformHooks);
   }
 
   if (isFunction(platformHooks.config)) {
@@ -41,10 +40,31 @@ export async function resolveServiceConfig(
   return defaults(initialConfig, config, {
     settings: {},
     gateway: {
-      enabled: service.apiModulePath && true,
+      enabled: false,
     },
     container: {
       enabled: false,
     },
   });
+}
+
+export async function replaceConfigTemplateVariables(
+  obj: Json,
+  context: Context,
+): Promise<Json> {
+  if (typeof obj === 'string') {
+    const tpl = template(obj, { async: true });
+
+    return await tpl({
+      context,
+    });
+  }
+
+  if (Array.isArray(obj) || typeof obj === 'object') {
+    for (const item in obj) {
+      obj[item] = await replaceConfigTemplateVariables(obj[item], context);
+    }
+  }
+
+  return obj;
 }

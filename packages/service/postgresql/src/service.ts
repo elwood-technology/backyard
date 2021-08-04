@@ -3,7 +3,6 @@ import { ContextModeLocal, invariant } from '@backyard/common';
 import type {
   ConfigurationService,
   Context,
-  ContextService,
   ServiceHookProviderArgs,
 } from '@backyard/types';
 
@@ -36,10 +35,10 @@ export function config(
   };
 }
 
-export async function init(
-  context: Context,
-  service: ContextService,
-): Promise<void> {
+export async function init({
+  context,
+  service,
+}: ServiceHookProviderArgs): Promise<void> {
   await context.addService({
     name: `${service.name}-migrate`,
     provider: '@backyard/service-postgresql-migrate',

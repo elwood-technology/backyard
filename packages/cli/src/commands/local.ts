@@ -23,6 +23,8 @@ export const SUB_COMMANDS = [
   'help',
 ];
 
+export const ALIAS_COMMANDS = ['start', 'stop', 'restart'];
+
 export const SUB_COMMANDS_DESC = [
   'build the local state',
   'alias for `local build`',
@@ -34,11 +36,27 @@ export const SUB_COMMANDS_DESC = [
   'this help menu. so meta!',
 ];
 
+export function findSubCommand(tools: Toolbox): string {
+  const subCommand = tools.parameters.first;
+
+  if (!subCommand) {
+    const argv: string[] = tools.parameters.argv ?? [];
+
+    for (const arg of argv) {
+      if (ALIAS_COMMANDS.includes(arg)) {
+        return arg;
+      }
+    }
+  }
+
+  return subCommand ?? 'help';
+}
+
 export default {
   name: 'local',
-  alias: ['dev', 'development', 'd', 'l'],
+  alias: ['dev', 'development', 'd', 'l', 'start', 'stop', 'restart'],
   async run(tools: Toolbox) {
-    const subCommand = tools.parameters.first ?? 'help';
+    const subCommand = findSubCommand(tools);
 
     if (!SUB_COMMANDS.includes(subCommand)) {
       tools.print.error(`Unknown command "${subCommand}"`);
@@ -213,9 +231,7 @@ export async function init(tools: Toolbox): Promise<void> {
     ...serviceUrls.map(([key, value]) => ` ${key}: ${value}`),
     ' ',
     'Configured Services',
-    ...getServices(context).map(
-      (item) => ` ${item.name} (${item.getInitialConfig().provider})`,
-    ),
+    ...getServices(context).map((item) => ` ${item.name} (${item.provider})`),
   ].filter(Boolean) as string[];
 
   await tools.filesystem.writeAsync(localTextFilePath, localText.join(EOL));

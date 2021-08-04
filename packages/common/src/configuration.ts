@@ -1,8 +1,4 @@
-import {
-  Configuration,
-  ConfigurationService,
-  ConfigurationSite,
-} from '@backyard/types';
+import { Configuration, ConfigurationService } from '@backyard/types';
 
 type ArgFn<T> = (mode: string) => T;
 type Arg<T> = T | ArgFn<T>;
@@ -17,12 +13,6 @@ function configProvider<T>(config: Arg<T>): T {
 
 export function createConfiguration(config: Arg<Configuration>): Configuration {
   return configProvider<Configuration>(config);
-}
-
-export function createSiteConfiguration(
-  config: Arg<ConfigurationSite>,
-): ConfigurationSite {
-  return configProvider<ConfigurationSite>(config);
 }
 
 export function createServiceConfiguration(

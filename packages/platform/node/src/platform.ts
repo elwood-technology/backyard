@@ -4,7 +4,7 @@ import { ContextModeLocal } from '@backyard/common';
 import type {
   ConfigurationService,
   Context,
-  ContextService,
+  ServiceHookProviderArgs,
 } from '@backyard/types';
 
 import type { NodeBootDevServerArgs } from './types';
@@ -44,20 +44,19 @@ export async function config(
 }
 
 export async function stage(
-  dir: string,
-  context: Context,
-  service: ContextService,
+  args: ServiceHookProviderArgs & { dir: string },
 ): Promise<void> {
+  const { dir, service, context } = args;
   const rel = relative(context.dir.root, service.apiModulePath as string);
   const { filesystem } = context.tools;
 
-  const args = JSON.stringify({
+  const serverArgs = JSON.stringify({
     handlerPath: join(appRoot, rel),
     watchPaths: [join(appRoot, dirname(rel))],
   } as NodeBootDevServerArgs);
 
   await filesystem.writeAsync(
     join(dir, 'index.js'),
-    `require('@backyard/platform-node/dev-server').boot(${args})`,
+    `require('@backyard/platform-node/dev-server').boot(${serverArgs})`,
   );
 }

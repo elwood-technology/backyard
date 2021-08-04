@@ -81,8 +81,6 @@ export async function operatorToken({
   return operatorToken;
 }
 
-export async function stage(_dir: string, __context: Context): Promise<void> {}
-
 export async function sql(
   _context: Context,
   __args: JsonObject,
