@@ -1,9 +1,12 @@
 import { join } from 'path';
 
-import type { Context } from '@backyard/types';
+import type { ServiceHookProviderArgs } from '@backyard/types';
 import { serviceHasGateway } from '@backyard/common';
 
-export async function stage(dir: string, context: Context): Promise<void> {
+export async function stage(
+  args: ServiceHookProviderArgs & { dir: string },
+): Promise<void> {
+  const { dir, context } = args;
   const services = Array.from(context.services)
     .filter(
       ([name, service]) => name !== 'registry' && serviceHasGateway(service),

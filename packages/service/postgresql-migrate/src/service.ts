@@ -1,7 +1,7 @@
 import { EOL } from 'os';
 import { join } from 'path';
 
-import { ConfigurationService, Context } from '@backyard/types';
+import { ConfigurationService, ServiceHookProviderArgs } from '@backyard/types';
 
 export function config(
   _config: ConfigurationService,
@@ -36,7 +36,12 @@ export function config(
   };
 }
 
-export async function stage(dir: string, context: Context): Promise<void> {
+export async function stage(
+  args: ServiceHookProviderArgs & {
+    dir: string;
+  },
+): Promise<void> {
+  const { dir, context } = args;
   const uri = await context.getService('db').hook('uri');
   await context.tools.filesystem.writeAsync(
     join(dir, 'Dockerfile'),

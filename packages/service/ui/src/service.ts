@@ -5,6 +5,7 @@ import type {
   ConfigurationService,
   Context,
   ContextService,
+  ServiceHookProviderArgs,
 } from '@backyard/types';
 import { config as nodeConfig } from '@backyard/platform-node';
 
@@ -42,7 +43,8 @@ export class UiService extends AbstractService {
     };
   }
 
-  stage = async (dir: string, context: Context) => {
+  stage = async (args: ServiceHookProviderArgs & { dir: string }) => {
+    const { dir, context } = args;
     const fs = this.filesystem(context);
 
     const modules = getServices(context)

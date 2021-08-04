@@ -60,10 +60,9 @@ export function config(
 }
 
 export async function stage(
-  dir: string,
-  context: Context,
-  service: KongContextService,
+  args: ServiceHookProviderArgs<KongContextService> & { dir: string },
 ): Promise<void> {
+  const { dir, context, service } = args;
   const { filesystem } = context.tools;
 
   await filesystem.writeAsync(

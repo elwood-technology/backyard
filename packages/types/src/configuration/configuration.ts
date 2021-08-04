@@ -1,11 +1,7 @@
 import type { DeepRequired } from 'ts-essentials';
-import type { Configuration as WebpackConfiguration } from 'webpack';
 
 import type { JsonObject } from '../scalar';
 import type { ServiceName } from '../service';
-import type { Context } from '../context';
-
-import { ConfigurationServiceAuthSettings } from './service-settings';
 
 export type ConfigurationPluginOptions = JsonObject;
 
@@ -48,7 +44,7 @@ export interface ConfigurationServiceContainer {
 export interface ConfigurationService<
   Settings extends ConfigurationServiceSettings = ConfigurationServiceSettings,
 > {
-  name: ServiceName;
+  name?: ServiceName;
   enabled?: boolean;
   version?: number;
   provider?: string;
@@ -60,32 +56,18 @@ export interface ConfigurationService<
   dependencies?: Array<string>;
 }
 
-export type ConfigurationServiceOptions =
-  | ConfigurationService
-  | {
-      name: 'auth';
-      provider?: string;
-      settings?: ConfigurationServiceAuthSettings;
-    };
-
 export interface ConfigurationServiceSettings extends JsonObject {}
-
-export type ConfigurationSite = {
-  name: string;
-  entry: Record<string, string>;
-  webpack?(config: WebpackConfiguration, context: Context): void;
-};
 
 export type ConfigurationResolve = {
   backyard?: string;
   source?: string;
   modules?: string[];
 };
+
 export type Configuration = {
   root?: string;
   resolve?: ConfigurationResolve;
-  services?: ConfigurationServiceOptions[];
-  sites?: ConfigurationSite[];
+  services?: ConfigurationService[];
   platform?: {
     local?: string;
     remote?: string;

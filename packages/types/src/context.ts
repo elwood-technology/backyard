@@ -3,7 +3,6 @@ import type { default as which } from 'which';
 
 import {
   FullConfiguration,
-  ConfigurationSite,
   ConfigurationService,
   ConfigurationServiceContainer,
   ConfigurationServiceSettings,
@@ -23,12 +22,14 @@ export interface ContextService<
   Settings extends ConfigurationServiceSettings = ConfigurationServiceSettings,
 > {
   name: string;
+  provider: string;
   type?: string;
   moduleRootPath: string;
   apiModulePath?: string;
   uiModulePath?: string;
   config: ConfigurationService<Settings>;
   init(): Promise<void>;
+  finalize(): Promise<void>;
   gateway: ConfigurationServiceGateway | undefined;
   container: ConfigurationServiceContainer | undefined;
   stage(dir: string): Promise<void>;
@@ -41,22 +42,11 @@ export interface ContextService<
   };
   getHooks(): ServiceHooks;
   getPlatformHooks(): ServiceHooks;
-  setPlatformHooks(hooks: ServiceHooks): void;
   getGatewayUrl(): string;
   getContainerUrl(): string;
-  getResolvedConfig(): ConfigurationService | undefined;
-  getInitialConfig(): ConfigurationService;
-}
-
-export interface ContextSite {
-  name: string;
-  config: ConfigurationSite;
-  moduleRootPath: string;
-  port: number;
 }
 
 export type ContextServicesMap = Map<ServiceName, ContextService>;
-export type ContextSitesMap = Map<string, ContextSite>;
 
 export interface Context {
   mode: ContextMode;
@@ -83,6 +73,6 @@ export interface Context {
     certKeyPath?: string;
   };
   log(msg: string): void;
-  addService(config: ConfigurationService): Promise<void>;
+  addService(config: ConfigurationService): Promise<ContextService>;
   getService(name: string): ContextService;
 }

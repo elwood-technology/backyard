@@ -5,7 +5,7 @@ import type {
 } from '@backyard/types';
 import { invariant, debug } from '@backyard/common';
 
-import { Service } from './service';
+import { loadService } from './service';
 
 const log = debug('backyard:context:state');
 
@@ -57,20 +57,19 @@ export class ContextState implements Context {
   async addService(
     config: ConfigurationService,
     tryToInitialize = false,
-  ): Promise<void> {
+  ): Promise<ContextService> {
     log('adding %s to context', config.name);
 
-    if (this.#services.has(config.name)) {
-      log(`Service "${config.name}" already exists`);
-      return;
-    }
+    invariant(config.name, 'Configuration must have a name');
+
+    invariant(
+      !this.#services.has(config.name),
+      `Service already exists with name "${config.name}"`,
+    );
 
     invariant(config.provider, 'Service must have a provider');
 
-    const service = new Service(config);
-    service.setContext(this);
-
-    await service.load();
+    const service = await loadService(this, config);
 
     if (tryToInitialize) {
       await service.init();
@@ -78,6 +77,8 @@ export class ContextState implements Context {
     }
 
     this.#services.set(config.name, service);
+
+    return service;
   }
 
   getService(name: string): ContextService {

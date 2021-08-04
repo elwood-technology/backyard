@@ -1,6 +1,10 @@
 import { join } from 'path';
 
-import type { Context, ConfigurationService } from '@backyard/types';
+import type {
+  Context,
+  ConfigurationService,
+  ServiceHookProviderArgs,
+} from '@backyard/types';
 import { getServices } from '@backyard/common';
 
 export async function config(
@@ -24,7 +28,10 @@ export async function config(
     },
   };
 }
-export async function stage(dir: string, context: Context): Promise<void> {
+export async function stage(
+  args: ServiceHookProviderArgs & { dir: string },
+): Promise<void> {
+  const { dir, context } = args;
   const { filesystem } = context.tools;
 
   filesystem.writeAsync(join(dir, 'state.json'), {

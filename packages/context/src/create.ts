@@ -12,11 +12,11 @@ import type {
   ContextMode,
   LocalPlatform,
   FullConfiguration,
+  ContextService,
 } from '@backyard/types';
 
 import { loadAndNormalizeConfiguration } from './config';
 import {
-  Service,
   readCoreServicesFromConfiguration,
   readServicesFromSource,
   readUsersServicesFromConfiguration,
@@ -98,23 +98,22 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
     ...(await readUsersServicesFromConfiguration(config)),
   ].filter((item) => item.enabled !== false);
 
-  const services: string[] = [];
+  const services: ContextService[] = [];
 
   for (const serviceConfig of allServices) {
-    await context.addService(serviceConfig, false);
-    services.push(serviceConfig.name);
+    services.push(await context.addService(serviceConfig, false));
   }
 
   log('initalizing services');
 
-  for (const name of services) {
-    await (context.getService(name) as Service).init();
+  for (const service of services) {
+    await service.init();
   }
 
   log('finalizing services');
 
-  for (const name of services) {
-    await (context.getService(name) as Service).finalize();
+  for (const service of services) {
+    await service.finalize();
   }
 
   return context;

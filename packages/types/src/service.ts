@@ -40,20 +40,17 @@ export type ServiceContainerProvider = (
   config?: ConfigurationServiceContainer,
 ) => Promise<ConfigurationServiceContainer>;
 
-export type ServiceStageProvider = (
-  dir: string,
-  context: Context,
-  config?: ConfigurationService,
-) => Promise<void>;
-
-export interface ServiceHookProviderArgs extends JsonObject {
+export interface ServiceHookProviderArgs<
+  Service extends ContextService = ContextService,
+  Parent = Json,
+> extends JsonObject {
   context: Context;
-  service: ContextService;
-  parent?: Json;
+  service: Service;
+  parent?: Parent;
 }
 
-export type ServiceHookProvider = <R = Json>(
-  args: ServiceHookProviderArgs,
+export type ServiceHookProvider<A extends JsonObject = JsonObject, R = Json> = (
+  args: ServiceHookProviderArgs & A,
 ) => Promise<R>;
 
 export interface ServiceHooks {
@@ -62,7 +59,7 @@ export interface ServiceHooks {
     config: ConfigurationService,
   ): Promise<Partial<ConfigurationService>>;
   init?(context: Context, service: ContextService): Promise<void>;
-  stage?: ServiceStageProvider;
+  stage?: ServiceHookProvider<{ dir: string }>;
   gateway?: ServiceGatewayProvider;
   container?: ServiceContainerProvider;
   hooks?: Record<string, ServiceHookProvider>;
