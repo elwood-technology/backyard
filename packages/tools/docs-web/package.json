@@ -1,6 +1,6 @@
 {
   "name": "@backyard/tools-docs-web",
-  "version": "0.2.5",
+  "version": "0.2.10",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
