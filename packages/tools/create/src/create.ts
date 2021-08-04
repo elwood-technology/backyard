@@ -22,6 +22,8 @@ export type CreateBackyardOptions = {
   projectDir: string;
   template: string;
   useNpm?: boolean;
+  runInstall?: boolean;
+  runInit?: boolean;
 };
 
 export type CreateBackyardTools = {
@@ -42,7 +44,13 @@ export async function createBackyard(
   options: CreateBackyardOptions,
   tools: CreateBackyardTools = {},
 ): Promise<void> {
-  const { projectDir, template, useNpm } = options;
+  const {
+    projectDir,
+    template,
+    useNpm = false,
+    runInit = true,
+    runInstall = true,
+  } = options;
   const { spin = () => {}, errorLog = () => {} } = tools;
 
   if (exists(projectDir)) {
@@ -128,13 +136,15 @@ export async function createBackyard(
 
   const cmd = useNpm ? await which('npm') : await which('yarn');
 
-  spin(`Running ${useNpm ? 'npm' : 'yarn'} install`);
+  if (runInstall !== false) {
+    spin(`Running ${useNpm ? 'npm' : 'yarn'} install`);
+    await run(cmd, ['install', '--ignore-scripts'], projectDir, errorLog);
+  }
 
-  await run(cmd, ['install', '--ignore-scripts'], projectDir, errorLog);
-
-  spin(`Initalizing Backyard`);
-
-  await run(cmd, ['run', 'backyard', 'init'], projectDir, errorLog);
+  if (runInit !== false) {
+    spin(`Initalizing Backyard`);
+    await run(cmd, ['run', 'backyard', 'init'], projectDir, errorLog);
+  }
 }
 
 export async function run(

@@ -10,9 +10,10 @@ import { createBackyard, CreateBackyardTools } from './create';
 import { writeFileSync } from 'fs';
 
 type Options = {
-  ['project-dir']: string;
   typescript?: boolean;
-  template?: string;
+  npm?: boolean;
+  install?: boolean;
+  init?: boolean;
 };
 
 const pkg = require('../package.json');
@@ -21,19 +22,23 @@ const spin = ora('Creating Backyard');
 
 async function main(): Promise<void> {
   let projectDir: string = '';
+  let template: string = 'default';
 
   const prog = new Command(pkg.name)
     .version(pkg.version)
-    .usage(`${green('<project-dir>')} [options]`)
-    .argument('<project-dir>')
-    .option('-t, --template <template>')
+    .usage(`${green('<project-dir>')} [template] [options]`)
+    .arguments('<project-dir> [template]')
+    .option('-t, --typescript', 'Use Typescript Starter Workspace')
     .option('-n, --npm', 'Use NPM instead of Yarn')
-    .action((dir) => {
+    .option('--install', 'Run yarn|npm install')
+    .option('--init', 'Run backyard init')
+    .action((dir, tpl) => {
       projectDir = dir;
+      template = tpl ?? 'default';
     })
     .parse(process.argv);
 
-  const { template = 'default' } = prog.opts() as Options;
+  const { typescript, npm, install, init } = prog.opts() as Options;
 
   if (!projectDir) {
     console.log();
@@ -64,7 +69,10 @@ async function main(): Promise<void> {
   await createBackyard(
     {
       projectDir: absoluteProjectDir,
-      template,
+      template: typescript ? 'ts' : template,
+      useNpm: npm,
+      runInit: init,
+      runInstall: install,
     },
     tools,
   );
@@ -98,11 +106,10 @@ async function main(): Promise<void> {
 main().catch((err) => {
   spin.stop();
 
+  const errorLogFile = join(process.cwd(), 'create-backyard-error.log');
+
   if (errorLogBuffer.length > 0) {
-    writeFileSync(
-      join(process.cwd(), 'create-backyard-error.log'),
-      errorLogBuffer.join(EOL),
-    );
+    writeFileSync(errorLogFile, errorLogBuffer.join(EOL));
   }
 
   const table = new Table({
@@ -119,5 +126,14 @@ main().catch((err) => {
     [gray('https://github.com/elwood-technology/backyard/issues/new')],
     [''],
   );
+
+  if (errorLogBuffer.length > 0) {
+    table.push(
+      [gray('An error log is available at:')],
+      [gray(errorLogFile)],
+      [''],
+    );
+  }
+
   console.log(table.toString());
 });
