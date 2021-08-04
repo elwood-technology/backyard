@@ -70,7 +70,7 @@ export async function readServicesFromSource(
     return [];
   }
 
-  const serviceFiles = await filesystem.findAsync(sourceDir, {
+  const serviceFiles = await filesystem.cwd(sourceDir).findAsync('', {
     matching: [
       '**/backyard-service.*',
       '!**/node_modules/**',
@@ -79,7 +79,9 @@ export async function readServicesFromSource(
   });
 
   return await Promise.all(
-    serviceFiles.map(async (file) => {
+    serviceFiles.map(async (fileName) => {
+      const file = resolve(sourceDir, fileName);
+
       return {
         ...(requireModule(file) as ConfigurationService),
         type: 'src',

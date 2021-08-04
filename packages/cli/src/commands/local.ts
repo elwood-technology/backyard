@@ -227,9 +227,6 @@ export async function init(tools: Toolbox): Promise<void> {
     ` Anonymous Key: ${keys.anonymousKey}`,
     ` Service Key: ${keys.serviceKey}`,
     ' ',
-    'Services URLS:',
-    ...serviceUrls.map(([key, value]) => ` ${key}: ${value}`),
-    ' ',
     'Configured Services',
     ...getServices(context).map((item) => ` ${item.name} (${item.provider})`),
   ].filter(Boolean) as string[];
