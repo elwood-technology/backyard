@@ -1,5 +1,10 @@
 # Backyard Types
+Provides global types for Backyard.
+
+## Install
 ![npm (scoped)](https://img.shields.io/npm/v/@backyard/types)
 
-## Overview
-Provides global types for Backyard.
+```
+yarn add @backyard/types
+```
+
