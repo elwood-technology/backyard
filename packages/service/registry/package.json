@@ -17,6 +17,8 @@
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
     "lib",
+    "backyard-service.js",
+    "backyard-api.js",
     "package.json"
   ],
   "publishConfig": {
