@@ -3,13 +3,12 @@
 
 ## 1. Create a Backyard workspace
 ```
-yarn create backyard hello-world -ts
+yarn create backyard ./hello-world typescript
 ```
 
 ## 2. Initialize the local workspace
 ```
 cd hello-world
-yarn backyard init --local
 ```
 
 ## 3. Start the workspace
