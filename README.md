@@ -27,13 +27,10 @@ Backyard eases the development and deployment of microservices by providing an o
 
 ```bash
 # typescript
-yarn create backyard -ts
+yarn create backyard ./my-app typescript
 
 # javascript
-yarn create backyard
-
-# NPM
-npx create-backyard
+yarn create backyard ./my-app
 ```
 
 ## Usage

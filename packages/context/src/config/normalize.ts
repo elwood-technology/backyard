@@ -1,4 +1,4 @@
-import deepDefaults from 'lodash.defaultsdeep';
+import deepDefaults from 'deepmerge';
 
 import type { Configuration, FullConfiguration } from '@backyard/types';
 
@@ -9,7 +9,7 @@ export function normalizeConfig(
   initialConfig: Configuration = {},
 ): FullConfiguration {
   const { value } = configurationSchema.validate(
-    deepDefaults(config, initialConfig),
+    deepDefaults(initialConfig, config),
   );
 
   return value as FullConfiguration;
