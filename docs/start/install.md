@@ -3,19 +3,15 @@
 
 ## New Project
 ```bash title=TypeScript
-# npx
-npx create-backyard projectName -ts
 
 # yarn
-yarn create backyard projectName -ts
+yarn create backyard ./workspace typescript
 ```
 
 ```bash title=JavaScript
-# npx
-npx create-backyard projectName
 
 # yarn
-yarn create backyard projectName
+yarn create backyard ./workspace
 ```
 
 ## Existing Project
