@@ -36,10 +36,6 @@
     {
       "path": "./platform",
       "prepend": false
-    },
-    {
-      "path": "./ui",
-      "prepend": false
     }
   ]
 }

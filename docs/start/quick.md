@@ -16,11 +16,11 @@ cd hello-world
 yarn backyard local start
 ```
 
-## 4. Open the workspace dashboard
-Before you can access the dashboard, you will need to setup your root admin account.
+## 4. Make a request
+Now you can start making request to the gateway!
 
 ```
-http://localhost:8080/auth/setup
-```
+curl http://localhost:8000/health
 
-You will need your "Operator Token" to complete the setup. You can find it in `.backyard/local/info.txt` if you don't know it.
+#> {"message":"awesome :)"}
+```

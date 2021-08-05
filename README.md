@@ -16,13 +16,6 @@ Backyard eases the development and deployment of microservices by providing an o
 - [Database](./packages/service/postgres)
 - [Rest API](./packages/service/postgrest)
 
-### Additional Services
- - [UI](./packages/services/ui)
- - [Authorization](./packages/service/zuul)
- - [Notifications](./packages/service/notifications)
- - [Activity](./packages/services/activity)
- - [Event Bus](./packages/service/events)
-
 ## Installation
 
 ```bash

@@ -150,7 +150,7 @@ export async function init(tools: Toolbox): Promise<void> {
   const { context } = tools;
   const platform = context.platforms.local;
   const localTextFilePath = join(context.dir.stage, 'local.txt');
-  // const hasLocalText = tools.filesystem.exists(localTextFilePath);
+  const hasLocalText = tools.filesystem.exists(localTextFilePath);
 
   const spin = tools.print.spin();
   spin.start('Initalizing...');
@@ -211,8 +211,10 @@ export async function init(tools: Toolbox): Promise<void> {
   const localText = [
     'Welcome To Backyard',
     ' ',
-    'Looking for some get started documentation: https://github.com/elwood-technology/backyard/blob/main/docs/start/quick.md',
-    'Have questions, ask them: https://github.com/elwood-technology/backyard/discussions',
+    'Looking for some documentation to help get started:',
+    ' https://github.com/elwood-technology/backyard/blob/main/docs/start/quick.md',
+    'Have questions, ask them here:',
+    ' https://github.com/elwood-technology/backyard/discussions',
     ' ',
     uiService && 'UI Service is installed. If you have not setup the Auth ',
     uiService &&
@@ -235,14 +237,18 @@ export async function init(tools: Toolbox): Promise<void> {
 
   spin.succeed();
 
-  const tbl = new Table({
-    chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
-    style: { 'padding-left': 2, 'padding-right': 2 },
-  });
+  // we use the local.txt file to determine if the user has run the init command
+  // before we cleared it out. No need to reprint this every time
+  if (!hasLocalText) {
+    const tbl = new Table({
+      chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
+      style: { 'padding-left': 2, 'padding-right': 2 },
+    });
 
-  tbl.push([''], ...localText.map((line) => [line]), ['']);
+    tbl.push([''], ...localText.map((line) => [line]), ['']);
 
-  tools.print.info(tbl.toString());
+    tools.print.info(tbl.toString());
+  }
 }
 
 export async function start(tools: Toolbox): Promise<void> {

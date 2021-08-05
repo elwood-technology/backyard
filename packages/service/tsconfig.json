@@ -25,18 +25,6 @@
     {
       "path": "./postgrest",
       "prepend": false
-    },
-    {
-      "path": "./zuul",
-      "prepend": false
-    },
-    {
-      "path": "./ui",
-      "prepend": false
-    },
-    {
-      "path": "./notifications",
-      "prepend": false
     }
   ]
 }

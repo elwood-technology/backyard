@@ -13,6 +13,7 @@
     "cli-table3": "^0.6.0",
     "commander": "^8.0.0",
     "fs-jetpack": "^4.1.0",
+    "node-fetch": "^2.6.1",
     "ora": "^5.4.1",
     "unzipper": "^0.10.11",
     "which": "^2.0.2"
@@ -23,6 +24,7 @@
     "package.json"
   ],
   "devDependencies": {
+    "@types/node-fetch": "^2.5.12",
     "@types/unzipper": "^0.10.4"
   }
 }

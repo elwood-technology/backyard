@@ -17,19 +17,12 @@
       - [`postgresql` (@backyrad/service-postgresql)](#postgresql-backyradservice-postgresql)
       - [`postgresql-migrate` (@backyrad/service-postgresql-migrate)](#postgresql-migrate-backyradservice-postgresql-migrate)
       - [`postgrest` (@backyrad/service-postgrest)](#postgrest-backyradservice-postgrest)
-      - [`ui` (@backyrad/service-ui)](#ui-backyradservice-ui)
-      - [`zuul` (@backyrad/service-zuul)](#zuul-backyradservice-zuul)
     - [Tools (`tools/`)](#tools-tools)
       - [`create` (create-backyard)](#create-create-backyard)
       - [`docs-web` (@backyard/tool-docs-web)](#docs-web-backyardtool-docs-web)
       - [`test` (@backyard/tool-test)](#test-backyardtool-test)
       - [`typescript` (@backyard/tool-typescript)](#typescript-backyardtool-typescript)
     - [`types` (@backyard/types)](#types-backyardtypes)
-    - [UI (`ui/`)](#ui-ui)
-      - [`dev-server` (@backyard/ui-dev-server)](#dev-server-backyardui-dev-server)
-      - [`react` (@backyard/ui-react)](#react-backyardui-react)
-      - [`static` (@backyard/ui-static)](#static-backyardui-static)
-      - [`webpack` (@backyard/ui-webpack)](#webpack-backyardui-webpack)
 
 ## Folder Structure & Packages
 
@@ -108,16 +101,6 @@ Default `store` service
 
 ![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgrest)
 
-#### `ui` (@backyrad/service-ui)
-UI service
-
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-ui)
-
-#### `zuul` (@backyrad/service-zuul)
-Default `authz` service
-
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-zuul)
-
 ---
 
 ### Tools (`tools/`)
@@ -153,30 +136,3 @@ Provides global types for Backyard.
 
 ![npm (scoped)](https://img.shields.io/npm/v/@backyard/types)
 
-
----
-
-### UI (`ui/`)
-Packages to build a Backyard Service UI
-
-#### `dev-server` (@backyard/ui-dev-server)
-Server for developing UI applications locally
-
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/ui-dev-server)
-
-
-#### `react` (@backyard/ui-react)
-React containers & hooks to connect a Backyard Service UI
-
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/ui-react)
-
-
-#### `static` (@backyard/ui-static)
-Static files used for UI Services
-
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/ui-static)
-
-#### `webpack` (@backyard/ui-webpack)
-Webpack configuration files for UI Services
-
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/ui-webpack)
