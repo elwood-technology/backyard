@@ -8,6 +8,7 @@
     "**/server.d.ts",
     "**/backyard-api.*",
     "**/backyard-service.*",
+    "**/dev-server.d.ts",
     "**/backyard-ui.*",
     "**/config/*"
   ],

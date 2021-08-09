@@ -1,5 +1,10 @@
 {
   "extends": "../../config/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./lib"
+  },
+  "include": ["src"],
   "references": [
     {
       "path": "./aws-ecs",
@@ -11,10 +16,6 @@
     },
     {
       "path": "./docker",
-      "prepend": false
-    },
-    {
-      "path": "./terraform",
       "prepend": false
     },
     {

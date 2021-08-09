@@ -1,4 +1,4 @@
-import type { TerraformHookArgs, Resource } from '@backyard/platform-terraform';
+import type { TerraformHookArgs, Resource } from '@backyard/plugin-terraform';
 
 export interface AwsEcsTerraformHookArgs extends TerraformHookArgs {
   state: AwsEcsTerraformState;

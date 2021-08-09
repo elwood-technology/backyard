@@ -6,7 +6,7 @@ import {
   createTerraformHookArgs,
   TerraformHookArgs,
   TerraformGenerator,
-} from '@backyard/platform-terraform';
+} from '@backyard/plugin-terraform';
 import { getServiceByName, getServices } from '@backyard/common';
 
 import { AwsEcsTerraformState, AwsEcsTerraformHookArgs } from './types';

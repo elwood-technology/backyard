@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@backyard/common": "^0.2.14",
-    "@backyard/platform-terraform": "^0.2.14"
+    "@backyard/plugin-terraform": "^0.2.14"
   },
   "devDependencies": {
     "@backyard/tools-typescript": "^0.2.14",

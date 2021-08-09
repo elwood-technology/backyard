@@ -1,3 +1,3 @@
-import type { CreateServerArgs } from './lib/dev-server';
+import type { NodeBootDevServerArgs } from './lib/types';
 
-export function boot(args: CreateServerArgs): void;
+export function boot(args: NodeBootDevServerArgs): void;
