@@ -12,6 +12,8 @@ import type {
   JsonObject,
   ConfigurationModule,
   Platform,
+  ServiceHooks,
+  ConfigurationServiceProviderOptions,
 } from '@backyard/types';
 
 import {
@@ -21,7 +23,7 @@ import {
   AbstractPlatform,
 } from '@backyard/common';
 
-import { resolvePlatform } from '../platform';
+import { loadPlatform } from '../platform';
 import { resolveServiceConfig } from './config';
 import { ContextServiceState, ContextServiceStateInput } from './state';
 import { loadServicesModuleHooks } from './hooks';
@@ -36,7 +38,11 @@ export async function loadService(
 ): Promise<ContextService> {
   invariant(initialConfig.provider, 'Service must have provider');
 
-  const pkgFile = await getPackageFilePath(initialConfig.provider);
+  const [providerModulePath, providerOptions] = normalizeModuleDef(
+    initialConfig.provider,
+  );
+
+  const pkgFile = await getPackageFilePath(providerModulePath);
 
   if (!pkgFile) {
     throw new Error('bad root module');
@@ -61,6 +67,7 @@ export async function loadService(
   invariant(name, `Unable to find name for service in "${moduleRootPath}"`);
 
   const hooks = await loadServicesModuleHooks(moduleRootPath);
+  const providerExtendHooks = await getProviderExtendedModule(providerOptions);
   let platform = loadServicePlatform(context, initialConfig.platform);
 
   let config = (await resolveServiceConfig({
@@ -69,6 +76,13 @@ export async function loadService(
     hooks,
     platform,
   })) as ConfigWithType;
+
+  if (isFunction(providerExtendHooks.config)) {
+    config = deepMerge(
+      config,
+      await providerExtendHooks.config(context, config),
+    ) as ConfigWithType;
+  }
 
   // it's possible that service.config hook set
   // a platform. we should use that here, and merge it
@@ -96,9 +110,28 @@ export async function loadService(
     config,
     hooks,
     platform,
+    providerExtendHooks,
   };
 
   return new ContextServiceState(context, input);
+}
+
+export async function getProviderExtendedModule(
+  options: ConfigurationServiceProviderOptions | undefined,
+): Promise<ServiceHooks> {
+  if (!options?.extends) {
+    return {};
+  }
+
+  const [extend] = normalizeModuleDef(options.extends);
+
+  const pkgFile = await getPackageFilePath(require.resolve(extend));
+
+  if (!pkgFile) {
+    return {};
+  }
+
+  return await loadServicesModuleHooks(dirname(pkgFile));
 }
 
 export function normalizeModuleDef(
@@ -126,7 +159,7 @@ export function loadServicePlatform(
   const platform =
     context.mode === ContextModeLocal ? config.local : config.remote;
 
-  return resolvePlatform(platform);
+  return loadPlatform(platform);
 }
 
 export async function getPackageFilePath(

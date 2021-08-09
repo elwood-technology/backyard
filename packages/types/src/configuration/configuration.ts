@@ -5,10 +5,9 @@ import type { ServiceName } from '../service';
 
 export type ConfigurationModuleOptions = JsonObject;
 
-export type ConfigurationModule =
-  | string
-  | [string]
-  | [string, ConfigurationModuleOptions];
+export type ConfigurationModule<
+  Options extends ConfigurationModuleOptions = ConfigurationModuleOptions,
+> = string | [string] | [string, Options];
 
 export type ConfigurationPlatform = {
   local?: ConfigurationModule;
@@ -49,13 +48,18 @@ export interface ConfigurationServiceContainer {
   meta?: JsonObject;
 }
 
+export interface ConfigurationServiceProviderOptions
+  extends ConfigurationModuleOptions {
+  extends?: ConfigurationModule;
+}
+
 export interface ConfigurationService<
   Settings extends ConfigurationServiceSettings = ConfigurationServiceSettings,
 > {
   name?: ServiceName;
   enabled?: boolean;
   version?: number;
-  provider?: string;
+  provider?: ConfigurationModule<ConfigurationServiceProviderOptions>;
   platform?: ConfigurationPlatform;
   comment?: string;
   settings?: Settings;

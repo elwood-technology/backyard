@@ -5,6 +5,10 @@ export abstract class AbstractPlatform<Options extends JsonObject = JsonObject>
 {
   protected options: Options = {} as Options;
 
+  async init(): Promise<void> {
+    return;
+  }
+
   setOptions(options: Options): void {
     this.options = options;
   }

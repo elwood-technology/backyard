@@ -1,13 +1,17 @@
 import { join } from 'path';
 
-import type { Context, JsonObject } from '@backyard/types';
+import type {
+  Context,
+  PlatformCommandHookArgs,
+  PlatformHookArgs,
+} from '@backyard/types';
 import { invariant } from '@backyard/common';
 
 import { createDockerCompose } from './docker-compose';
 import { run } from './run';
 import { isDockerRunning } from './util';
 
-export async function before(context: Context): Promise<void> {
+export async function before({ context }: PlatformHookArgs): Promise<void> {
   const dockerPath = await context.tools.which('docker');
 
   if (!(await isDockerRunning(dockerPath))) {
@@ -15,15 +19,14 @@ export async function before(context: Context): Promise<void> {
   }
 }
 
-export async function init(
-  context: Context,
-  options: JsonObject = {},
-): Promise<void> {
+export async function build(args: PlatformCommandHookArgs): Promise<void> {
+  const { context, commandOptions } = args;
   const { filesystem } = context.tools;
   const services = Array.from(context.services.values());
   const dockerComposeCmdPath = await getDockerComposePath(context);
 
-  const { ['project-name']: projectName = 'by', docker = true } = options;
+  const { ['project-name']: projectName = 'by', docker = true } =
+    commandOptions;
 
   await filesystem.writeAsync(
     join(context.dir.stage, 'docker-compose.yml'),
@@ -57,11 +60,9 @@ export async function init(
   }
 }
 
-export async function start(
-  context: Context,
-  options: JsonObject = {},
-): Promise<void> {
-  const { ['project-name']: projectName = 'by' } = options;
+export async function start(args: PlatformCommandHookArgs): Promise<void> {
+  const { context, commandOptions } = args;
+  const { ['project-name']: projectName = 'by' } = commandOptions;
   const dockerComposeCmdPath = await getDockerComposePath(context);
 
   await run(
@@ -74,12 +75,10 @@ export async function start(
   );
 }
 
-export async function stop(
-  context: Context,
-  options: JsonObject,
-): Promise<void> {
+export async function stop(args: PlatformCommandHookArgs): Promise<void> {
+  const { context, commandOptions } = args;
   const dockerComposeCmdPath = await getDockerComposePath(context);
-  const { ['project-name']: projectName = 'by' } = options;
+  const { ['project-name']: projectName = 'by' } = commandOptions;
 
   await run(
     dockerComposeCmdPath,
@@ -91,11 +90,9 @@ export async function stop(
   );
 }
 
-export async function clean(
-  context: Context,
-  options: JsonObject,
-): Promise<void> {
-  const { ['project-name']: projectName = 'by' } = options;
+export async function clean(args: PlatformCommandHookArgs): Promise<void> {
+  const { context, commandOptions } = args;
+  const { ['project-name']: projectName = 'by' } = commandOptions;
   const dockerComposeCmdPath = await getDockerComposePath(context);
 
   await run(

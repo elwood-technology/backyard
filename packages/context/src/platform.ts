@@ -6,27 +6,55 @@ import {
   JsonObject,
   RemotePlatform,
   LocalPlatform,
+  PlatformCommandHookArgs,
+  Context,
+  Configuration,
+  PlatformHookArgs,
 } from '@backyard/types';
-import { normalizeModuleDef, isFunction } from '@backyard/common';
+import {
+  normalizeModuleDef,
+  isFunction,
+  requireModule,
+  invariant,
+  AbstractPlatform,
+} from '@backyard/common';
 
-import { loadServicesModuleHooksFromFile } from './service/hooks';
-import { Context } from 'vm';
+export function loadPlatforms(config: Configuration): Context['platforms'] {
+  const { local } = loadPlatform<LocalPlatform>(
+    config.platform?.local ?? '@backyard/platform-docker',
+  );
+  const { remote } = loadPlatform<RemotePlatform>(config.platform?.remote);
 
-export function resolvePlatform<P extends Platform = Platform>(
-  config: ConfigurationModule | undefined,
+  invariant(local, 'Unable to load local platform');
+
+  return {
+    local: new ContextPlatformStateLocal('local', local),
+    remote: remote && new ContextPlatformStateRemote('remote', remote),
+  };
+}
+
+export function loadPlatform<P extends Platform = Platform>(
+  module: ConfigurationModule | undefined,
 ): P {
+  const [platform, options] = resolvePlatform(module);
+
+  if (isFunction(platform.setOptions)) {
+    platform.setOptions(options);
+  }
+
+  return platform as P;
+}
+
+export function resolvePlatform(
+  config: ConfigurationModule | undefined,
+): [Platform, JsonObject] {
   if (!config) {
-    return {} as P;
+    return [new (class extends AbstractPlatform {})(), {}];
   }
 
-  const [mod, options] = normalizeModuleDef(config);
-  const hooks = loadServicesModuleHooksFromFile(mod) as Platform;
-
-  if (isFunction(hooks.setOptions)) {
-    hooks.setOptions(options);
-  }
-
-  return hooks as P;
+  const [modulePath, options] = normalizeModuleDef(config);
+  const hooks = requireModule(modulePath) as Platform;
+  return [hooks, options];
 }
 
 export class ContextPlatformState implements ContextPlatform {
@@ -41,15 +69,14 @@ export class ContextPlatformState implements ContextPlatform {
   }
 
   async executeHook<Result = Json>(
-    context: Context,
     name: string,
-    args: JsonObject = {},
+    args: PlatformHookArgs,
   ): Promise<Result> {
     let result = {} as Result;
     const fn = this.#platform[name];
 
     if (fn && isFunction(fn)) {
-      result = await fn({ context, ...args });
+      result = await fn({ options: this.getOptions(), ...args });
     }
 
     return result as Result;
@@ -60,7 +87,7 @@ export class ContextPlatformState implements ContextPlatform {
     name: string,
     args: JsonObject,
   ): Promise<Result> => {
-    return await this.executeHook(context, name, args);
+    return await this.executeHook(name, { context, ...args });
   };
 
   setOptions(options: JsonObject): void {
@@ -81,23 +108,23 @@ export class ContextPlatformStateLocal
   extends ContextPlatformState
   implements LocalPlatform
 {
-  async before(context: Context): Promise<void> {
-    await this.executeHook(context, 'before');
+  async before(args: PlatformHookArgs): Promise<void> {
+    await this.executeHook('before', args);
   }
-  async after(context: Context): Promise<void> {
-    await this.executeHook(context, 'after');
+  async after(args: PlatformHookArgs): Promise<void> {
+    await this.executeHook('after', args);
   }
-  async init(context: Context, options?: JsonObject): Promise<void> {
-    await this.executeHook(context, 'init', options);
+  async build(args: PlatformCommandHookArgs): Promise<void> {
+    await this.executeHook('build', args);
   }
-  async start(context: Context, options?: JsonObject): Promise<void> {
-    await this.executeHook(context, 'start', options);
+  async start(args: PlatformCommandHookArgs): Promise<void> {
+    await this.executeHook('start', args);
   }
-  async stop(context: Context, options?: JsonObject): Promise<void> {
-    await this.executeHook(context, 'stop', options);
+  async stop(args: PlatformCommandHookArgs): Promise<void> {
+    await this.executeHook('stop', args);
   }
-  async clean(context: Context, options?: JsonObject): Promise<void> {
-    await this.executeHook(context, 'clean', options);
+  async clean(args: PlatformCommandHookArgs): Promise<void> {
+    await this.executeHook('clean', args);
   }
 }
 
@@ -105,13 +132,13 @@ export class ContextPlatformStateRemote
   extends ContextPlatformState
   implements RemotePlatform
 {
-  async build(context: Context, options?: JsonObject): Promise<void> {
-    await this.executeHook(context, 'build', options);
+  async build(args: PlatformCommandHookArgs): Promise<void> {
+    await this.executeHook('build', args);
   }
-  async deploy(context: Context, options?: JsonObject): Promise<void> {
-    await this.executeHook(context, 'deploy', options);
+  async deploy(args: PlatformCommandHookArgs): Promise<void> {
+    await this.executeHook('deploy', args);
   }
-  async teardown(context: Context, options?: JsonObject): Promise<void> {
-    await this.executeHook(context, 'teardown', options);
+  async teardown(args: PlatformCommandHookArgs): Promise<void> {
+    await this.executeHook('teardown', args);
   }
 }

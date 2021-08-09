@@ -1,11 +1,22 @@
 import { EOL } from 'os';
 import { join } from 'path';
 
-import { ConfigurationService, ServiceHookProviderArgs } from '@backyard/types';
+import type {
+  ConfigurationService,
+  ServiceHookProviderArgs,
+  Context,
+} from '@backyard/types';
+import { invariant } from '@backyard/common';
 
 export function config(
-  _config: ConfigurationService,
+  _context: Context,
+  config: ConfigurationService,
 ): Partial<ConfigurationService> {
+  invariant(
+    config.settings?.db,
+    'Must provide settings.db with name of Database service',
+  );
+
   return {
     settings: {
       user: 'postgres',
@@ -22,10 +33,10 @@ export function config(
       port: 5433,
       externalPort: 5433,
       build: {
-        context: `./db-migrate`,
+        context: `./${config.name}`,
       },
       environment: {
-        POSTGRES_URI: '<%= await context.getService("db").hook("uri") %>',
+        POSTGRES_URI: `<%= await context.getService("${config.settings.db}").hook("uri") %>`,
       },
       meta: {
         dockerCompose: {
@@ -41,8 +52,9 @@ export async function stage(
     dir: string;
   },
 ): Promise<void> {
-  const { dir, context } = args;
-  const uri = await context.getService('db').hook('uri');
+  const { dir, context, service } = args;
+  const db = service.config.settings?.db;
+  const uri = await context.getService(db).hook('uri');
   await context.tools.filesystem.writeAsync(
     join(dir, 'Dockerfile'),
     `
@@ -104,7 +116,7 @@ alter default privileges in schema public grant all on sequences to postgres, an
   ];
 
   for (const [_, service] of context.services) {
-    const result = (await service.hook('sql', {})) ?? [];
+    const result = (await service.hook('sql', { name: db })) ?? [];
 
     if (Array.isArray(result)) {
       result.forEach((item) => {

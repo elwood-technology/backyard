@@ -41,6 +41,7 @@ export interface ContextService<
     hook(name: string, args?: JsonObject): Promise<Json>;
   };
   getHooks(): ServiceHooks;
+  getExtendedHooks(): ServiceHooks;
   getPlatform(): Platform;
   getGatewayUrl(): string;
   getContainerUrl(): string;

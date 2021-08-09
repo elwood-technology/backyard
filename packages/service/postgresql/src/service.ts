@@ -42,6 +42,9 @@ export async function init({
   await context.addService({
     name: `${service.name}-migrate`,
     provider: '@backyard/service-postgresql-migrate',
+    settings: {
+      db: service.name,
+    },
   });
 }
 
