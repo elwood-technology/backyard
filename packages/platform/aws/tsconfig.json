@@ -13,10 +13,6 @@
     {
       "path": "../../common",
       "prepend": false
-    },
-    {
-      "path": "../terraform",
-      "prepend": false
     }
   ]
 }
