@@ -4,7 +4,7 @@ import which from 'which';
 import * as filesystem from 'fs-jetpack';
 import { config as loadDotEnv } from 'dotenv';
 
-import { invariant, debug, requireModule } from '@backyard/common';
+import { invariant, debug } from '@backyard/common';
 import type {
   RemotePlatform,
   Configuration,
@@ -21,7 +21,11 @@ import {
   readServicesFromSource,
   readUsersServicesFromConfiguration,
 } from './service';
-
+import {
+  resolvePlatform,
+  ContextPlatformStateLocal,
+  ContextPlatformStateRemote,
+} from './platform';
 import { ContextState } from './state';
 
 export type CreateContextArgs = {
@@ -120,21 +124,16 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
 }
 
 export function loadPlatforms(config: Configuration): Context['platforms'] {
-  const localPlatform = config.platform?.local ?? '@backyard/platform-docker';
-  const RemotePlatform =
-    config.platform?.remote ?? '@backyard/platform-aws-ecs';
-
-  const { local } =
-    requireModule<{ local: LocalPlatform }>(localPlatform) ?? {};
-  const { remote } =
-    requireModule<{ remote: RemotePlatform }>(RemotePlatform) ?? {};
+  const local = resolvePlatform<LocalPlatform>(
+    config.platform?.local ?? '@backyard/platform-docker',
+  );
+  const remote = resolvePlatform<RemotePlatform>(config.platform?.remote);
 
   invariant(local, 'Unable to load local platform');
-  invariant(remote, 'Unable to load remote platform');
 
   return {
-    local,
-    remote,
+    local: new ContextPlatformStateLocal('local', local),
+    remote: remote && new ContextPlatformStateRemote('remote', remote),
   };
 }
 

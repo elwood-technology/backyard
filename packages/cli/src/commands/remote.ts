@@ -34,6 +34,11 @@ export default {
       process.exit(1);
     }
 
+    if (!tools.context.platforms.remote) {
+      tools.print.error(`No remote platform provided in configuration`);
+      process.exit(1);
+    }
+
     switch (subCommand) {
       case 'clean': {
         return await clean(tools);
@@ -89,7 +94,7 @@ export async function build(tools: Toolbox): Promise<void> {
 
   spin.text = 'Sending to remote platform...';
 
-  await tools.context.platforms.remote.build(
+  await tools.context.platforms.remote!.build(
     tools.context,
     tools.parameters.options,
   );
@@ -102,7 +107,7 @@ export async function deploy(tools: Toolbox): Promise<void> {
     await build(tools);
   }
 
-  await tools.context.platforms.remote.deploy(
+  await tools.context.platforms.remote!.deploy(
     tools.context,
     tools.parameters.options,
   );
@@ -121,7 +126,7 @@ export async function teardown(tools: Toolbox): Promise<void> {
     }
   }
 
-  await tools.context.platforms.remote.teardown(
+  await tools.context.platforms.remote!.teardown(
     tools.context,
     tools.parameters.options,
   );

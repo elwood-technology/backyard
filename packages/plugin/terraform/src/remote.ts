@@ -31,6 +31,9 @@ export function setupForDeployAndTeardown(context: Context): Dir {
 
 export async function build(context: Context): Promise<void> {
   const tf = new TerraformGenerator();
+
+  invariant(context.platforms.remote, 'No remote platform provided');
+
   invariant(
     isFunction(context.platforms.remote.terraform),
     'Platform does not support Terraform',

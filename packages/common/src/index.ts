@@ -5,3 +5,4 @@ export * from './constants';
 export * from './service';
 export * from './util';
 export * from './abstract/service';
+export * from './abstract/platform';

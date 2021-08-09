@@ -1,5 +1,5 @@
 {
-  "name": "@backyard/platform-terraform",
+  "name": "@backyard/platform-aws",
   "version": "0.2.14",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@backyard/common": "^0.2.14",
-    "terraform-generator": "^5.0.0"
+    "@backyard/platform-terraform": "^0.2.14"
   },
   "devDependencies": {
     "@backyard/tools-typescript": "^0.2.14",
@@ -19,7 +19,6 @@
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
     "lib",
-    "bin",
     "package.json"
   ],
   "publishConfig": {

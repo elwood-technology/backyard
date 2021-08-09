@@ -8,11 +8,13 @@ import type {
   ConfigurationServiceContainer,
   JsonObject,
   Json,
+  Platform,
 } from '@backyard/types';
 
-import { invariant, debug, isFunction } from '@backyard/common';
+import { invariant, debug } from '@backyard/common';
 
 import { replaceConfigTemplateVariables } from './config';
+import { executeServiceHook } from './hooks';
 
 const log = debug('backyard:context:service');
 
@@ -22,7 +24,7 @@ export type ContextServiceStateInput = Pick<
 > & {
   config: DeepRequired<ConfigurationService>;
   hooks: ServiceHooks;
-  platformHooks: ServiceHooks;
+  platform: Platform;
 };
 
 export class ContextServiceState implements ContextService {
@@ -83,8 +85,8 @@ export class ContextServiceState implements ContextService {
     return this.#state.hooks;
   }
 
-  getPlatformHooks(): ServiceHooks {
-    return this.#state.platformHooks;
+  getPlatform(): Platform {
+    return this.#state.platform;
   }
 
   async init(): Promise<void> {
@@ -135,29 +137,7 @@ export class ContextServiceState implements ContextService {
     args: JsonObject = {},
   ): Promise<Result> {
     log(`${this.name}.executeHook("${name}")`);
-    let result: Json = undefined;
-
-    if (
-      this.#state.platformHooks.hooks &&
-      isFunction(this.#state.platformHooks.hooks[name])
-    ) {
-      result = await this.#state.platformHooks.hooks[name]({
-        context: this.getContext(),
-        service: this,
-        ...args,
-      });
-    }
-
-    if (this.#state.hooks.hooks && isFunction(this.#state.hooks.hooks[name])) {
-      result = await this.#state.hooks.hooks[name]({
-        context: this.getContext(),
-        service: this,
-        parent: result,
-        ...args,
-      });
-    }
-
-    return result as Result;
+    return await executeServiceHook<Result>(this, name, args);
   }
 
   hook = async <Result = Json>(

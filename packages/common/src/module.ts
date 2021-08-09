@@ -1,3 +1,6 @@
+import { ConfigurationModule } from 'packages/types/src/configuration';
+import { JsonObject } from 'packages/types/src/scalar';
+
 export function requireModule<T>(
   id: string,
   paths: string[] = [],
@@ -25,4 +28,18 @@ export function silentResolve(id: string): string | undefined {
   } catch (_error) {
     return undefined;
   }
+}
+
+export function normalizeModuleDef(
+  mod: ConfigurationModule,
+): [string, JsonObject] {
+  if (typeof mod === 'string') {
+    return [mod, {}];
+  }
+
+  if (mod.length === 1) {
+    return [mod[0], {}];
+  }
+
+  return mod;
 }

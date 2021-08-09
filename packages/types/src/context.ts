@@ -10,7 +10,7 @@ import {
 } from './configuration';
 import { Json, JsonObject } from './scalar';
 import { ServiceHooks, ServiceName } from './service';
-import { RemotePlatform, LocalPlatform } from './platform';
+import { RemotePlatform, LocalPlatform, Platform } from './platform';
 
 export type ContextMode = 'local' | 'remote';
 
@@ -41,9 +41,10 @@ export interface ContextService<
     hook(name: string, args?: JsonObject): Promise<Json>;
   };
   getHooks(): ServiceHooks;
-  getPlatformHooks(): ServiceHooks;
+  getPlatform(): Platform;
   getGatewayUrl(): string;
   getContainerUrl(): string;
+  getContext(): Context;
 }
 
 export type ContextServicesMap = Map<ServiceName, ContextService>;
@@ -61,8 +62,8 @@ export interface Context {
   config: FullConfiguration;
   services: ContextServicesMap;
   platforms: {
-    local: LocalPlatform;
-    remote: RemotePlatform;
+    local: ContextPlatform & LocalPlatform;
+    remote?: ContextPlatform & RemotePlatform;
   };
   tools: {
     filesystem: typeof filesystem;
@@ -75,4 +76,14 @@ export interface Context {
   log(msg: string): void;
   addService(config: ConfigurationService): Promise<ContextService>;
   getService(name: string): ContextService;
+}
+
+export interface ContextPlatform {
+  type: 'local' | 'remote';
+  platform: Platform;
+  hook<Result = Json>(
+    context: Context,
+    name: string,
+    args: JsonObject,
+  ): Promise<Result>;
 }

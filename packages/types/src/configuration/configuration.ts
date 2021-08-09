@@ -3,9 +3,17 @@ import type { DeepRequired } from 'ts-essentials';
 import type { JsonObject } from '../scalar';
 import type { ServiceName } from '../service';
 
-export type ConfigurationPluginOptions = JsonObject;
+export type ConfigurationModuleOptions = JsonObject;
 
-export type ConfigurationPlugin = string | [string, ConfigurationPluginOptions];
+export type ConfigurationModule =
+  | string
+  | [string]
+  | [string, ConfigurationModuleOptions];
+
+export type ConfigurationPlatform = {
+  local?: ConfigurationModule;
+  remote?: ConfigurationModule;
+};
 
 export interface ConfigurationServiceGateway {
   enabled: boolean;
@@ -48,7 +56,7 @@ export interface ConfigurationService<
   enabled?: boolean;
   version?: number;
   provider?: string;
-  platform?: string;
+  platform?: ConfigurationPlatform;
   comment?: string;
   settings?: Settings;
   gateway?: ConfigurationServiceGateway;
@@ -68,10 +76,7 @@ export type Configuration = {
   root?: string;
   resolve?: ConfigurationResolve;
   services?: ConfigurationService[];
-  platform?: {
-    local?: string;
-    remote?: string;
-  };
+  platform?: ConfigurationPlatform;
 };
 
 export type FullConfiguration = DeepRequired<Configuration> & {
