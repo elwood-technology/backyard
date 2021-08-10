@@ -12,8 +12,8 @@ export function generateKeys(
 
   invariant(secret, 'No secret provided to Kong');
 
-  const iat = settings?.jwt?.iat ?? new Date().getTime() / 1000;
-  const exp = settings?.jwt?.exp ?? iat + 60 * 60 * 24 * 365 * 50;
+  const iat = Number(settings?.jwt?.iat ?? new Date().getTime() / 1000);
+  const exp = Number(settings?.jwt?.exp ?? iat + 60 * 60 * 24 * 365 * 50);
 
   const anonymousKey = jwt.sign(
     {
@@ -22,7 +22,7 @@ export function generateKeys(
       exp,
       aud: '',
       sub: '',
-      Role: 'anon',
+      role: 'anon',
     },
     secret,
   );
@@ -33,7 +33,7 @@ export function generateKeys(
       exp,
       aud: '',
       sub: '',
-      Role: 'service_role',
+      role: 'service_role',
     },
     secret,
   );

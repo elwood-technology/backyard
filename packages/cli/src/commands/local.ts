@@ -14,7 +14,6 @@ import { Toolbox } from '../types';
 
 export const SUB_COMMANDS = [
   'build',
-  'init',
   'start',
   'stop',
   'restart',
@@ -27,7 +26,6 @@ export const ALIAS_COMMANDS = ['start', 'stop', 'restart'];
 
 export const SUB_COMMANDS_DESC = [
   'build the local state',
-  'alias for `local build`',
   'start docker services',
   'stop docker services',
   'start then stop docker services',
@@ -76,7 +74,6 @@ export default {
 
       switch (subCommand) {
         case 'build':
-        case 'init':
           return await build(tools);
 
         case 'start':
@@ -247,14 +244,14 @@ export async function start(tools: Toolbox): Promise<void> {
   const { context } = tools;
   const platform = context.platforms.local;
 
-  if (tools.parameters.options['init'] === true) {
+  if (tools.parameters.options['build'] === true) {
     await build(tools);
   }
 
   if (!tools.filesystem.exists(context.dir.stage)) {
     if (
       await tools.prompt.confirm(
-        'Looks like you do not have a ".backyard/local" folder.\nWould you like to run "local init"?',
+        'Looks like you do not have a ".backyard/local" folder.\nWould you like to run "local build"?',
         true,
       )
     ) {

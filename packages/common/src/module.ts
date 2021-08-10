@@ -1,5 +1,7 @@
-import { ConfigurationModule } from 'packages/types/src/configuration';
-import { JsonObject } from 'packages/types/src/scalar';
+import {
+  ConfigurationModule,
+  ConfigurationModuleOptions,
+} from '@backyard/types';
 
 export function requireModule<T>(
   id: string,
@@ -32,13 +34,32 @@ export function silentResolve(id: string): string | undefined {
 
 export function normalizeModuleDef(
   mod: ConfigurationModule,
-): [string, JsonObject] {
+): [string, ConfigurationModuleOptions] {
   if (typeof mod === 'string') {
     return [mod, {}];
   }
 
+  if (!Array.isArray(mod)) {
+    const { resolve, ...options } = mod as ConfigurationModuleOptions;
+    return [resolve!, options];
+  }
+
   if (mod.length === 1) {
-    return [mod[0], {}];
+    return normalizeModuleDef([mod[0], {}]);
+  }
+
+  const [first, options = {}] = mod as [
+    string | ConfigurationModuleOptions,
+    ConfigurationModuleOptions,
+  ];
+
+  if (typeof first === 'string') {
+    return [first, options];
+  }
+
+  if (first.resolve) {
+    const { resolve, ...rest } = first;
+    return [resolve!, { ...options, ...rest }];
   }
 
   return mod;

@@ -9,8 +9,6 @@ import type {
   ConfigurationService,
   ContextService,
   ConfigurationPlatform,
-  JsonObject,
-  ConfigurationModule,
   Platform,
   ServiceHooks,
   ConfigurationServiceProviderOptions,
@@ -21,6 +19,7 @@ import {
   invariant,
   isFunction,
   AbstractPlatform,
+  normalizeModuleDef,
 } from '@backyard/common';
 
 import { loadPlatform } from '../platform';
@@ -132,20 +131,6 @@ export async function getProviderExtendedModule(
   }
 
   return await loadServicesModuleHooks(dirname(pkgFile));
-}
-
-export function normalizeModuleDef(
-  mod: ConfigurationModule,
-): [string, JsonObject] {
-  if (typeof mod === 'string') {
-    return [mod, {}];
-  }
-
-  if (mod.length === 1) {
-    return [mod[0], {}];
-  }
-
-  return mod;
 }
 
 export function loadServicePlatform(

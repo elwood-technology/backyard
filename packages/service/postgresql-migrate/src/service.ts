@@ -30,8 +30,6 @@ export function config(
       enabled: true,
       essential: false,
       host: '0.0.0.0',
-      port: 5433,
-      externalPort: 5433,
       build: {
         context: `./${config.name}`,
       },
@@ -40,7 +38,7 @@ export function config(
       },
       meta: {
         dockerCompose: {
-          depends_on: ['db'],
+          depends_on: [config.settings.db],
         },
       },
     },
@@ -86,34 +84,11 @@ until PGPASSWORD=$POSTGRES_PASSWORD psql $POSTGRES_URI '\\q'; do
 done
 
 >&2 echo "Postgres is up - executing command"
+cat schema.sql
 cat schema.sql | psql $POSTGRES_URI`,
   );
 
-  const files = [
-    [
-      '00-schema',
-      `
--- Set up reatime
-create publication supabase_realtime for all tables;
--- Extension namespacing
-create schema extensions;
-create extension if not exists "uuid-ossp"      with schema extensions;
-create extension if not exists pgcrypto         with schema extensions;
-create extension if not exists pgjwt            with schema extensions;
--- Developer roles
-create role anon                nologin noinherit;
-create role authenticated       nologin noinherit; -- "logged in" user: web_user, app_user, etc
-create role service_role        nologin noinherit bypassrls; -- allow developers to create JWT's that bypass their policies
-create user authenticator noinherit;
-grant anon              to authenticator;
-grant authenticated     to authenticator;
-grant service_role      to authenticator;
-grant usage                     on schema public to postgres, anon, authenticated, service_role;
-alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role;
-alter default privileges in schema public grant all on functions to postgres, anon, authenticated, service_role;
-alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;`,
-    ],
-  ];
+  const files: string[] = [];
 
   for (const [_, service] of context.services) {
     const result = (await service.hook('sql', { name: db })) ?? [];

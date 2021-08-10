@@ -37,7 +37,7 @@ export function config(
     },
     gateway: {
       enabled: true,
-      name: config.name,
+      prefix: config.name,
       stripPath: true,
     },
     container: {
@@ -45,7 +45,7 @@ export function config(
       externalPort: 9999,
       port: 9999,
       imageName: 'supabase/gotrue:latest',
-      host: context.mode === ContextModeLocal ? 'auth' : '0.0.0.0',
+      host: context.mode === ContextModeLocal ? config.name : '0.0.0.0',
       environment: {
         GOTRUE_JWT_SECRET:
           '<%= await context.getService("gateway").hook("jwtSecret") %>',

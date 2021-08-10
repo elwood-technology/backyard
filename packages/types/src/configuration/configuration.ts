@@ -3,11 +3,13 @@ import type { DeepRequired } from 'ts-essentials';
 import type { JsonObject } from '../scalar';
 import type { ServiceName } from '../service';
 
-export type ConfigurationModuleOptions = JsonObject;
+export interface ConfigurationModuleOptions extends JsonObject {
+  resolve?: string;
+}
 
 export type ConfigurationModule<
   Options extends ConfigurationModuleOptions = ConfigurationModuleOptions,
-> = string | [string] | [string, Options];
+> = string | [string] | Options | [Options] | [string, Options];
 
 export type ConfigurationPlatform = {
   local?: ConfigurationModule;
@@ -16,8 +18,8 @@ export type ConfigurationPlatform = {
 
 export interface ConfigurationServiceGateway {
   enabled: boolean;
-  name?: string;
   url?: string;
+  prefix?: string;
   stripPath?: boolean;
   routes?: Array<{
     name: string;

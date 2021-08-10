@@ -36,21 +36,16 @@ export async function build(args: PlatformCommandHookArgs): Promise<void> {
   if (docker !== false) {
     await run(
       dockerComposeCmdPath,
-      ['build', '--no-cache'],
-      {
-        cwd: context.dir.stage,
-      },
-      context.log,
-    );
-
-    await run(
-      dockerComposeCmdPath,
       [
         '--project-name',
         projectName,
         'up',
+        '--build',
         '--no-start',
         '--renew-anon-volumes',
+        '--force-recreate',
+        '--always-recreate-deps',
+        '--remove-orphans',
       ],
       {
         cwd: context.dir.stage,
