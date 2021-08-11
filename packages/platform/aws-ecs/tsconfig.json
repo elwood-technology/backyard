@@ -15,7 +15,7 @@
       "prepend": false
     },
     {
-      "path": "../../plugin/terraform",
+      "path": "../aws",
       "prepend": false
     }
   ]

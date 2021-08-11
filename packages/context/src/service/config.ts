@@ -14,7 +14,7 @@ export type ResolveServiceConfigArgs = {
   initialConfig: ConfigurationService;
   context: Context;
   hooks: ServiceHooks;
-  platform: Platform;
+  platform?: Platform;
 };
 
 export async function resolveServiceConfig(
@@ -34,7 +34,7 @@ export async function resolveServiceConfig(
     ]);
   }
 
-  if (isFunction(platform.config)) {
+  if (platform && isFunction(platform.config)) {
     config = deepMerge(config, await platform.config(context, config));
   }
 

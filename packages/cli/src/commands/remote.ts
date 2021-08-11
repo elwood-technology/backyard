@@ -39,6 +39,8 @@ export default {
       process.exit(1);
     }
 
+    await tools.context.platforms.remote.init();
+
     switch (subCommand) {
       case 'clean': {
         return await clean(tools);

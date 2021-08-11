@@ -18,10 +18,14 @@ import {
 import { ContextPlatformState } from './state';
 
 export function loadPlatforms(config: Configuration): Context['platforms'] {
-  const { local } = loadPlatform<LocalPlatform>(
+  const local = loadPlatform<LocalPlatform>(
     config.platform?.local ?? '@backyard/platform-docker',
+    'local',
   );
-  const { remote } = loadPlatform<RemotePlatform>(config.platform?.remote);
+  const remote = loadPlatform<RemotePlatform>(
+    config.platform?.remote,
+    'remote',
+  );
 
   invariant(local, 'Unable to load local platform');
 
@@ -33,14 +37,20 @@ export function loadPlatforms(config: Configuration): Context['platforms'] {
 
 export function loadPlatform<P extends Platform = Platform>(
   module: ConfigurationModule | undefined,
-): P {
+  type: 'local' | 'remote',
+): P | undefined {
   const [platform, options] = resolvePlatform(module);
+  const w = platform[type];
 
-  if (isFunction(platform.setOptions)) {
-    platform.setOptions(options);
+  if (!w) {
+    return undefined;
   }
 
-  return platform as P;
+  if (isFunction(w.setOptions)) {
+    w.setOptions(options);
+  }
+
+  return w as P;
 }
 
 export function resolvePlatform(

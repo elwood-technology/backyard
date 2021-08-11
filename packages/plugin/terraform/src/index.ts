@@ -1,13 +1,4 @@
-import { TerraformGenerator } from 'terraform-generator';
+import * as api from './api';
 
-export * as remote from './remote';
-export * from './hook';
+export default api;
 export * from './types';
-
-export default {
-  async createGenerator(): Promise<TerraformGenerator> {
-    return new TerraformGenerator();
-  },
-};
-
-export { Function, Argument, Map, Heredoc } from 'terraform-generator';

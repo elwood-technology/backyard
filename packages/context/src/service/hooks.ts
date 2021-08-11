@@ -55,7 +55,7 @@ export async function executeServiceHook<Result = Json>(
 
   const hooks = service.getHooks().hooks;
   const extendedHooks = service.getExtendedHooks().hooks;
-  const platformHooks = service.getPlatform().hooks;
+  const platformHooks = service.getPlatform();
   const context = service.getContext();
   const isAPrecedingHook =
     name.startsWith('before:') || name.startsWith('after:');

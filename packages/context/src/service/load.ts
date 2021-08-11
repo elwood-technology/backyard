@@ -18,7 +18,6 @@ import {
   ContextModeLocal,
   invariant,
   isFunction,
-  AbstractPlatform,
   normalizeModuleDef,
 } from '@backyard/common';
 
@@ -83,18 +82,8 @@ export async function loadService(
     ) as ConfigWithType;
   }
 
-  // it's possible that service.config hook set
-  // a platform. we should use that here, and merge it
-  // with what was already set
-  if (config.platform) {
-    platform = deepMerge(
-      platform,
-      loadServicePlatform(context, config.platform),
-    );
-  }
-
   // give the platform hooks a chance to update config
-  if (isFunction(platform.config)) {
+  if (platform && isFunction(platform.config)) {
     config = deepMerge(
       config,
       await platform.config(context, config),
@@ -136,15 +125,15 @@ export async function getProviderExtendedModule(
 export function loadServicePlatform(
   context: Context,
   config: ConfigurationPlatform | undefined,
-): Platform {
+): Platform | undefined {
   if (!config) {
-    return new (class extends AbstractPlatform {})();
+    return undefined;
   }
 
   const platform =
     context.mode === ContextModeLocal ? config.local : config.remote;
 
-  return loadPlatform(platform);
+  return loadPlatform(platform, context.mode);
 }
 
 export async function getPackageFilePath(

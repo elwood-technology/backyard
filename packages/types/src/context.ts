@@ -42,7 +42,7 @@ export interface ContextService<
   };
   getHooks(): ServiceHooks;
   getExtendedHooks(): ServiceHooks;
-  getPlatform(): Platform;
+  getPlatform(): Platform | undefined;
   getGatewayUrl(): string;
   getContainerUrl(): string;
   getContext(): Context;

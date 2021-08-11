@@ -1,47 +1,62 @@
 import { AbstractRemotePlatform } from '@backyard/common';
 
 import type {
-  // Context,
   PlatformCommandHookArgs,
-  PlatformInitArgs, //ContextService, JsonObject
+  PlatformInitArgs,
 } from '@backyard/types';
-import TerraformPlugin from '@backyard/plugin-terraform';
-// import { getServiceByName, getServices } from '@backyard/common';
 
-type Plugins = {
-  terraform: typeof TerraformPlugin;
-};
+import { getServices } from '@backyard/common';
 
-type Options = {
-  profile: string;
-  region: string;
-};
+import type {
+  AwsRemoteOptions,
+  AwsRemotePlugins,
+  AwsRemoteTerraformHookArgs,
+} from './types';
+import { addVpc } from './vpn';
 
 export class AwsRemotePlatform extends AbstractRemotePlatform<
-  Options,
-  Plugins
+  AwsRemoteOptions,
+  AwsRemotePlugins
 > {
   async init(args: PlatformInitArgs) {
     args.registerPlugin('terraform', '@backyard/plugin-terraform');
   }
 
-  async build(args: PlatformCommandHookArgs<Plugins>) {
-    const { plugins } = args;
-    const { profile, region } = this.getOptions();
+  async build(args: PlatformCommandHookArgs<AwsRemotePlugins>) {
+    const { context, plugins } = args;
+    const { profile, region, vpc } = this.getOptions();
 
-    const tf = await plugins.terraform.createGenerator();
+    const state = await plugins.terraform.createState();
 
-    tf.provider('aws', {
+    state.generator.provider('aws', {
       region: region,
       profile: profile,
     });
 
-    //   const gateway = getServiceByName('gateway', context);
-    //   const tf = new TerraformGenerator();
+    state.add('data', 'aws_availability_zones', 'available', {
+      state: 'available',
+    });
 
-    // const az = tf.data('aws_availability_zones', 'available', {
-    //   state: 'available',
-    // });
+    const hookArgs: AwsRemoteTerraformHookArgs = {
+      options: this.getOptions(),
+      state,
+      vpc() {
+        if (vpc) {
+          return state.get('resource', 'aws_vpc', vpc.name);
+        }
+        return undefined;
+      },
+    };
+
+    addVpc(hookArgs);
+
+    const services = getServices(context);
+
+    for (const service of services) {
+      await service.hook('aws', hookArgs);
+    }
+
+    state.write(context.dir.stage);
   }
 
   async deploy(_args: PlatformCommandHookArgs) {
@@ -122,6 +137,7 @@ export class AwsRemotePlatform extends AbstractRemotePlatform<
 //   destination_cidr_block: '0.0.0.0/0',
 //   gateway_id: ig.id,
 // });
+
 // const eip = tf.resource('aws_eip', 'backyard--vpc-eip', {
 //   count: 2,
 //   vpc: true,

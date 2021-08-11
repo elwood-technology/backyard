@@ -6,7 +6,12 @@ import {
   Context,
   PlatformPlugin,
 } from '@backyard/types';
-import { isFunction } from '@backyard/common';
+import {
+  invariant,
+  isFunction,
+  silentResolve,
+  requireModule,
+} from '@backyard/common';
 
 export class ContextPlatformState<Hooks extends string>
   implements ContextPlatform<Hooks>
@@ -32,7 +37,23 @@ export class ContextPlatformState<Hooks extends string>
     this.#context = context;
   }
 
-  async init(): Promise<void> {}
+  async init(): Promise<void> {
+    if (isFunction(this.#platform.init)) {
+      await this.#platform.init({
+        registerPlugin: (name: string, provider: string) => {
+          const p = silentResolve(provider);
+
+          invariant(
+            p,
+            `Unable to resolve requested plugin "${provider}" as "${name}"`,
+          );
+
+          this.#plugins[name] = requireModule(p) as PlatformPlugin;
+        },
+      });
+    }
+  }
+
   setOptions(options: JsonObject): void {
     if (isFunction(this.#platform.setOptions)) {
       this.#platform.setOptions(options);
@@ -47,9 +68,10 @@ export class ContextPlatformState<Hooks extends string>
     const fn = (this.#platform as unknown as Record<Hooks, any>)[name];
 
     if (fn && isFunction(fn)) {
-      result = await fn({
+      result = await fn.call(this.#platform, {
         options: this.#options,
         context: this.#context,
+        plugins: this.#plugins,
         ...args,
       });
     }

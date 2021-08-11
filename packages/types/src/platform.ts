@@ -2,7 +2,7 @@ import { Context } from './context';
 import { Json, JsonObject } from './scalar';
 
 export interface PlatformPlugin {
-  [index: string]: (...args: Json) => Promise<Json>;
+  [index: string]: (...args: Json) => Promise<Json> | Json;
 }
 export type PlatformPlugins = Record<string, PlatformPlugin>;
 

@@ -24,7 +24,7 @@ export type ContextServiceStateInput = Pick<
 > & {
   config: DeepRequired<ConfigurationService>;
   hooks: ServiceHooks;
-  platform: Platform;
+  platform?: Platform;
   providerExtendHooks: ServiceHooks;
 };
 
@@ -90,7 +90,7 @@ export class ContextServiceState implements ContextService {
     return this.#state.providerExtendHooks ?? {};
   }
 
-  getPlatform(): Platform {
+  getPlatform(): Platform | undefined {
     return this.#state.platform;
   }
 
