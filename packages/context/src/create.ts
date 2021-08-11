@@ -90,6 +90,9 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
     platforms: loadPlatforms(config),
   });
 
+  context.platforms.local.setContext(context);
+  context.platforms.remote?.setContext(context);
+
   const allServices = [
     ...(await readCoreServicesFromConfiguration(config)),
     ...(sourceDir === 'skip' ? [] : await readServicesFromSource(sourceDir)),

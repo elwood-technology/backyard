@@ -94,7 +94,7 @@ export async function build(tools: Toolbox): Promise<void> {
 
   spin.text = 'Sending to remote platform...';
 
-  await tools.context.platforms.remote!.build({
+  await tools.context.platforms.remote!.executeHook('build', {
     context: tools.context,
     commandOptions: tools.parameters.options,
   });
@@ -107,7 +107,7 @@ export async function deploy(tools: Toolbox): Promise<void> {
     await build(tools);
   }
 
-  await tools.context.platforms.remote!.deploy({
+  await tools.context.platforms.remote!.executeHook('deploy', {
     context: tools.context,
     commandOptions: tools.parameters.options,
   });
@@ -126,7 +126,7 @@ export async function teardown(tools: Toolbox): Promise<void> {
     }
   }
 
-  await tools.context.platforms.remote!.teardown({
+  await tools.context.platforms.remote!.executeHook('teardown', {
     context: tools.context,
     commandOptions: tools.parameters.options,
   });

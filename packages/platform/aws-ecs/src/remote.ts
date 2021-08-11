@@ -11,8 +11,8 @@ import { getServiceByName, getServices } from '@backyard/common';
 
 import { AwsEcsTerraformState, AwsEcsTerraformHookArgs } from './types';
 
-export async function build(context: Context): Promise<void> {
-  await remote.build(context);
+export async function build(_context: Context): Promise<void> {
+  // await remote.build(context);
   return;
 }
 

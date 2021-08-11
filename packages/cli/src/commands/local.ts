@@ -5,7 +5,6 @@
 import {
   invariant,
   ContextModeLocal,
-  isFunction,
   // getServices,
   // serviceHasGateway,
 } from '@backyard/common';
@@ -65,11 +64,10 @@ export default {
     await tools.createContext(ContextModeLocal);
 
     try {
-      if (
-        subCommand !== 'help' &&
-        isFunction(tools.context.platforms.local.before)
-      ) {
-        await tools.context.platforms.local.before({ context: tools.context });
+      if (subCommand !== 'help') {
+        await tools.context.platforms.local.executeHook('before', {
+          context: tools.context,
+        });
       }
 
       switch (subCommand) {
@@ -97,11 +95,10 @@ export default {
           help(tools);
       }
 
-      if (
-        subCommand !== 'help' &&
-        isFunction(tools.context.platforms.local.after)
-      ) {
-        await tools.context.platforms.local.after({ context: tools.context });
+      if (subCommand !== 'help') {
+        await tools.context.platforms.local.executeHook('after', {
+          context: tools.context,
+        });
       }
     } catch (err) {
       tools.print.error(err.message);
@@ -159,7 +156,10 @@ export async function build(tools: Toolbox): Promise<void> {
   spin.text = 'Initializing platform';
 
   try {
-    await platform.build({ context, commandOptions: tools.parameters.options });
+    await platform.executeHook('build', {
+      context,
+      commandOptions: tools.parameters.options,
+    });
   } catch (err) {
     spin.fail(err.message);
     console.log(err.stack);
@@ -264,7 +264,10 @@ export async function start(tools: Toolbox): Promise<void> {
   try {
     spin.start('Starting...');
 
-    await platform.start({ context, commandOptions: tools.parameters.options });
+    await platform.executeHook('start', {
+      context,
+      commandOptions: tools.parameters.options,
+    });
 
     spin.succeed('Started!');
   } catch (err) {
@@ -284,7 +287,10 @@ export async function stop(tools: Toolbox): Promise<void> {
 
     spin.start('Stopping...');
 
-    await platform.stop({ context, commandOptions: tools.parameters.options });
+    await platform.executeHook('stop', {
+      context,
+      commandOptions: tools.parameters.options,
+    });
 
     spin.succeed('Stopped!');
   } catch (err) {
@@ -302,7 +308,10 @@ export async function clean(tools: Toolbox): Promise<void> {
   try {
     spin.start('Cleaning platform...');
 
-    await platform.clean({ context, commandOptions: tools.parameters.options });
+    await platform.executeHook('clean', {
+      context,
+      commandOptions: tools.parameters.options,
+    });
 
     spin.text = 'Cleaning stage...';
 

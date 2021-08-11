@@ -1,10 +1,11 @@
 import type { DeepRequired } from 'ts-essentials';
 
-import type { JsonObject } from '../scalar';
-import type { ServiceName } from '../service';
+import type { JsonObject } from './scalar';
+import type { ServiceName } from './service';
 
 export interface ConfigurationModuleOptions extends JsonObject {
   resolve?: string;
+  plugins?: string[];
 }
 
 export type ConfigurationModule<

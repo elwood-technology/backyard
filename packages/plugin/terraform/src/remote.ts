@@ -2,11 +2,14 @@ import { join } from 'path';
 
 import { TerraformGenerator } from 'terraform-generator';
 
-import { invariant, isFunction } from '@backyard/common';
-import type { Context, JsonObject } from '@backyard/types';
+import { invariant } from '@backyard/common';
+import type {
+  Context,
+  JsonObject,
+  PlatformCommandHookArgs,
+} from '@backyard/types';
 
 import { runTerraform } from './run';
-import { createTerraformHookArgs } from './hook';
 
 type Dir = {
   destDir: string;
@@ -29,21 +32,22 @@ export function setupForDeployAndTeardown(context: Context): Dir {
   };
 }
 
-export async function build(context: Context): Promise<void> {
+export async function build(args: PlatformCommandHookArgs): Promise<void> {
+  const { context } = args;
   const tf = new TerraformGenerator();
 
   invariant(context.platforms.remote, 'No remote platform provided');
 
-  invariant(
-    isFunction(context.platforms.remote.terraform),
-    'Platform does not support Terraform',
-  );
-  await context.platforms.remote.terraform(
-    context,
-    createTerraformHookArgs({
-      tf,
-    }),
-  );
+  // invariant(
+  //   isFunction(context.platforms.remote.terraform),
+  //   'Platform does not support Terraform',
+  // );
+  // await context.platforms.remote.terraform(
+  //   context,
+  //   createTerraformHookArgs({
+  //     tf,
+  //   }),
+  // );
   tf.write({
     dir: context.dir.stage,
     format: true,

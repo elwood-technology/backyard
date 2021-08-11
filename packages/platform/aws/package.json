@@ -9,7 +9,8 @@
     "compile": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@backyard/common": "^0.2.14"
+    "@backyard/common": "^0.2.14",
+    "@backyard/platform-terraform": "^0.2.14"
   },
   "devDependencies": {
     "@backyard/tools-typescript": "^0.2.14",
