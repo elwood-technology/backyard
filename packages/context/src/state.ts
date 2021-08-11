@@ -67,7 +67,10 @@ export class ContextState implements Context {
       `Service already exists with name "${config.name}"`,
     );
 
-    invariant(config.provider, 'Service must have a provider');
+    invariant(
+      config.provider,
+      `Service "${config.name}" does not have a provider`,
+    );
 
     const service = await loadService(this, config);
 

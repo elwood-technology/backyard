@@ -55,8 +55,8 @@ export async function awsEcsContainerTaskDef(
     environment: Object.entries(container.environment ?? {}).map(
       ([name, value]) => {
         return {
-          name,
-          value,
+          name: String(name),
+          value: String(value),
         };
       },
     ),

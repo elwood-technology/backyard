@@ -35,7 +35,7 @@ export type PlatformLocalHooks =
   | 'stop'
   | 'clean';
 
-export type PlatformRemoteHooks = 'build' | 'deploy' | 'teardown';
+export type PlatformRemoteHooks = 'build' | 'deploy' | 'teardown' | 'clean';
 
 export interface Platform<Options extends JsonObject = JsonObject>
   extends JsonObject {
@@ -61,4 +61,5 @@ export interface RemotePlatform<
   build(args: PlatformCommandHookArgs<Plugins>): Promise<void>;
   deploy(args: PlatformCommandHookArgs<Plugins>): Promise<void>;
   teardown(args: PlatformCommandHookArgs<Plugins>): Promise<void>;
+  clean(args: PlatformCommandHookArgs<Plugins>): Promise<void>;
 }

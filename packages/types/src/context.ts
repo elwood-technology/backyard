@@ -28,6 +28,7 @@ export interface ContextService<
   apiModulePath?: string;
   uiModulePath?: string;
   config: ConfigurationService<Settings>;
+  settings: Settings;
   init(): Promise<void>;
   finalize(): Promise<void>;
   gateway: ConfigurationServiceGateway | undefined;

@@ -53,3 +53,10 @@ export type TerraformState = {
   ): TerraformAddType<T>;
   write(to: string): void;
 };
+
+export type TerraformStageDirs = {
+  destDir: string;
+  dataDir: string;
+  backendConfigFile: string;
+  backendStateFile: string;
+};

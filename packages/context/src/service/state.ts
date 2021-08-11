@@ -77,6 +77,10 @@ export class ContextServiceState implements ContextService {
     return this.#state.type ?? 'local';
   }
 
+  get settings(): JsonObject {
+    return this.#config.settings;
+  }
+
   getContext(): Context {
     invariant(this.#context, 'No context set');
     return this.#context;

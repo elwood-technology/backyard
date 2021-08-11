@@ -12,7 +12,7 @@ import {
   TerraformState,
   TerraformAddTypeName,
   TerraformAddType,
-} from './types';
+} from '../types';
 
 export function addModuleTo<T extends TerraformAddTypeName>(
   state: TerraformState,

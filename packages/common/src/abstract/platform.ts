@@ -34,5 +34,6 @@ export abstract class AbstractRemotePlatform<
 {
   abstract build(args: PlatformCommandHookArgs<Plugins>): Promise<void>;
   abstract deploy(args: PlatformCommandHookArgs<Plugins>): Promise<void>;
+  abstract clean(args: PlatformCommandHookArgs<Plugins>): Promise<void>;
   abstract teardown(args: PlatformCommandHookArgs<Plugins>): Promise<void>;
 }

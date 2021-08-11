@@ -128,7 +128,10 @@ export async function createGatewayTaskDef(
   const taskDef = [];
 
   for (const service of getServices(context)) {
-    const def = await service.hook('awsEcsContainerTaskDef', args);
+    const def = await service.hook('awsEcsContainerTaskDef', {
+      ...args,
+      service,
+    });
 
     if (def) {
       taskDef.push(def);
