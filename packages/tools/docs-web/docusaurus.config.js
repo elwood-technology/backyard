@@ -1,27 +1,25 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
-
-
 module.exports = {
   title: 'Backyard',
   tagline: 'Microservices for everyone!',
   url: 'https://backyard.io',
-  baseUrl: '/docs/',
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   organizationName: 'backyard-hq',
   projectName: 'backyard',
   themeConfig: {
     navbar: {
-      title: 'Docs',
+      title: 'Backyard',
       items: [
-        // {
-        //   type: 'doc',
-        //   docId: 'intro',
-        //   position: 'left',
-        //   label: 'Intro',
-        // },
+        {
+          type: 'doc',
+          docId: 'intro',
+          position: 'left',
+          label: 'Docs',
+        },
         // {
         //   type: 'doc',
         //   docId: 'guides',
@@ -53,17 +51,14 @@ module.exports = {
       {
 
         docs: {
-          id: 'docs',
           path: '../../../docs',
           sidebarPath: require.resolve('./sidebars.js'),
-          routeBasePath: '/',
           editUrl:
             'https://github.com/backyard-hq/backyard/edit/master/docs/',
           remarkPlugins: [
             [require('@docusaurus/remark-plugin-npm2yarn'), { sync: true }],
           ],
         },
-
       },
     ],
   ],
