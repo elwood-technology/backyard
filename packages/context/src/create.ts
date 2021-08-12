@@ -6,11 +6,9 @@ import { config as loadDotEnv } from 'dotenv';
 
 import { invariant, debug } from '@backyard/common';
 import type {
-  RemotePlatform,
   Configuration,
   Context,
   ContextMode,
-  LocalPlatform,
   FullConfiguration,
   ContextService,
 } from '@backyard/types';
@@ -21,11 +19,7 @@ import {
   readServicesFromSource,
   readUsersServicesFromConfiguration,
 } from './service';
-import {
-  resolvePlatform,
-  ContextPlatformStateLocal,
-  ContextPlatformStateRemote,
-} from './platform';
+import { loadPlatforms } from './platform';
 import { ContextState } from './state';
 
 export type CreateContextArgs = {
@@ -96,11 +90,16 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
     platforms: loadPlatforms(config),
   });
 
+  context.platforms.local.setContext(context);
+  context.platforms.remote?.setContext(context);
+
   const allServices = [
     ...(await readCoreServicesFromConfiguration(config)),
-    ...(await readServicesFromSource(sourceDir)),
+    ...(sourceDir === 'skip' ? [] : await readServicesFromSource(sourceDir)),
     ...(await readUsersServicesFromConfiguration(config)),
   ].filter((item) => item.enabled !== false);
+
+  log('found services: %s', allServices.map((item) => item.name).join(', '));
 
   const services: ContextService[] = [];
 
@@ -123,20 +122,6 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
   return context;
 }
 
-export function loadPlatforms(config: Configuration): Context['platforms'] {
-  const local = resolvePlatform<LocalPlatform>(
-    config.platform?.local ?? '@backyard/platform-docker',
-  );
-  const remote = resolvePlatform<RemotePlatform>(config.platform?.remote);
-
-  invariant(local, 'Unable to load local platform');
-
-  return {
-    local: new ContextPlatformStateLocal('local', local),
-    remote: remote && new ContextPlatformStateRemote('remote', remote),
-  };
-}
-
 export function getSourceDir(
   config: FullConfiguration,
   rootDir: string,
@@ -145,6 +130,10 @@ export function getSourceDir(
 
   if (BACKYARD_SRC_DIR) {
     return resolve(rootDir, BACKYARD_SRC_DIR);
+  }
+
+  if (config.resolve?.source === 'skip') {
+    return 'skip';
   }
 
   if (config.resolve?.source) {

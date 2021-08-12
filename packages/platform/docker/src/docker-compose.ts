@@ -41,7 +41,7 @@ export function createDockerCompose(
           container_name: container.name ?? `by-${service.name}`,
           environment: container.environment ?? {},
           ...more,
-          ports: createPorts(container),
+          ...createPorts(container),
         },
       };
     }, {}),
@@ -64,14 +64,16 @@ function imageName(config: ConfigurationServiceContainer): JsonObject {
   return {};
 }
 
-function createPorts(config: ConfigurationServiceContainer): string[] {
+function createPorts(config: ConfigurationServiceContainer): JsonObject {
   const morePorts = config.meta?.dockerCompose?.ports ?? [];
 
   if (!config.externalPort) {
-    return morePorts;
+    return morePorts.length === 0 ? {} : { props: morePorts };
   }
 
-  return [[config.externalPort, config.port].join(':'), ...morePorts];
+  return {
+    ports: [[config.externalPort, config.port].join(':'), ...morePorts],
+  };
 }
 
 function createVolumes(volumes: Array<[string, string]> = []): JsonObject {

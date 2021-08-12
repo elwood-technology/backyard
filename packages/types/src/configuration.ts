@@ -1,14 +1,16 @@
 import type { DeepRequired } from 'ts-essentials';
 
-import type { JsonObject } from '../scalar';
-import type { ServiceName } from '../service';
+import type { JsonObject } from './scalar';
+import type { ServiceName } from './service';
 
-export type ConfigurationModuleOptions = JsonObject;
+export interface ConfigurationModuleOptions extends JsonObject {
+  resolve?: string;
+  plugins?: string[];
+}
 
-export type ConfigurationModule =
-  | string
-  | [string]
-  | [string, ConfigurationModuleOptions];
+export type ConfigurationModule<
+  Options extends ConfigurationModuleOptions = ConfigurationModuleOptions,
+> = string | [string] | Options | [Options] | [string, Options];
 
 export type ConfigurationPlatform = {
   local?: ConfigurationModule;
@@ -17,8 +19,8 @@ export type ConfigurationPlatform = {
 
 export interface ConfigurationServiceGateway {
   enabled: boolean;
-  name?: string;
   url?: string;
+  prefix?: string;
   stripPath?: boolean;
   routes?: Array<{
     name: string;
@@ -49,13 +51,18 @@ export interface ConfigurationServiceContainer {
   meta?: JsonObject;
 }
 
+export interface ConfigurationServiceProviderOptions
+  extends ConfigurationModuleOptions {
+  extends?: ConfigurationModule;
+}
+
 export interface ConfigurationService<
   Settings extends ConfigurationServiceSettings = ConfigurationServiceSettings,
 > {
   name?: ServiceName;
   enabled?: boolean;
   version?: number;
-  provider?: string;
+  provider?: ConfigurationModule<ConfigurationServiceProviderOptions>;
   platform?: ConfigurationPlatform;
   comment?: string;
   settings?: Settings;

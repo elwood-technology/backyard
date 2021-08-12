@@ -10,7 +10,7 @@ import type { Toolbox } from '../types';
 
 export default async function context(tools: Toolbox): Promise<void> {
   tools.createContext = async (mode: ContextMode) => {
-    const envName = mode === ContextModeLocal ? 'local.env' : 'remove.env';
+    const envName = mode === ContextModeLocal ? '.env.local' : '.env.remote';
     const cwd = tools.parameters.options.cwd || process.cwd();
 
     if (process.env.BACKYARD_ENV_FILE) {

@@ -12,6 +12,14 @@ import { requireModule, isFunction } from '@backyard/common';
 export async function loadServicesModuleHooks(
   moduleRootPath: string,
 ): Promise<ServiceHooks> {
+  if (!filesystem.exists(moduleRootPath)) {
+    throw new Error(`Module root path ${moduleRootPath} does not exist`);
+  }
+
+  if (filesystem.isFile(moduleRootPath)) {
+    return loadServicesModuleHooksFromFile(moduleRootPath);
+  }
+
   const serviceModulePath = filesystem
     .find(moduleRootPath, {
       matching: 'backyard-service.*',
@@ -28,11 +36,11 @@ export async function loadServicesModuleHooks(
 export function loadServicesModuleHooksFromFile(
   modulePath: string,
 ): ServiceHooks {
-  const { config, init, ...hooks } = requireModule(modulePath) as ServiceHooks;
+  const hooks = requireModule(modulePath) as ServiceHooks;
 
   return {
-    config,
-    init,
+    config: hooks.config,
+    init: hooks.init,
     stage: hooks.stage,
     hooks: hooks as ServiceHooks['hooks'],
   };
@@ -46,15 +54,29 @@ export async function executeServiceHook<Result = Json>(
   let result: Json = undefined;
 
   const hooks = service.getHooks().hooks;
-  const platformHooks = service.getPlatform().hooks;
+  const extendedHooks = service.getExtendedHooks().hooks;
+  const platformHooks = service.getPlatform();
   const context = service.getContext();
+  const isAPrecedingHook =
+    name.startsWith('before:') || name.startsWith('after:');
 
-  await executeServiceHook(service, `before:${name}`, args);
+  if (!isAPrecedingHook) {
+    await executeServiceHook(service, `before:${name}`, args);
+  }
 
   if (platformHooks && isFunction(platformHooks[name])) {
     result = await platformHooks[name]({
       context,
       service,
+      ...args,
+    });
+  }
+
+  if (extendedHooks && isFunction(extendedHooks[name])) {
+    result = await extendedHooks[name]({
+      context,
+      service,
+      parent: result,
       ...args,
     });
   }
@@ -68,7 +90,9 @@ export async function executeServiceHook<Result = Json>(
     });
   }
 
-  await executeServiceHook(service, `after:${name}`, { ...args, result });
+  if (!isAPrecedingHook) {
+    await executeServiceHook(service, `after:${name}`, { ...args, result });
+  }
 
   return result as Result;
 }

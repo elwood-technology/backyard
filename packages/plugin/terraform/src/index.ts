@@ -1,5 +1,4 @@
-export * as remote from './remote';
-export * from './hook';
-export * from './types';
+import * as api from './api';
 
-export { Function, Argument, Map, Heredoc } from 'terraform-generator';
+export default api;
+export * from './types';
