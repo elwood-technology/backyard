@@ -1,17 +1,44 @@
 import { join } from 'path';
 
 import type { JsonObject, ServiceHookProviderArgs } from '@backyard/types';
-import type { AwsRemoteTerraformHookArgs } from '@backyard/platform-aws';
+
+import { invariant } from '@backyard/common';
+
+import type { AwsRemoteTerraformHookArgs, AwsRemoteOptions } from '../types';
+import { getServices } from 'packages/common/src/service';
 
 export async function awsEcsContainerTaskDef(
   args: ServiceHookProviderArgs & AwsRemoteTerraformHookArgs,
 ): Promise<JsonObject | undefined> {
-  const { service, context, state, options } = args;
+  const { service, context, state } = args;
   const { container } = service;
 
   if (!container || container?.enabled === false) {
     return;
   }
+
+  const { ecs, region, profile } = (context.platforms.remote?.getOptions() ??
+    {}) as AwsRemoteOptions;
+  const clusters = ecs?.clusters ?? [];
+  const numberOfServices = getServices(context).length - 1;
+
+  invariant(
+    container.port,
+    `Service "${service.name}" does not have a "container.port". This is required for ECS Containers`,
+  );
+
+  const {
+    cluster: clusterName,
+    containerCpu = 100 / numberOfServices / 100,
+    containerMemory = 0,
+  } = service.platform?.getOptions() ?? {};
+
+  const cluster = clusters.find((item) => item.name === clusterName) ?? {
+    cpu: 256,
+    memory: 512,
+  };
+  const cpu = Math.floor(cluster.cpu * containerCpu);
+  const memory = Math.floor(cluster.memory * containerMemory);
 
   let image = container.imageName;
 
@@ -30,8 +57,8 @@ export async function awsEcsContainerTaskDef(
       source: 'github.com/backyardjs/terraform-aws-ecr-image',
       dockerfile_dir: join(context.dir.stage, service.name),
       ecr_repository_url: ecr.attr('repository_url'),
-      aws_profile: options.profile,
-      aws_region: options.region,
+      aws_profile: profile,
+      aws_region: region,
     });
 
     image = img.attr('ecr_image_url').toString();
@@ -39,16 +66,16 @@ export async function awsEcsContainerTaskDef(
 
   return {
     name: service.name,
-    cpu: 9,
+    cpu,
     image,
-    memory: 9,
+    memory,
     essential: container.essential !== false,
     networkMode: 'awsvpc',
     logConfiguration: {
       logDriver: 'awslogs',
       options: {
         'awslogs-group': 'BackyardLogGroup',
-        'awslogs-region': options.region,
+        'awslogs-region': region,
         'awslogs-stream-prefix': service.name,
       },
     },
@@ -62,8 +89,8 @@ export async function awsEcsContainerTaskDef(
     ),
     portMappings: [
       {
-        containerPort: container.port ?? 5433,
-        hostPort: container.port ?? 5433,
+        containerPort: container.port,
+        hostPort: container.port,
       },
     ],
   };

@@ -12,7 +12,7 @@ import type {
   AwsRemotePlugins,
   AwsRemoteTerraformHookArgs,
 } from './types';
-import { addVpc } from './vpn';
+import { addVpc } from './vpc';
 
 export class AwsRemotePlatform extends AbstractRemotePlatform<
   AwsRemoteOptions,

@@ -4,6 +4,7 @@ import {
   Context,
   ConfigurationService,
   ServiceHookProviderArgs,
+  JsonObject,
 } from '@backyard/types';
 import { ContextModeLocal, invariant } from '@backyard/common';
 
@@ -191,4 +192,20 @@ ALTER ROLE postgres SET search_path = "$user", public, auth;
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;`,
     ],
   ];
+}
+
+export async function awsEcsContainerTaskDef(
+  args: ServiceHookProviderArgs,
+): Promise<JsonObject> {
+  const { parent, service } = args;
+
+  return {
+    ...parent,
+    dependsOn: [
+      {
+        containerName: service.config.settings!.db,
+        condition: 'HEALTHY',
+      },
+    ],
+  };
 }

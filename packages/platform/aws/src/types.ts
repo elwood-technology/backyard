@@ -15,6 +15,13 @@ export type AwsRemoteOptions = {
     name: string;
     subnetCount?: number;
   };
+  ecs?: {
+    clusters?: Array<{
+      name: string;
+      cpu: number;
+      memory: number;
+    }>;
+  };
 };
 
 export interface AwsRemoteTerraformHookArgs extends JsonObject {

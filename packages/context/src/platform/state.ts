@@ -5,6 +5,8 @@ import {
   JsonObject,
   Context,
   PlatformPlugin,
+  ContextPlatformTypeName,
+  ConfigurationService,
 } from '@backyard/types';
 import {
   invariant,
@@ -13,16 +15,23 @@ import {
   requireModule,
 } from '@backyard/common';
 
-export class ContextPlatformState<Hooks extends string>
-  implements ContextPlatform<Hooks>
+export class ContextPlatformState<
+  T extends ContextPlatformTypeName,
+  Hooks extends string,
+> implements ContextPlatform<T, Hooks>
 {
   #platform: Platform;
   #plugins: Record<string, PlatformPlugin> = {};
   #context: Context | undefined;
   #options: JsonObject = {};
 
-  constructor(public readonly type: 'local' | 'remote', platform: Platform) {
+  constructor(
+    public readonly type: T,
+    platform: Platform,
+    options: JsonObject,
+  ) {
     this.#platform = platform;
+    this.setOptions(options);
   }
 
   get platform() {
@@ -35,6 +44,16 @@ export class ContextPlatformState<Hooks extends string>
 
   setContext(context: Context): void {
     this.#context = context;
+  }
+
+  async config(
+    context: Context,
+    config: ConfigurationService,
+  ): Promise<ConfigurationService> {
+    if (isFunction(this.#platform.config)) {
+      return this.#platform.config(context, config);
+    }
+    return config;
   }
 
   async init(): Promise<void> {
@@ -55,9 +74,15 @@ export class ContextPlatformState<Hooks extends string>
   }
 
   setOptions(options: JsonObject): void {
+    this.#options = options;
+
     if (isFunction(this.#platform.setOptions)) {
       this.#platform.setOptions(options);
     }
+  }
+
+  getOptions(): JsonObject {
+    return this.#options;
   }
 
   async executeHook<Result = Json>(
@@ -66,6 +91,8 @@ export class ContextPlatformState<Hooks extends string>
   ): Promise<Result> {
     let result = {} as Result;
     const fn = (this.#platform as unknown as Record<Hooks, any>)[name];
+
+    // console.log(name, this.#options);
 
     if (fn && isFunction(fn)) {
       result = await fn.call(this.#platform, {

@@ -3,6 +3,7 @@ import { ContextModeLocal, invariant } from '@backyard/common';
 import type {
   ConfigurationService,
   Context,
+  JsonObject,
   ServiceHookProviderArgs,
 } from '@backyard/types';
 
@@ -37,19 +38,6 @@ export function config(
   };
 }
 
-export async function init({
-  context,
-  service,
-}: ServiceHookProviderArgs): Promise<void> {
-  await context.addService({
-    name: `${service.name}-migrate`,
-    provider: '@backyard/service-postgresql-migrate',
-    settings: {
-      db: service.name,
-    },
-  });
-}
-
 export async function uri({
   service,
 }: ServiceHookProviderArgs): Promise<string> {
@@ -62,4 +50,21 @@ export async function uri({
   invariant(service.container.port, 'Missing db[container.port]');
 
   return `postgres://${user}:${password}@${service.container.host}:${service.container.port}/${name}?sslmode=disable`;
+}
+
+export async function awsEcsContainerTaskDef(
+  args: ServiceHookProviderArgs,
+): Promise<JsonObject> {
+  const { parent } = args;
+
+  return {
+    ...parent,
+    healthCheck: {
+      command: [
+        'CMD-SHELL',
+        'PGPASSWORD=$POSTGRES_PASSWORD pg_isready -d $POSTGRES_DB -U $POSTGRES_USER -p $POSTGRES_PORT',
+      ],
+      retries: 2,
+    },
+  };
 }

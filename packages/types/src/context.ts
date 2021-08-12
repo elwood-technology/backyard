@@ -35,15 +35,10 @@ export interface ContextService<
   container: ConfigurationServiceContainer | undefined;
   stage(dir: string): Promise<void>;
   hook<R = Json>(name: string, args?: JsonObject): Promise<R>;
-  platform?: {
-    gateway: ConfigurationServiceGateway | undefined;
-    container: ConfigurationServiceContainer | undefined;
-    stage(dir: string): Promise<void>;
-    hook(name: string, args?: JsonObject): Promise<Json>;
-  };
+  platform?: ContextPlatform<ContextPlatformTypeName, string>;
   getHooks(): ServiceHooks;
   getExtendedHooks(): ServiceHooks;
-  getPlatform(): Platform | undefined;
+  getPlatform(): ContextPlatform<ContextPlatformTypeName, string> | undefined;
   getGatewayUrl(): string;
   getContainerUrl(): string;
   getContext(): Context;
@@ -64,8 +59,8 @@ export interface Context {
   config: FullConfiguration;
   services: ContextServicesMap;
   platforms: {
-    local: ContextPlatform<PlatformLocalHooks>;
-    remote?: ContextPlatform<PlatformRemoteHooks>;
+    local: ContextPlatformLocal;
+    remote?: ContextPlatformRemote;
   };
   tools: {
     filesystem: typeof filesystem;
@@ -80,11 +75,28 @@ export interface Context {
   getService(name: string): ContextService;
 }
 
-export interface ContextPlatform<Hooks> {
-  type: 'local' | 'remote';
+export type ContextPlatformTypeName = ContextMode;
+
+export interface ContextPlatform<
+  T extends ContextPlatformTypeName,
+  Hooks extends string,
+> {
   platform: Platform;
   plugins: Record<string, Json>;
   init(): Promise<void>;
   setContext(context: Context): void;
+  getOptions(): JsonObject;
+  type: T;
+  config(
+    context: Context,
+    config: ConfigurationService,
+  ): Promise<ConfigurationService>;
   executeHook<Result = Json>(name: Hooks, args: JsonObject): Promise<Result>;
 }
+
+export type ContextPlatformLocal = ContextPlatform<'local', PlatformLocalHooks>;
+
+export type ContextPlatformRemote = ContextPlatform<
+  'remote',
+  PlatformRemoteHooks
+>;

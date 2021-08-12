@@ -16,3 +16,8 @@ export interface KongConfig {
   services: KongService[];
   consumers: Array<{ username: string; keyauth_credentials: JsonObject }>;
 }
+
+export interface GoTrueServiceSettings {
+  db: string;
+  operatorToken: string;
+}

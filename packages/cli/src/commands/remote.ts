@@ -119,7 +119,7 @@ export async function teardown(tools: Toolbox): Promise<void> {
   const { yes = false, clean = true } = tools.parameters.options;
 
   if (yes === false) {
-    const areYouSure = tools.prompt.confirm(
+    const areYouSure = await tools.prompt.confirm(
       'Are you sure you want to teardown the remote instance',
     );
 

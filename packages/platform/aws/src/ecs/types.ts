@@ -13,3 +13,16 @@ export interface AwsEcsTerraformState {
   albSecurityGroup: Resource;
   alb: Resource;
 }
+
+export interface AwsRemoteEcsOptions {
+  cluster?: string;
+  containerCpu?: number;
+  containerMemory?: number;
+  healthCheck?: {
+    command: string[];
+    interval?: number;
+    timeout?: number;
+    retries?: number;
+    startPeriod?: number;
+  };
+}

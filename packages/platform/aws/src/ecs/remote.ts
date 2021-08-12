@@ -1,7 +1,6 @@
 import type { ServiceHookProviderArgs } from '@backyard/types';
 
-import type { AwsRemoteTerraformHookArgs } from '@backyard/platform-aws';
-
+import type { AwsRemoteTerraformHookArgs } from '../types';
 import { addGatewayEcs } from './gateway';
 
 export async function aws(

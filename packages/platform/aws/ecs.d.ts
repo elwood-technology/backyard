@@ -1,1 +1,1 @@
-export * from './lib/ecs/types.d.ts';
+export * from './lib/ecs/index.d.ts';

@@ -9,9 +9,10 @@ import type {
   ConfigurationService,
   ContextService,
   ConfigurationPlatform,
-  Platform,
   ServiceHooks,
   ConfigurationServiceProviderOptions,
+  ContextPlatform,
+  ContextPlatformTypeName,
 } from '@backyard/types';
 
 import {
@@ -66,7 +67,7 @@ export async function loadService(
 
   const hooks = await loadServicesModuleHooks(moduleRootPath);
   const providerExtendHooks = await getProviderExtendedModule(providerOptions);
-  let platform = loadServicePlatform(context, initialConfig.platform);
+  const platform = loadServicePlatform(context, initialConfig.platform);
 
   let config = (await resolveServiceConfig({
     context,
@@ -125,7 +126,7 @@ export async function getProviderExtendedModule(
 export function loadServicePlatform(
   context: Context,
   config: ConfigurationPlatform | undefined,
-): Platform | undefined {
+): ContextPlatform<ContextPlatformTypeName, string> | undefined {
   if (!config) {
     return undefined;
   }
@@ -133,7 +134,7 @@ export function loadServicePlatform(
   const platform =
     context.mode === ContextModeLocal ? config.local : config.remote;
 
-  return loadPlatform(platform, context.mode);
+  return loadPlatform(platform, context.mode === 'local' ? 'local' : 'remote');
 }
 
 export async function getPackageFilePath(

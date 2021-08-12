@@ -64,8 +64,8 @@ export async function executeServiceHook<Result = Json>(
     await executeServiceHook(service, `before:${name}`, args);
   }
 
-  if (platformHooks && isFunction(platformHooks[name])) {
-    result = await platformHooks[name]({
+  if (platformHooks) {
+    result = await platformHooks.executeHook(name, {
       context,
       service,
       ...args,

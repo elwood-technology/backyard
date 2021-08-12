@@ -8,7 +8,8 @@ import type {
   ConfigurationServiceContainer,
   JsonObject,
   Json,
-  Platform,
+  ContextPlatform,
+  ContextPlatformTypeName,
 } from '@backyard/types';
 
 import { invariant, debug } from '@backyard/common';
@@ -24,7 +25,7 @@ export type ContextServiceStateInput = Pick<
 > & {
   config: DeepRequired<ConfigurationService>;
   hooks: ServiceHooks;
-  platform?: Platform;
+  platform?: ContextPlatform<ContextPlatformTypeName, string>;
   providerExtendHooks: ServiceHooks;
 };
 
@@ -81,6 +82,10 @@ export class ContextServiceState implements ContextService {
     return this.#config.settings;
   }
 
+  get platform(): ContextPlatform<ContextPlatformTypeName, string> | undefined {
+    return this.#state.platform;
+  }
+
   getContext(): Context {
     invariant(this.#context, 'No context set');
     return this.#context;
@@ -94,7 +99,7 @@ export class ContextServiceState implements ContextService {
     return this.#state.providerExtendHooks ?? {};
   }
 
-  getPlatform(): Platform | undefined {
+  getPlatform(): ContextPlatform<ContextPlatformTypeName, string> | undefined {
     return this.#state.platform;
   }
 

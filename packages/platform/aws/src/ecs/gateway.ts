@@ -1,7 +1,7 @@
 import type { Context, JsonObject } from '@backyard/types';
-
 import { getServices, getServiceByName } from '@backyard/common';
-import type { AwsRemoteTerraformHookArgs } from '@backyard/platform-aws';
+
+import type { AwsRemoteTerraformHookArgs } from '../types';
 
 export async function addGatewayEcs(
   context: Context,
@@ -35,6 +35,7 @@ export async function addGatewayEcs(
   );
 
   const publicSubnets = state.get('resource', 'aws_subnet', 'public');
+  const privateSubnets = state.get('resource', 'aws_subnet', 'private');
 
   const alb = state.add('resource', 'aws_alb', 'gateway', {
     name: 'BackyardTestALB',
@@ -84,11 +85,11 @@ export async function addGatewayEcs(
   const memory = 8192;
   const taskDef = await createGatewayTaskDef(context, args);
 
-  const _cluster = state.add('resource', 'aws_ecs_cluster', 'ecs-cluster', {
+  const cluster = state.add('resource', 'aws_ecs_cluster', 'ecs-cluster', {
     name: 'Backyard',
   });
 
-  const _task = state.add('resource', 'aws_ecs_task_definition', 'ecs-task', {
+  const task = state.add('resource', 'aws_ecs_task_definition', 'ecs-task', {
     family: 'Backyard',
     network_mode: 'awsvpc',
     requires_compatibilities: ['FARGATE'],
@@ -118,6 +119,49 @@ export async function addGatewayEcs(
       target_group_arn: target.id,
       type: 'forward',
     },
+  });
+
+  const securityGroup = state.add(
+    'resource',
+    'aws_security_group',
+    'gatway-sg',
+    {
+      name: 'BackyardKongSecurityGroup',
+      description: 'ALB Security Group',
+      vpc_id: vpc?.id,
+
+      ingress: {
+        protocol: 'tcp',
+        from_port: gateway?.container?.port,
+        to_port: gateway?.container?.port,
+        security_groups: [albSecurityGroup.id],
+      },
+
+      egress: {
+        from_port: 0,
+        to_port: 0,
+        protocol: '-1',
+        cidr_blocks: ['0.0.0.0/0'],
+      },
+    },
+  );
+
+  state.add('resource', 'aws_ecs_service', 'ecs-service', {
+    name: 'Backyard',
+    cluster: cluster.id,
+    task_definition: task.id,
+    desired_count: 1,
+    launch_type: 'FARGATE',
+    network_configuration: {
+      security_groups: [securityGroup.id],
+      subnets: privateSubnets.attr('*.id'),
+    },
+    load_balancer: {
+      target_group_arn: target.id,
+      container_name: 'gateway',
+      container_port: gateway?.container?.port,
+    },
+    depends_on: [alb],
   });
 }
 

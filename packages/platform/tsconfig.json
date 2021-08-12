@@ -11,10 +11,6 @@
       "prepend": false
     },
     {
-      "path": "./aws-lambda",
-      "prepend": false
-    },
-    {
       "path": "./docker",
       "prepend": false
     },

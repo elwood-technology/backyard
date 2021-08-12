@@ -6,7 +6,8 @@ import type {
   ConfigurationService,
   ServiceHooks,
   Json,
-  Platform,
+  ContextPlatform,
+  ContextPlatformTypeName,
 } from '@backyard/types';
 import { isFunction } from '@backyard/common';
 
@@ -14,7 +15,7 @@ export type ResolveServiceConfigArgs = {
   initialConfig: ConfigurationService;
   context: Context;
   hooks: ServiceHooks;
-  platform?: Platform;
+  platform?: ContextPlatform<ContextPlatformTypeName, string>;
 };
 
 export async function resolveServiceConfig(

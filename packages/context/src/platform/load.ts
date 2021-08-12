@@ -6,10 +6,15 @@ import {
   LocalPlatform,
   Context,
   Configuration,
+  ContextPlatformTypeName,
+  PlatformLocalHooks,
+  PlatformRemoteHooks,
+  ContextPlatformLocal,
+  ContextPlatformRemote,
+  ContextPlatform,
 } from '@backyard/types';
 import {
   normalizeModuleDef,
-  isFunction,
   requireModule,
   invariant,
   AbstractPlatform,
@@ -18,27 +23,27 @@ import {
 import { ContextPlatformState } from './state';
 
 export function loadPlatforms(config: Configuration): Context['platforms'] {
-  const local = loadPlatform<LocalPlatform>(
+  const local = loadPlatform(
     config.platform?.local ?? '@backyard/platform-docker',
     'local',
-  );
-  const remote = loadPlatform<RemotePlatform>(
+  ) as ContextPlatformLocal;
+  const remote = loadPlatform(
     config.platform?.remote,
     'remote',
-  );
+  ) as ContextPlatformRemote;
 
   invariant(local, 'Unable to load local platform');
 
   return {
-    local: new ContextPlatformState('local', local),
-    remote: remote && new ContextPlatformState('remote', remote),
+    local,
+    remote,
   };
 }
 
-export function loadPlatform<P extends Platform = Platform>(
+export function loadPlatform(
   module: ConfigurationModule | undefined,
-  type: 'local' | 'remote',
-): P | undefined {
+  type: ContextPlatformTypeName,
+): ContextPlatform<ContextPlatformTypeName, string> | undefined {
   const [platform, options] = resolvePlatform(module);
   const w = platform[type];
 
@@ -46,11 +51,19 @@ export function loadPlatform<P extends Platform = Platform>(
     return undefined;
   }
 
-  if (isFunction(w.setOptions)) {
-    w.setOptions(options);
+  if (type === 'local') {
+    return new ContextPlatformState<'local', PlatformLocalHooks>(
+      'local',
+      w as LocalPlatform,
+      options,
+    );
   }
 
-  return w as P;
+  return new ContextPlatformState<'remote', PlatformRemoteHooks>(
+    'remote',
+    w as RemotePlatform,
+    options,
+  );
 }
 
 export function resolvePlatform(
