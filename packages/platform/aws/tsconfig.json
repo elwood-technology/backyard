@@ -15,7 +15,7 @@
       "prepend": false
     },
     {
-      "path": "../terraform",
+      "path": "../../plugin/terraform",
       "prepend": false
     }
   ]

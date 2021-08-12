@@ -10,7 +10,9 @@
     "**/backyard-service.*",
     "**/dev-server.d.ts",
     "**/backyard-ui.*",
-    "**/config/*"
+    "**/config/*",
+    "**/packages/platform/aws/*.d.ts",
+    "**/packages/platform/aws/*.js"
   ],
   "exclude": ["tmp", "temp", "build", "templates", "docs", "node_modules"]
 }
