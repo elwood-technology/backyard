@@ -1,20 +1,18 @@
-import { join } from 'path';
-import { EOL } from 'os';
+// import { join } from 'path';
+// import { EOL } from 'os';
 
-import Table from 'cli-table3';
+// import Table from 'cli-table3';
 import {
   invariant,
   ContextModeLocal,
-  isFunction,
-  getServices,
-  serviceHasGateway,
+  // getServices,
+  // serviceHasGateway,
 } from '@backyard/common';
 
 import { Toolbox } from '../types';
 
 export const SUB_COMMANDS = [
   'build',
-  'init',
   'start',
   'stop',
   'restart',
@@ -27,7 +25,6 @@ export const ALIAS_COMMANDS = ['start', 'stop', 'restart'];
 
 export const SUB_COMMANDS_DESC = [
   'build the local state',
-  'alias for `local build`',
   'start docker services',
   'stop docker services',
   'start then stop docker services',
@@ -67,17 +64,15 @@ export default {
     await tools.createContext(ContextModeLocal);
 
     try {
-      if (
-        subCommand !== 'help' &&
-        isFunction(tools.context.platforms.local.before)
-      ) {
-        await tools.context.platforms.local.before(tools.context);
+      if (subCommand !== 'help') {
+        await tools.context.platforms.local.executeHook('before', {
+          context: tools.context,
+        });
       }
 
       switch (subCommand) {
         case 'build':
-        case 'init':
-          return await init(tools);
+          return await build(tools);
 
         case 'start':
           return await start(tools);
@@ -100,11 +95,10 @@ export default {
           help(tools);
       }
 
-      if (
-        subCommand !== 'help' &&
-        isFunction(tools.context.platforms.local.after)
-      ) {
-        await tools.context.platforms.local.after(tools.context);
+      if (subCommand !== 'help') {
+        await tools.context.platforms.local.executeHook('after', {
+          context: tools.context,
+        });
       }
     } catch (err) {
       tools.print.error(err.message);
@@ -129,7 +123,7 @@ export async function help(tools: Toolbox): Promise<void> {
         'Looks like you do not have a ".backyard" folder. Would you like to run "local build"?',
       )
     ) {
-      return await init(tools);
+      return await build(tools);
     }
   }
 
@@ -146,11 +140,11 @@ export async function help(tools: Toolbox): Promise<void> {
   tools.print.newline();
 }
 
-export async function init(tools: Toolbox): Promise<void> {
+export async function build(tools: Toolbox): Promise<void> {
   const { context } = tools;
   const platform = context.platforms.local;
-  const localTextFilePath = join(context.dir.stage, 'local.txt');
-  const hasLocalText = tools.filesystem.exists(localTextFilePath);
+  // const localTextFilePath = join(context.dir.stage, 'local.txt');
+  // const hasLocalText = tools.filesystem.exists(localTextFilePath);
 
   const spin = tools.print.spin();
   spin.start('Initalizing...');
@@ -159,114 +153,109 @@ export async function init(tools: Toolbox): Promise<void> {
 
   await tools.prepareStage();
 
-  spin.text = 'Building services';
-
-  for (const [name, service] of context.services) {
-    const serviceDir = join(context.dir.stage, name);
-
-    await tools.filesystem.dirAsync(serviceDir);
-    await service.stage(serviceDir);
-  }
-
   spin.text = 'Initializing platform';
 
   try {
-    await platform.init(context, tools.parameters.options);
+    await platform.executeHook('build', {
+      context,
+      commandOptions: tools.parameters.options,
+    });
   } catch (err) {
     spin.fail(err.message);
+    console.log(err.stack);
     return;
   }
 
-  const gatewayPort = context.services.get('gateway')?.container?.externalPort;
+  // const gatewayPort = context.services.get('gateway')?.container?.externalPort;
 
-  const serviceUrls = getServices(context)
-    .filter((item) => serviceHasGateway(item))
-    .map((item) => {
-      return [
-        `${item.name.toUpperCase()}_URL`,
-        `http://localhost:${gatewayPort}/${item.name}/v1`,
-      ];
-    });
+  // const serviceUrls = getServices(context)
+  //   .filter((item) => serviceHasGateway(item))
+  //   .map((item) => {
+  //     return [
+  //       `${item.name.toUpperCase()}_URL`,
+  //       `http://localhost:${gatewayPort}/${item.name}/v1`,
+  //     ];
+  //   });
 
-  const operatorToken = await context.getService('auth').hook('operatorToken');
-  const keys = (await context.getService('gateway').hook('keys')) as {
-    anonymousKey: string;
-    serviceKey: string;
-  };
+  // const operatorToken = await context.getService('auth').hook('operatorToken');
+  // const keys = (await context.getService('gateway').hook('keys')) as {
+  //   anonymousKey: string;
+  //   serviceKey: string;
+  // };
 
-  await tools.filesystem.writeAsync(
-    join(context.dir.stage, '.env'),
-    [
-      ...serviceUrls,
-      ['GATEWAY_URL', `http://localhost:${gatewayPort}`],
-      ['KEY_ANON', keys.anonymousKey],
-      ['KEY_SERVER', keys.serviceKey],
-    ]
-      .map(([key, value]) => [`BACKYARD_${key}`, value].join('='))
-      .join(EOL),
-  );
+  // await tools.filesystem.writeAsync(
+  //   join(context.dir.stage, '.env'),
+  //   [
+  //     ...serviceUrls,
+  //     ['GATEWAY_URL', `http://localhost:${gatewayPort}`],
+  //     ['KEY_ANON', keys.anonymousKey],
+  //     ['KEY_SERVER', keys.serviceKey],
+  //   ]
+  //     .map(([key, value]) => [`BACKYARD_${key}`, value].join('='))
+  //     .join(EOL),
+  // );
 
-  const uiService = getServices(context).find((item) => item.name === 'ui');
+  // const uiService = getServices(context).find((item) => item.name === 'ui');
 
-  const localText = [
-    'Welcome To Backyard',
-    ' ',
-    'Looking for some documentation to help get started:',
-    ' https://github.com/elwood-technology/backyard/blob/main/docs/start/quick.md',
-    'Have questions, ask them here:',
-    ' https://github.com/elwood-technology/backyard/discussions',
-    ' ',
-    uiService && 'UI Service is installed. If you have not setup the Auth ',
-    uiService &&
-      'Service yet, you will need to visit the Setup url to get started',
-    uiService &&
-      ` Entry: http://${uiService.container?.externalHost}:${uiService.container?.externalPort}/`,
-    uiService &&
-      ` Setup: http://${uiService.container?.externalHost}:${uiService.container?.externalPort}/auth/setup`,
-    uiService && ' ',
-    'Here is some important information you may need:',
-    ` Operator Token: ${operatorToken}`,
-    ` Anonymous Key: ${keys.anonymousKey}`,
-    ` Service Key: ${keys.serviceKey}`,
-    ' ',
-    'Configured Services',
-    ...getServices(context).map((item) => ` ${item.name} (${item.provider})`),
-  ].filter(Boolean) as string[];
+  // const localText = [
+  //   'Welcome To Backyard',
+  //   ' ',
+  //   'Looking for some documentation to help get started:',
+  //   ' https://github.com/elwood-technology/backyard/blob/main/docs/start/quick.md',
+  //   'Have questions, ask them here:',
+  //   ' https://github.com/elwood-technology/backyard/discussions',
+  //   ' ',
+  //   uiService && 'UI Service is installed. If you have not setup the Auth ',
+  //   uiService &&
+  //     'Service yet, you will need to visit the Setup url to get started',
+  //   uiService &&
+  //     ` Entry: http://${uiService.container?.externalHost}:${uiService.container?.externalPort}/`,
+  //   uiService &&
+  //     ` Setup: http://${uiService.container?.externalHost}:${uiService.container?.externalPort}/auth/setup`,
+  //   uiService && ' ',
+  //   'Here is some important information you may need:',
+  //   ` Operator Token: ${operatorToken}`,
+  //   ` Anonymous Key: ${keys.anonymousKey}`,
+  //   ` Service Key: ${keys.serviceKey}`,
+  //   ' ',
+  //   'Configured Services',
+  //   ...getServices(context).map((item) => ` ${item.name} (${item.provider})`),
+  // ].filter(Boolean) as string[];
 
-  await tools.filesystem.writeAsync(localTextFilePath, localText.join(EOL));
+  // await tools.filesystem.writeAsync(localTextFilePath, localText.join(EOL));
+
+  // // we use the local.txt file to determine if the user has run the init command
+  // // before we cleared it out. No need to reprint this every time
+  // if (!hasLocalText) {
+  //   const tbl = new Table({
+  //     chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
+  //     style: { 'padding-left': 2, 'padding-right': 2 },
+  //   });
+
+  //   tbl.push([''], ...localText.map((line) => [line]), ['']);
+
+  //   tools.print.info(tbl.toString());
+  // }
 
   spin.succeed();
-
-  // we use the local.txt file to determine if the user has run the init command
-  // before we cleared it out. No need to reprint this every time
-  if (!hasLocalText) {
-    const tbl = new Table({
-      chars: { mid: '', 'left-mid': '', 'mid-mid': '', 'right-mid': '' },
-      style: { 'padding-left': 2, 'padding-right': 2 },
-    });
-
-    tbl.push([''], ...localText.map((line) => [line]), ['']);
-
-    tools.print.info(tbl.toString());
-  }
 }
 
 export async function start(tools: Toolbox): Promise<void> {
   const { context } = tools;
   const platform = context.platforms.local;
 
-  if (tools.parameters.options['init'] === true) {
-    await init(tools);
+  if (tools.parameters.options['build'] === true) {
+    await build(tools);
   }
 
   if (!tools.filesystem.exists(context.dir.stage)) {
     if (
       await tools.prompt.confirm(
-        'Looks like you do not have a ".backyard/local" folder.\nWould you like to run "local init"?',
+        'Looks like you do not have a ".backyard/local" folder.\nWould you like to run "local build"?',
         true,
       )
     ) {
-      await init(tools);
+      await build(tools);
     }
   }
 
@@ -275,7 +264,10 @@ export async function start(tools: Toolbox): Promise<void> {
   try {
     spin.start('Starting...');
 
-    await platform.start(context, tools.parameters.options);
+    await platform.executeHook('start', {
+      context,
+      commandOptions: tools.parameters.options,
+    });
 
     spin.succeed('Started!');
   } catch (err) {
@@ -295,7 +287,10 @@ export async function stop(tools: Toolbox): Promise<void> {
 
     spin.start('Stopping...');
 
-    await platform.stop(context, tools.parameters.options);
+    await platform.executeHook('stop', {
+      context,
+      commandOptions: tools.parameters.options,
+    });
 
     spin.succeed('Stopped!');
   } catch (err) {
@@ -313,7 +308,10 @@ export async function clean(tools: Toolbox): Promise<void> {
   try {
     spin.start('Cleaning platform...');
 
-    await platform.clean(context, tools.parameters.options);
+    await platform.executeHook('clean', {
+      context,
+      commandOptions: tools.parameters.options,
+    });
 
     spin.text = 'Cleaning stage...';
 

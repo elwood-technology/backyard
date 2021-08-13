@@ -38,14 +38,14 @@ export async function createKongConfig(
 
       invariant(gateway, 'Gateway is not defined');
 
-      const name = service.name;
+      const prefix = service.gateway?.prefix ?? service.name;
       const version = 1;
       const stripPath = gateway.stripPath ?? true;
       const routes = gateway.routes ?? [
         {
-          name: `${name}-all`,
+          name: `${prefix}-all`,
           strip_path: stripPath,
-          paths: [`/${name}/v${version}`],
+          paths: [`/${prefix}/v${version}`],
         },
       ];
 
@@ -54,8 +54,8 @@ export async function createKongConfig(
       const port = container?.port ?? 3000;
 
       return {
-        name,
-        _comment: name,
+        name: service.name,
+        _comment: `Gateway for ${service.name}`,
         url: service.gateway?.url ?? `http://${host}:${port}`,
         routes,
         plugins: [

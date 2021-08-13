@@ -10,7 +10,7 @@ import {
 } from './configuration';
 import { Json, JsonObject } from './scalar';
 import { ServiceHooks, ServiceName } from './service';
-import { RemotePlatform, LocalPlatform } from './platform';
+import { Platform, PlatformLocalHooks, PlatformRemoteHooks } from './platform';
 
 export type ContextMode = 'local' | 'remote';
 
@@ -28,22 +28,20 @@ export interface ContextService<
   apiModulePath?: string;
   uiModulePath?: string;
   config: ConfigurationService<Settings>;
+  settings: Settings;
   init(): Promise<void>;
   finalize(): Promise<void>;
   gateway: ConfigurationServiceGateway | undefined;
   container: ConfigurationServiceContainer | undefined;
   stage(dir: string): Promise<void>;
   hook<R = Json>(name: string, args?: JsonObject): Promise<R>;
-  platform?: {
-    gateway: ConfigurationServiceGateway | undefined;
-    container: ConfigurationServiceContainer | undefined;
-    stage(dir: string): Promise<void>;
-    hook(name: string, args?: JsonObject): Promise<Json>;
-  };
+  platform?: ContextPlatform<ContextPlatformTypeName, string>;
   getHooks(): ServiceHooks;
-  getPlatformHooks(): ServiceHooks;
+  getExtendedHooks(): ServiceHooks;
+  getPlatform(): ContextPlatform<ContextPlatformTypeName, string> | undefined;
   getGatewayUrl(): string;
   getContainerUrl(): string;
+  getContext(): Context;
 }
 
 export type ContextServicesMap = Map<ServiceName, ContextService>;
@@ -61,8 +59,8 @@ export interface Context {
   config: FullConfiguration;
   services: ContextServicesMap;
   platforms: {
-    local: LocalPlatform;
-    remote: RemotePlatform;
+    local: ContextPlatformLocal;
+    remote?: ContextPlatformRemote;
   };
   tools: {
     filesystem: typeof filesystem;
@@ -76,3 +74,29 @@ export interface Context {
   addService(config: ConfigurationService): Promise<ContextService>;
   getService(name: string): ContextService;
 }
+
+export type ContextPlatformTypeName = ContextMode;
+
+export interface ContextPlatform<
+  T extends ContextPlatformTypeName,
+  Hooks extends string,
+> {
+  platform: Platform;
+  plugins: Record<string, Json>;
+  init(): Promise<void>;
+  setContext(context: Context): void;
+  getOptions(): JsonObject;
+  type: T;
+  config(
+    context: Context,
+    config: ConfigurationService,
+  ): Promise<ConfigurationService>;
+  executeHook<Result = Json>(name: Hooks, args: JsonObject): Promise<Result>;
+}
+
+export type ContextPlatformLocal = ContextPlatform<'local', PlatformLocalHooks>;
+
+export type ContextPlatformRemote = ContextPlatform<
+  'remote',
+  PlatformRemoteHooks
+>;

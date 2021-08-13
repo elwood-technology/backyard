@@ -1,7 +1,12 @@
 # Architecture
 
 - [Architecture](#architecture)
-  - [Folder Structure & Packages](#folder-structure--packages)
+  - [Folder Structure](#folder-structure)
+    - [Files](#files)
+      - [Package Example](#package-example)
+      - [Typescript Configuration Example](#typescript-configuration-example)
+      - [ReadMe Example](#readme-example)
+  - [Packages](#packages)
     - [`cli` (@backyard/cli)](#cli-backyardcli)
     - [`common` (@backyard/common)](#common-backyardcommon)
     - [`context` (@backyard/context)](#context-backyardcontext)
@@ -24,7 +29,35 @@
       - [`typescript` (@backyard/tool-typescript)](#typescript-backyardtool-typescript)
     - [`types` (@backyard/types)](#types-backyardtypes)
 
-## Folder Structure & Packages
+## Folder Structure
+All folders should follow the following structure
+
+```
+ ./package
+  ./config          files used to configure dev tools
+  ./bin             executable scripts included in the packaged
+  ./scripts         executable script used in development or build.
+  ./src             source files
+  package.json
+  tsconfig.json
+  readme.md
+```
+
+### Files
+
+  - `package.json` - required (example below). make sure to follow the standard package naming convention
+  - `tsconfig.json` - (example below). should always extend the base typescript config at `<root>/config/tsconfig.base.json`
+  - `readme.md` - required (example below)
+
+#### Package Example
+
+#### Typescript Configuration Example
+
+#### ReadMe Example
+
+---
+
+##  Packages
 
 ### `cli` (@backyard/cli)
 Command line interface. Installs to `backyard` and `by`
