@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@backyard/types": "^0.2.15",
-    "@types/jest": "^26.0.15"
+    "@types/jest": "^27.0.1"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [

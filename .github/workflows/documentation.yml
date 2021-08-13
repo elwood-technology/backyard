@@ -2,9 +2,9 @@ name: documentation
 
 on:
   pull_request:
-    branches: [documentation]
+    branches: [main]
   push:
-    branches: [documentation]
+    branches: [main]
 
 jobs:
   checks:
@@ -17,6 +17,7 @@ jobs:
           node-version: "12.x"
       - name: Test Build
         run: |
+          cd ./packages/tools/docs-web;
           if [ -e yarn.lock ]; then
             yarn install --frozen-lockfile
           elif [ -e package-lock.json ]; then
@@ -41,8 +42,9 @@ jobs:
           USE_SSH: true
           GIT_USER: git
         run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "gh-actions"
+          cd ./packages/tools/docs-web;
+          git config --global user.email "travis@elwood.technology"
+          git config --global user.name "traviskuhl"
           if [ -e yarn.lock ]; then
             yarn install --frozen-lockfile
           elif [ -e package-lock.json ]; then

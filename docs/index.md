@@ -4,7 +4,7 @@ sidebar_position: 1
 slug: /
 ---
 
-# Backyard
+# Introduction
 
 An opinioned microservices platform.
 
