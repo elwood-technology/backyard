@@ -17,6 +17,7 @@ jobs:
           node-version: "12.x"
       - name: Test Build
         run: |
+          yarn && yarn compile
           cd ./packages/tools/docs-web;
           if [ -e yarn.lock ]; then
             yarn install --frozen-lockfile
@@ -42,6 +43,7 @@ jobs:
           USE_SSH: true
           GIT_USER: git
         run: |
+          yarn && yarn compile
           cd ./packages/tools/docs-web;
           git config --global user.email "travis@elwood.technology"
           git config --global user.name "traviskuhl"
