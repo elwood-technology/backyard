@@ -34,31 +34,9 @@ create.d.ts:2
 
 #### Defined in
 
-service/core.d.ts:1
+core-services.d.ts:1
 
 ## Functions
-
-### addServiceToContext
-
-▸ **addServiceToContext**(`context`, `config`, `tryToInitialize?`): `Promise`<`void`\>
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `context` | `Context` |
-| `config` | `ConfigurationService` |
-| `tryToInitialize?` | `boolean` |
-
-#### Returns
-
-`Promise`<`void`\>
-
-#### Defined in
-
-service/add.d.ts:2
-
-___
 
 ### createContext
 
@@ -100,27 +78,6 @@ util.d.ts:2
 
 ___
 
-### createKeys
-
-▸ **createKeys**(`destDir`, `config`): `Context`[``"keys"``]
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `destDir` | `string` |
-| `config` | `Configuration` |
-
-#### Returns
-
-`Context`[``"keys"``]
-
-#### Defined in
-
-create.d.ts:10
-
-___
-
 ### getBackyardDir
 
 ▸ **getBackyardDir**(`config`, `rootDir`): `string`
@@ -138,7 +95,7 @@ ___
 
 #### Defined in
 
-create.d.ts:14
+create.d.ts:12
 
 ___
 
@@ -159,7 +116,7 @@ ___
 
 #### Defined in
 
-create.d.ts:13
+create.d.ts:11
 
 ___
 
@@ -207,24 +164,4 @@ ___
 
 #### Defined in
 
-create.d.ts:12
-
-___
-
-### loadPlatforms
-
-▸ **loadPlatforms**(`config`): `Context`[``"platforms"``]
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `config` | `Configuration` |
-
-#### Returns
-
-`Context`[``"platforms"``]
-
-#### Defined in
-
-create.d.ts:11
+create.d.ts:10

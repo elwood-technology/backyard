@@ -1,27 +1,37 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
-
-
 module.exports = {
   title: 'Backyard',
   tagline: 'Microservices for everyone!',
   url: 'https://backyard.io',
-  baseUrl: '/docs/',
+  baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
-  organizationName: 'backyard-hq',
+  organizationName: 'elwood-technology',
   projectName: 'backyard',
   themeConfig: {
+    colorMode: {
+      defaultMode: 'light',
+      disableSwitch: true,
+      respectPrefersColorScheme: true,
+    },
     navbar: {
-      title: 'Docs',
+      logo: {
+        alt: 'Backyard Logo',
+        src: '/logo.svg',
+        srcDark: '/logo.svg',
+        href: 'https://backyard.io/',
+        target: '_self',
+      },
+      title: 'Backyard',
       items: [
-        // {
-        //   type: 'doc',
-        //   docId: 'intro',
-        //   position: 'left',
-        //   label: 'Intro',
-        // },
+        {
+          type: 'doc',
+          docId: 'intro',
+          position: 'left',
+          label: 'Docs',
+        },
         // {
         //   type: 'doc',
         //   docId: 'guides',
@@ -29,7 +39,17 @@ module.exports = {
         //   label: 'Guides',
         // },
         {
-          href: 'https://github.com/backyard-hq/backyard',
+          href: 'https://github.com/elwood-technology/backyard/discussions',
+          label: 'Support',
+          position: 'right',
+        },
+        {
+          href: 'https://discord.gg/4cJ6Rbfwyc',
+          label: 'Discord',
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/elwood-technology/backyard',
           label: 'GitHub',
           position: 'right',
         },
@@ -53,17 +73,14 @@ module.exports = {
       {
 
         docs: {
-          id: 'docs',
           path: '../../../docs',
           sidebarPath: require.resolve('./sidebars.js'),
-          routeBasePath: '/',
           editUrl:
-            'https://github.com/backyard-hq/backyard/edit/master/docs/',
+            'https://github.com/elwood-technology/backyard/edit/master/docs/',
           remarkPlugins: [
             [require('@docusaurus/remark-plugin-npm2yarn'), { sync: true }],
           ],
         },
-
       },
     ],
   ],
