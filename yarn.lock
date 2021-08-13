@@ -1166,19 +1166,7 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
-"@backyard/common@^0.2.15":
-  version "0.2.15"
-  resolved "https://registry.yarnpkg.com/@backyard/common/-/common-0.2.15.tgz#9f0eba386a9afaad3f972aff3986fed119ea6efd"
-  integrity sha512-ZROLLe8RIT0CuVfFocNvebuGtSQ6W9ilzqcl1QyP9wENT6sASL3bMdnqfTF6x1IGwHQLsLlF6SUPecQRV8Y9DQ==
-  dependencies:
-    "@backyard/types" "^0.2.15"
-    "@types/debug" "^4.1.5"
-    "@types/uuid" "^8.3.0"
-    debug "^4.2.0"
-    ts-invariant "^0.9.0"
-    uuid "^8.3.1"
-
-"@backyard/platform-aws-ecs@^0.2.14":
+"@backyard/platform-aws-ecs@^0.2.15":
   version "0.2.15"
   resolved "https://registry.yarnpkg.com/@backyard/platform-aws-ecs/-/platform-aws-ecs-0.2.15.tgz#a39764e8eafc67ebe1a1d139d668244c5ecbcdcb"
   integrity sha512-DUvqNXm/MRClfiNPvKxVNBGfskUy1rpxXu0hvxuxbP6bWUB4V308OGWffuE6VxFIxckcsvmAK2WY5kt/PLs3Ag==
@@ -1186,22 +1174,13 @@
     "@backyard/common" "^0.2.15"
     "@backyard/platform-terraform" "^0.2.15"
 
-"@backyard/platform-terraform@^0.2.14", "@backyard/platform-terraform@^0.2.15":
+"@backyard/platform-terraform@^0.2.15":
   version "0.2.15"
   resolved "https://registry.yarnpkg.com/@backyard/platform-terraform/-/platform-terraform-0.2.15.tgz#4f70b9e4199931ca3772a2770b39ec2b51cd1ba7"
   integrity sha512-otILz5j2ZVCIPn2/n7gsySBY/Ah6iFu0feZOOq5SiQxqNm7GpuWFApJEHGvYpnklyVFjKMF+5OnVrNZ/ZCwwew==
   dependencies:
     "@backyard/common" "^0.2.15"
     terraform-generator "^5.0.0"
-
-"@backyard/types@^0.2.15":
-  version "0.2.15"
-  resolved "https://registry.yarnpkg.com/@backyard/types/-/types-0.2.15.tgz#e9e34edc2226ccfcc6e62e6c2279bc6aefc0f684"
-  integrity sha512-U+nAzxm5MQDe22u48rK+lqdBL5p1BMON6c2yCSKnD1odPYBqFi14esDk/jtj3+E5YRV9aONldhMsDI5jGbbq6Q==
-  dependencies:
-    fs-jetpack "^4.1.0"
-    ts-essentials "^7.0.1"
-    webpack "*"
 
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
@@ -3166,6 +3145,14 @@
   integrity sha512-c3mAZEuK0lvBp8tmuL74XRKn1+y2dcwOUpH7x4WrF6gk1GIgiluDRgMYQtw2OFcBvAJWlt6ASU3tSqxp0Uu0Aw==
   dependencies:
     "@types/istanbul-lib-report" "*"
+
+"@types/jest@^26.0.15":
+  version "26.0.24"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-26.0.24.tgz#943d11976b16739185913a1936e0de0c4a7d595a"
+  integrity sha512-E/X5Vib8BWqZNRlDxj9vYXhsDwPYbPINqKF9BsnSoon4RQ0D9moEuLD8txgyypFLH7J4+Lho9Nr/c8H0Fi+17w==
+  dependencies:
+    jest-diff "^26.0.0"
+    pretty-format "^26.0.0"
 
 "@types/jest@^27.0.0":
   version "27.0.0"
