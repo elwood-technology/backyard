@@ -64,9 +64,6 @@ describe('create', () => {
       });
 
       expect(local.services.has('gateway')).toBeTruthy();
-      expect(local.services.has('db')).toBeTruthy();
-      expect(local.services.has('auth')).toBeTruthy();
-      expect(local.services.has('something')).toBeFalsy();
     });
   });
 });

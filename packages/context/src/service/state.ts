@@ -8,11 +8,14 @@ import type {
   ConfigurationServiceContainer,
   JsonObject,
   Json,
+  ContextPlatform,
+  ContextPlatformTypeName,
 } from '@backyard/types';
 
-import { invariant, debug, isFunction } from '@backyard/common';
+import { invariant, debug } from '@backyard/common';
 
 import { replaceConfigTemplateVariables } from './config';
+import { executeServiceHook } from './hooks';
 
 const log = debug('backyard:context:service');
 
@@ -22,7 +25,8 @@ export type ContextServiceStateInput = Pick<
 > & {
   config: DeepRequired<ConfigurationService>;
   hooks: ServiceHooks;
-  platformHooks: ServiceHooks;
+  platform?: ContextPlatform<ContextPlatformTypeName, string>;
+  providerExtendHooks: ServiceHooks;
 };
 
 export class ContextServiceState implements ContextService {
@@ -43,7 +47,7 @@ export class ContextServiceState implements ContextService {
   }
 
   get provider(): string {
-    return this.#state.config.provider;
+    return this.#state.config.provider[0];
   }
 
   get moduleRootPath(): string {
@@ -74,6 +78,14 @@ export class ContextServiceState implements ContextService {
     return this.#state.type ?? 'local';
   }
 
+  get settings(): JsonObject {
+    return this.#config.settings;
+  }
+
+  get platform(): ContextPlatform<ContextPlatformTypeName, string> | undefined {
+    return this.#state.platform;
+  }
+
   getContext(): Context {
     invariant(this.#context, 'No context set');
     return this.#context;
@@ -83,8 +95,12 @@ export class ContextServiceState implements ContextService {
     return this.#state.hooks;
   }
 
-  getPlatformHooks(): ServiceHooks {
-    return this.#state.platformHooks;
+  getExtendedHooks(): ServiceHooks {
+    return this.#state.providerExtendHooks ?? {};
+  }
+
+  getPlatform(): ContextPlatform<ContextPlatformTypeName, string> | undefined {
+    return this.#state.platform;
   }
 
   async init(): Promise<void> {
@@ -135,29 +151,7 @@ export class ContextServiceState implements ContextService {
     args: JsonObject = {},
   ): Promise<Result> {
     log(`${this.name}.executeHook("${name}")`);
-    let result: Json = undefined;
-
-    if (
-      this.#state.platformHooks.hooks &&
-      isFunction(this.#state.platformHooks.hooks[name])
-    ) {
-      result = await this.#state.platformHooks.hooks[name]({
-        context: this.getContext(),
-        service: this,
-        ...args,
-      });
-    }
-
-    if (this.#state.hooks.hooks && isFunction(this.#state.hooks.hooks[name])) {
-      result = await this.#state.hooks.hooks[name]({
-        context: this.getContext(),
-        service: this,
-        parent: result,
-        ...args,
-      });
-    }
-
-    return result as Result;
+    return await executeServiceHook<Result>(this, name, args);
   }
 
   hook = async <Result = Json>(

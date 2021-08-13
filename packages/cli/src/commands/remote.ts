@@ -34,6 +34,13 @@ export default {
       process.exit(1);
     }
 
+    if (!tools.context.platforms.remote) {
+      tools.print.error(`No remote platform provided in configuration`);
+      process.exit(1);
+    }
+
+    await tools.context.platforms.remote.init();
+
     switch (subCommand) {
       case 'clean': {
         return await clean(tools);
@@ -89,10 +96,10 @@ export async function build(tools: Toolbox): Promise<void> {
 
   spin.text = 'Sending to remote platform...';
 
-  await tools.context.platforms.remote.build(
-    tools.context,
-    tools.parameters.options,
-  );
+  await tools.context.platforms.remote!.executeHook('build', {
+    context: tools.context,
+    commandOptions: tools.parameters.options,
+  });
 
   spin.succeed('Build Complete!');
 }
@@ -102,17 +109,17 @@ export async function deploy(tools: Toolbox): Promise<void> {
     await build(tools);
   }
 
-  await tools.context.platforms.remote.deploy(
-    tools.context,
-    tools.parameters.options,
-  );
+  await tools.context.platforms.remote!.executeHook('deploy', {
+    context: tools.context,
+    commandOptions: tools.parameters.options,
+  });
 }
 
 export async function teardown(tools: Toolbox): Promise<void> {
   const { yes = false, clean = true } = tools.parameters.options;
 
   if (yes === false) {
-    const areYouSure = tools.prompt.confirm(
+    const areYouSure = await tools.prompt.confirm(
       'Are you sure you want to teardown the remote instance',
     );
 
@@ -121,10 +128,10 @@ export async function teardown(tools: Toolbox): Promise<void> {
     }
   }
 
-  await tools.context.platforms.remote.teardown(
-    tools.context,
-    tools.parameters.options,
-  );
+  await tools.context.platforms.remote!.executeHook('teardown', {
+    context: tools.context,
+    commandOptions: tools.parameters.options,
+  });
 
   if (clean !== true) {
     await clean(tools);

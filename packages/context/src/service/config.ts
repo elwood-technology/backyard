@@ -6,6 +6,8 @@ import type {
   ConfigurationService,
   ServiceHooks,
   Json,
+  ContextPlatform,
+  ContextPlatformTypeName,
 } from '@backyard/types';
 import { isFunction } from '@backyard/common';
 
@@ -13,32 +15,28 @@ export type ResolveServiceConfigArgs = {
   initialConfig: ConfigurationService;
   context: Context;
   hooks: ServiceHooks;
-  platformHooks: ServiceHooks;
+  platform?: ContextPlatform<ContextPlatformTypeName, string>;
 };
 
 export async function resolveServiceConfig(
   args: ResolveServiceConfigArgs,
 ): Promise<ConfigurationService> {
-  const { initialConfig, context, hooks, platformHooks } = args;
-  let config = deepMerge(
-    {
-      settings: {},
-      gateway: {
-        enabled: false,
-      },
-      container: {
-        enabled: false,
-      },
-    },
-    initialConfig,
-  ) as ConfigurationService;
+  const { initialConfig, context, hooks, platform } = args;
+  let config = deepMerge(initialConfig, {
+    settings: {},
+    gateway: {},
+    container: {},
+  }) as ConfigurationService;
 
   if (isFunction(hooks.config)) {
-    config = deepMerge(config, await hooks.config(context, config));
+    config = deepMerge.all([
+      await hooks.config(context, config),
+      initialConfig,
+    ]);
   }
 
-  if (isFunction(platformHooks.config)) {
-    config = deepMerge(config, await platformHooks.config(context, config));
+  if (platform && isFunction(platform.config)) {
+    config = deepMerge(config, await platform.config(context, config));
   }
 
   return config;

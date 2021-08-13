@@ -1,7 +1,7 @@
 import { ContextModeLocal } from '@backyard/common';
 
 import { Toolbox } from '../types';
-import { init } from './local';
+import { build } from './local';
 
 export default {
   name: 'init',
@@ -15,7 +15,7 @@ export default {
     await filesystem.dirAsync(context.dir.backyard);
 
     if (local !== false) {
-      await init(tools);
+      await build(tools);
     }
   },
 };

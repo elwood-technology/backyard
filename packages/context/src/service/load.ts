@@ -2,22 +2,34 @@ import { join, dirname } from 'path';
 
 import { filesystem } from 'gluegun';
 import findUp from 'find-up';
-import defaults from 'lodash.defaultsdeep';
+import deepMerge from 'deepmerge';
 
 import type {
   Context,
   ConfigurationService,
   ContextService,
+  ConfigurationPlatform,
+  ServiceHooks,
+  ConfigurationServiceProviderOptions,
+  ContextPlatform,
+  ContextPlatformTypeName,
 } from '@backyard/types';
 
-import { invariant, isFunction } from '@backyard/common';
+import {
+  ContextModeLocal,
+  invariant,
+  isFunction,
+  normalizeModuleDef,
+} from '@backyard/common';
 
+import { loadPlatform } from '../platform';
 import { resolveServiceConfig } from './config';
 import { ContextServiceState, ContextServiceStateInput } from './state';
-import {
-  loadServicesModuleHooks,
-  loadServicesModuleHooksFromFile,
-} from './hooks';
+import { loadServicesModuleHooks } from './hooks';
+
+type ConfigWithType = ContextServiceStateInput['config'] & {
+  type?: string;
+};
 
 export async function loadService(
   context: Context,
@@ -25,7 +37,11 @@ export async function loadService(
 ): Promise<ContextService> {
   invariant(initialConfig.provider, 'Service must have provider');
 
-  const pkgFile = await getPackageFilePath(initialConfig.provider);
+  const [providerModulePath, providerOptions] = normalizeModuleDef(
+    initialConfig.provider,
+  );
+
+  const pkgFile = await getPackageFilePath(providerModulePath);
 
   if (!pkgFile) {
     throw new Error('bad root module');
@@ -50,38 +66,29 @@ export async function loadService(
   invariant(name, `Unable to find name for service in "${moduleRootPath}"`);
 
   const hooks = await loadServicesModuleHooks(moduleRootPath);
-  let platformHooks = initialConfig.platform
-    ? loadServicesModuleHooksFromFile(initialConfig.platform)
-    : {};
+  const providerExtendHooks = await getProviderExtendedModule(providerOptions);
+  const platform = loadServicePlatform(context, initialConfig.platform);
 
   let config = (await resolveServiceConfig({
     context,
     initialConfig,
     hooks,
-    platformHooks,
-  })) as ContextServiceStateInput['config'] & {
-    type?: string;
-  };
+    platform,
+  })) as ConfigWithType;
 
-  // it's possible that service.config hook set
-  // a platform. we should use that here, and merge it
-  // with what was already set
-  if (config.platform) {
-    const newPlatformHooks = loadServicesModuleHooksFromFile(config.platform);
-
-    platformHooks = {
-      ...newPlatformHooks,
-      ...platformHooks,
-      hooks: {
-        ...newPlatformHooks.hooks,
-        ...platformHooks.hooks,
-      },
-    };
+  if (isFunction(providerExtendHooks.config)) {
+    config = deepMerge(
+      config,
+      await providerExtendHooks.config(context, config),
+    ) as ConfigWithType;
   }
 
   // give the platform hooks a chance to update config
-  if (isFunction(platformHooks.config)) {
-    config = defaults(config, await platformHooks.config(context, config));
+  if (platform && isFunction(platform.config)) {
+    config = deepMerge(
+      config,
+      await platform.config(context, config),
+    ) as ConfigWithType;
   }
 
   const input: ContextServiceStateInput = {
@@ -91,10 +98,43 @@ export async function loadService(
     uiModulePath,
     config,
     hooks,
-    platformHooks,
+    platform,
+    providerExtendHooks,
   };
 
   return new ContextServiceState(context, input);
+}
+
+export async function getProviderExtendedModule(
+  options: ConfigurationServiceProviderOptions | undefined,
+): Promise<ServiceHooks> {
+  if (!options?.extends) {
+    return {};
+  }
+
+  const [extend] = normalizeModuleDef(options.extends);
+
+  const pkgFile = await getPackageFilePath(require.resolve(extend));
+
+  if (!pkgFile) {
+    return {};
+  }
+
+  return await loadServicesModuleHooks(dirname(pkgFile));
+}
+
+export function loadServicePlatform(
+  context: Context,
+  config: ConfigurationPlatform | undefined,
+): ContextPlatform<ContextPlatformTypeName, string> | undefined {
+  if (!config) {
+    return undefined;
+  }
+
+  const platform =
+    context.mode === ContextModeLocal ? config.local : config.remote;
+
+  return loadPlatform(platform, context.mode === 'local' ? 'local' : 'remote');
 }
 
 export async function getPackageFilePath(

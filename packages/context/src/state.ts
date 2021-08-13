@@ -56,7 +56,7 @@ export class ContextState implements Context {
 
   async addService(
     config: ConfigurationService,
-    tryToInitialize = false,
+    tryToInitialize = true,
   ): Promise<ContextService> {
     log('adding %s to context', config.name);
 
@@ -67,11 +67,16 @@ export class ContextState implements Context {
       `Service already exists with name "${config.name}"`,
     );
 
-    invariant(config.provider, 'Service must have a provider');
+    invariant(
+      config.provider,
+      `Service "${config.name}" does not have a provider`,
+    );
 
     const service = await loadService(this, config);
 
     if (tryToInitialize) {
+      log('initalizing %s', config.name);
+
       await service.init();
       await service.finalize();
     }

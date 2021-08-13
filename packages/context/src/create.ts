@@ -4,13 +4,11 @@ import which from 'which';
 import * as filesystem from 'fs-jetpack';
 import { config as loadDotEnv } from 'dotenv';
 
-import { invariant, debug, requireModule } from '@backyard/common';
+import { invariant, debug } from '@backyard/common';
 import type {
-  RemotePlatform,
   Configuration,
   Context,
   ContextMode,
-  LocalPlatform,
   FullConfiguration,
   ContextService,
 } from '@backyard/types';
@@ -21,7 +19,7 @@ import {
   readServicesFromSource,
   readUsersServicesFromConfiguration,
 } from './service';
-
+import { loadPlatforms } from './platform';
 import { ContextState } from './state';
 
 export type CreateContextArgs = {
@@ -92,11 +90,16 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
     platforms: loadPlatforms(config),
   });
 
+  context.platforms.local.setContext(context);
+  context.platforms.remote?.setContext(context);
+
   const allServices = [
     ...(await readCoreServicesFromConfiguration(config)),
-    ...(await readServicesFromSource(sourceDir)),
+    ...(sourceDir === 'skip' ? [] : await readServicesFromSource(sourceDir)),
     ...(await readUsersServicesFromConfiguration(config)),
   ].filter((item) => item.enabled !== false);
+
+  log('found services: %s', allServices.map((item) => item.name).join(', '));
 
   const services: ContextService[] = [];
 
@@ -119,25 +122,6 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
   return context;
 }
 
-export function loadPlatforms(config: Configuration): Context['platforms'] {
-  const localPlatform = config.platform?.local ?? '@backyard/platform-docker';
-  const RemotePlatform =
-    config.platform?.remote ?? '@backyard/platform-aws-ecs';
-
-  const { local } =
-    requireModule<{ local: LocalPlatform }>(localPlatform) ?? {};
-  const { remote } =
-    requireModule<{ remote: RemotePlatform }>(RemotePlatform) ?? {};
-
-  invariant(local, 'Unable to load local platform');
-  invariant(remote, 'Unable to load remote platform');
-
-  return {
-    local,
-    remote,
-  };
-}
-
 export function getSourceDir(
   config: FullConfiguration,
   rootDir: string,
@@ -146,6 +130,10 @@ export function getSourceDir(
 
   if (BACKYARD_SRC_DIR) {
     return resolve(rootDir, BACKYARD_SRC_DIR);
+  }
+
+  if (config.resolve?.source === 'skip') {
+    return 'skip';
   }
 
   if (config.resolve?.source) {

@@ -3,8 +3,8 @@ import { randomBytes } from 'crypto';
 import {
   Context,
   ConfigurationService,
-  JsonObject,
   ServiceHookProviderArgs,
+  JsonObject,
 } from '@backyard/types';
 import { ContextModeLocal, invariant } from '@backyard/common';
 
@@ -12,6 +12,16 @@ export function config(
   context: Context,
   config: ConfigurationService,
 ): Partial<ConfigurationService> {
+  invariant(
+    config.settings?.db,
+    'You must provide the name of the database service in settings.db',
+  );
+
+  invariant(
+    config.settings?.operatorToken,
+    'You must provide an operatorToken in settings.operatorToken',
+  );
+
   return {
     settings: {
       operatorToken: randomBytes(100).toString('hex'),
@@ -28,7 +38,7 @@ export function config(
     },
     gateway: {
       enabled: true,
-      name: 'auth',
+      prefix: config.name,
       stripPath: true,
     },
     container: {
@@ -36,7 +46,7 @@ export function config(
       externalPort: 9999,
       port: 9999,
       imageName: 'supabase/gotrue:latest',
-      host: context.mode === ContextModeLocal ? 'auth' : '0.0.0.0',
+      host: context.mode === ContextModeLocal ? config.name : '0.0.0.0',
       environment: {
         GOTRUE_JWT_SECRET:
           '<%= await context.getService("gateway").hook("jwtSecret") %>',
@@ -59,9 +69,8 @@ export function config(
           config.settings?.mailerAutoConfirm ?? true,
         ),
         GOTRUE_LOG_LEVEL: config.settings?.logLevel ?? '',
-        GOTRUE_OPERATOR_TOKEN:
-          '<%= await context.getService("auth").hook("operatorToken") %>',
-        DATABASE_URL: '<%= await context.getService("db").hook("uri") %>',
+        GOTRUE_OPERATOR_TOKEN: `<%= await context.getService("${config.name}").hook("operatorToken") %>`,
+        DATABASE_URL: `<%= await context.getService("${config.settings.db}").hook("uri") %>`,
       },
       meta: {
         dockerCompose: {
@@ -77,14 +86,17 @@ export async function operatorToken({
 }: ServiceHookProviderArgs): Promise<string> {
   const { operatorToken } = service.config?.settings || {};
   invariant(operatorToken, 'No operatorToken in gotrue config');
-
   return operatorToken;
 }
 
-export async function sql(
-  _context: Context,
-  __args: JsonObject,
-): Promise<Array<[string, string]>> {
+export async function sql({
+  name,
+  service,
+}: ServiceHookProviderArgs): Promise<Array<[string, string]>> {
+  if (name !== service.config?.settings?.db) {
+    return [];
+  }
+
   return [
     [
       '01-auth',
@@ -180,4 +192,20 @@ ALTER ROLE postgres SET search_path = "$user", public, auth;
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;`,
     ],
   ];
+}
+
+export async function awsEcsContainerTaskDef(
+  args: ServiceHookProviderArgs,
+): Promise<JsonObject> {
+  const { parent, service } = args;
+
+  return {
+    ...parent,
+    dependsOn: [
+      {
+        containerName: service.config.settings!.db,
+        condition: 'HEALTHY',
+      },
+    ],
+  };
 }

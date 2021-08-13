@@ -6,8 +6,13 @@ import type {
   ConfigurationService,
   Configuration,
   FullConfiguration,
+  ConfigurationServiceProviderOptions,
 } from '@backyard/types';
-import { requireModule, silentResolve } from '@backyard/common';
+import {
+  requireModule,
+  silentResolve,
+  normalizeModuleDef,
+} from '@backyard/common';
 
 import { coreServiceProviders } from '../core-services';
 
@@ -112,23 +117,25 @@ export async function readUsersServicesFromConfiguration(
     });
 }
 
-function resolveProvider(
+export function resolveProvider(
   config: FullConfiguration,
-  provider: string | undefined,
-): string | undefined {
+  provider: ConfigurationService['provider'],
+): [string, ConfigurationServiceProviderOptions] | undefined {
   if (!provider) {
     return undefined;
   }
 
-  if (isAbsolute(provider)) {
-    return provider;
+  const [module, options] = normalizeModuleDef(provider);
+
+  if (isAbsolute(module)) {
+    return [module, options];
   }
 
-  if (silentResolve(provider)) {
-    return require.resolve(provider);
+  if (silentResolve(module)) {
+    return [require.resolve(module), options];
   }
 
   const root = config._configFileRoot ?? process.cwd();
 
-  return resolve(root, provider);
+  return [resolve(root, module), options];
 }
