@@ -16,8 +16,3 @@ Backyard is still under heavy development. The documentation is mostly not avail
 ## Overview
 Backyard eases the development and deployment of microservices by providing an opinionated platform for business tool API & UI.
 
-### Core Services
-- [API Gateway](../packages/service/kong)
-- [Authentication](../packages/service/gotrue)
-- [Database](../packages/service/postgres)
-- [Rest API](../packages/service/postgrest)
