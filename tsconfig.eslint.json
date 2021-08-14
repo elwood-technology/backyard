@@ -14,5 +14,13 @@
     "**/packages/platform/aws/*.d.ts",
     "**/packages/platform/aws/*.js"
   ],
-  "exclude": ["tmp", "temp", "build", "templates", "docs", "node_modules"]
+  "exclude": [
+    "tmp",
+    "temp",
+    "build",
+    "templates",
+    "docs",
+    "node_modules",
+    "examples"
+  ]
 }
