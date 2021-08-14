@@ -7,8 +7,7 @@ tmp/
 .DS_Store
 .dev-db
 .backyard
-backyard.ts
-backyard.js
+/backyard.ts
 
 # Logs
 logs
