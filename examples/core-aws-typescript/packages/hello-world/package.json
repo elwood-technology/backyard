@@ -1,0 +1,18 @@
+{
+  "name": "backyard-project-ts-hello-world",
+  "version": "0.0.0",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json"
+  },
+  "dependencies": {
+    "@backyard/common": "latest"
+  },
+  "devDependencies": {
+    "@backyard/types": "latest"
+  },
+  "files": [
+    "lib",
+    "package.json"
+  ]
+}
