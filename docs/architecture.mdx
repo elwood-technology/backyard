@@ -1,6 +1,12 @@
+---
+id: arch
+slug: /architecture
+---
+
 # Architecture
 
 - [Architecture](#architecture)
+  - [Glossary](#glossary)
   - [Folder Structure](#folder-structure)
     - [Files](#files)
       - [Package Example](#package-example)
@@ -13,9 +19,9 @@
     - [Platforms (`platforms/`)](#platforms-platforms)
       - [`docker` (@backyard/platform-docker)](#docker-backyardplatform-docker)
       - [`node` (@backyard/platform-node)](#node-backyardplatform-node)
-      - [`aws-ecs` (@backyard/platform-aws-ecs)](#aws-ecs-backyardplatform-aws-ecs)
-      - [`aws-lambda` (@backyard/platform-aws-lambda)](#aws-lambda-backyardplatform-aws-lambda)
-      - [`terraform` (@backyard/platform-terraform)](#terraform-backyardplatform-terraform)
+      - [`aws` (@backyard/platform-aws)](#aws-backyardplatform-aws)
+    - [Plugins (`plugins/`)](#plugins-plugins)
+      - [`terraform` (@backyard/plugin-terraform)](#terraform-backyardplugin-terraform)
     - [Services (`service/`)](#services-service)
       - [`gotrue` (@backyard/service-gotrue)](#gotrue-backyardservice-gotrue)
       - [`kong` (@backyard/service-kong)](#kong-backyardservice-kong)
@@ -29,6 +35,18 @@
       - [`typescript` (@backyard/tool-typescript)](#typescript-backyardtool-typescript)
     - [`types` (@backyard/types)](#types-backyardtypes)
 
+
+
+## Glossary
+
+- `Workspace` A collection of services & platforms.
+- `Service` A container that performs a function
+- `Platform` A service that configures a workspace to run in a given environment
+  - `Local Platform` A platform that runs on the local environment
+  - `Remote Platform` A platform that runs in a remote environment
+- `Plugin` A module that provides extended functionality to a service or platform
+
+---
 ## Folder Structure
 All folders should follow the following structure
 
@@ -62,21 +80,21 @@ All folders should follow the following structure
 ### `cli` (@backyard/cli)
 Command line interface. Installs to `backyard` and `by`
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/cli)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/cli)](https://www.npmjs.com/package/@backyard/cli)
 
 ---
 
 ### `common` (@backyard/common)
 Shared utility code. Also exports standard packages like `ts-invariant`, `uuid` and `debug` that are used by multiple child packages
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/common)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/common)](https://www.npmjs.com/package/@backyard/common)
 
 ---
 
 ### `context` (@backyard/context)
 Context represents a Backyard workspace. It handles reading configuration, building & managing the `.backyard/` folder, and initializing services & maintaining state of services.
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/context)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/context)](https://www.npmjs.com/package/@backyard/context)
 
 ---
 
@@ -86,23 +104,23 @@ Platforms define infrastructure and runtime environments for `local` and `remote
 #### `docker` (@backyard/platform-docker)
 Used as the default platform for `local` development
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-docker)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-docker)](https://www.npmjs.com/package/@backyard/platform-docker)
 
 #### `node` (@backyard/platform-node)
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-node)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-node)](https://www.npmjs.com/package/@backyard/platform-node)
 
-#### `aws-ecs` (@backyard/platform-aws-ecs)
+#### `aws` (@backyard/platform-aws)
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-aws-ecs)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-aws)](https://www.npmjs.com/package/@backyard/platform-aws)
 
-#### `aws-lambda` (@backyard/platform-aws-lambda)
+---
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-aws-lambda)
+### Plugins (`plugins/`)
 
-#### `terraform` (@backyard/platform-terraform)
+#### `terraform` (@backyard/plugin-terraform)
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/platform-terraform)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/plugin-terraform)](https://www.npmjs.com/package/@backyard/plugin-terraform)
 
 ---
 
@@ -112,27 +130,27 @@ Core maintained services
 #### `gotrue` (@backyard/service-gotrue)
 Default `auth` services
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-gotrue)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-gotrue)](https://www.npmjs.com/package/@backyard/service-gotrue)
 
 #### `kong` (@backyard/service-kong)
 Default `gateway` service
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-kong)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-kong)](https://www.npmjs.com/package/@backyard/service-kong)
 
 #### `postgresql` (@backyrad/service-postgresql)
 Default `db` service
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgresql)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgresql)](https://www.npmjs.com/package/@backyard/service-postgresql)
 
 #### `postgresql-migrate` (@backyrad/service-postgresql-migrate)
 Used to initialize `local` and `remote` databases
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgresql-migrate)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgresql-migrate)](https://www.npmjs.com/package/@backyard/service-postgresql-migrate)
 
 #### `postgrest` (@backyrad/service-postgrest)
 Default `store` service
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgrest)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-postgrest)](https://www.npmjs.com/package/@backyard/service-postgrest)
 
 ---
 
@@ -142,7 +160,7 @@ Tools provide utilities and packages for building Backyard
 #### `create` (create-backyard)
 `create-backyard` package that powers `npx create-backyard` & `yarn create backyard`
 
-![npm (scoped)](https://img.shields.io/npm/v/create-backyard)
+[![npm (scoped)](https://img.shields.io/npm/v/create-backyard)](https://www.npmjs.com/package/create-backyard)
 
 #### `docs-web` (@backyard/tool-docs-web)
 Docusaurus configuration and source for build `<root>/docs` folder. Lives at https://backyard.io/docs`
@@ -167,5 +185,5 @@ Meta package for `typescript` & `ts-node`. Provides shortcuts for:
 ### `types` (@backyard/types)
 Provides global types for Backyard.
 
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/types)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/types)](https://www.npmjs.com/package/@backyard/types)
 

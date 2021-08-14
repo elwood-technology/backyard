@@ -1,12 +1,12 @@
 # Backyard Docs
 
-- [Introduction](./intro.md)
-- [Architecture](./architecture.md)
-- [Getting Start](./start/quick.md)
-  - [Installation](./start/install.md)
-  - [Configuration](./start/configuration.md)
-  - [Services](./start/services.md)
+- [Introduction](./intro.mdx)
+- [Architecture](./architecture.mdx)
+- [Getting Start](./start/quick.mdx)
+  - [Installation](./start/install.mdx)
+  - [Configuration](./start/configuration.mdx)
+  - [Services](./start/services.mdx)
 - Reference
-  - [CLI](./reference/cli/cli.md)
-    - [Local](./reference/cli/local.md)
-    - [Remote](./reference/cli/remote.md)
+  - [CLI](./reference/cli/cli.mdx)
+    - [Local](./reference/cli/local.mdx)
+    - [Remote](./reference/cli/remote.mdx)

@@ -11,6 +11,11 @@ function configProvider<T>(config: Arg<T>): T {
   return config;
 }
 
+/**
+ *
+ * @deprecated
+ * use createWorkspaceConfiguration instead
+ */
 export function createConfiguration(config: Arg<Configuration>): Configuration {
   return configProvider<Configuration>(config);
 }
@@ -19,4 +24,10 @@ export function createServiceConfiguration(
   config: Arg<ConfigurationService>,
 ): ConfigurationService {
   return configProvider<ConfigurationService>(config);
+}
+
+export function createWorkspaceConfiguration(
+  config: Arg<Configuration>,
+): Configuration {
+  return configProvider<Configuration>(config);
 }

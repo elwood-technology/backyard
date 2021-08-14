@@ -20,5 +20,9 @@ module.exports = {
       label: 'Getting Started',
       items: ['start/quick', 'start/install', 'start/configuration', 'start/services'],
     },
+    {
+      type: 'doc',
+      id: 'arch'
+    },
   ],
 };
