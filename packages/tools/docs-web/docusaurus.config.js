@@ -21,7 +21,7 @@ module.exports = {
         alt: 'Backyard Logo',
         src: '/logo.svg',
         srcDark: '/logo.svg',
-        href: 'https://backyard.io/',
+        href: '/',
         target: '_self',
       },
       title: 'Backyard',
@@ -71,7 +71,9 @@ module.exports = {
     [
       '@docusaurus/preset-classic',
       {
-
+        theme: {
+          customCss: [require.resolve('./src/css/custom.css')],
+        },
         docs: {
           path: '../../../docs',
           sidebarPath: require.resolve('./sidebars.js'),

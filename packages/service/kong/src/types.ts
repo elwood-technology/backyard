@@ -26,7 +26,7 @@ export interface KongKeys {
   serviceKey: string;
 }
 
-export interface KongSettings extends ConfigurationServiceSettings {
+export interface KongServiceSettings extends ConfigurationServiceSettings {
   jwt: {
     iat?: number;
     secret?: string;
@@ -37,4 +37,4 @@ export interface KongSettings extends ConfigurationServiceSettings {
   serviceKey: string;
 }
 
-export type KongContextService = ContextService<KongSettings>;
+export type KongContextService = ContextService<KongServiceSettings>;
