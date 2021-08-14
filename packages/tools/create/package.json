@@ -1,6 +1,6 @@
 {
   "name": "create-backyard",
-  "version": "0.2.17",
+  "version": "0.2.18",
   "main": "lib/index.js",
   "repository": "git@github.com:elwood-technology/backyard.git",
   "author": "Travis Kuhl <travis@elwood.technology>",
