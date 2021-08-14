@@ -1,1 +1,1 @@
-export { createConfiguration } from '@backyard/common';
+export { createWorkspaceConfiguration, useEnvValue } from '@backyard/common';

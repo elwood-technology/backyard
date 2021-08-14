@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
 
 import type { ConfigurationService } from '@backyard/types';
-import { KongKeys, KongSettings } from './types';
+import { KongKeys, KongServiceSettings } from './types';
 import { invariant } from '@backyard/common';
 
 export function generateKeys(
-  config: ConfigurationService<KongSettings>,
+  config: ConfigurationService<KongServiceSettings>,
 ): KongKeys {
   const { settings } = config;
   const secret = settings?.jwt.secret;

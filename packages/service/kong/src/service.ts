@@ -13,7 +13,7 @@ import { ContextModeRemote, invariant } from '@backyard/common';
 import { createKongConfig } from './config';
 
 import { generateKeys } from './keys';
-import { KongContextService, KongKeys, KongSettings } from './types';
+import { KongContextService, KongKeys, KongServiceSettings } from './types';
 
 export const kongPlugins = [
   'request-transformer',
@@ -26,7 +26,7 @@ export const kongPlugins = [
 
 export function config(
   context: Context,
-  _config: ConfigurationService<KongSettings>,
+  _config: ConfigurationService<KongServiceSettings>,
 ): Partial<ConfigurationService> {
   const iat = 384584607;
 
@@ -93,7 +93,9 @@ EXPOSE 8000`,
 export async function keys({
   service,
 }: ServiceHookProviderArgs): Promise<KongKeys> {
-  return generateKeys(service.config as ConfigurationService<KongSettings>);
+  return generateKeys(
+    service.config as ConfigurationService<KongServiceSettings>,
+  );
 }
 
 export async function anonymousKey(

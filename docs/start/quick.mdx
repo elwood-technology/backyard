@@ -1,0 +1,52 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+
+# Quick Start
+
+
+## 1. Create a workspace
+
+<Tabs
+  defaultValue="ts"
+  values={[
+    { label: 'TypeScript', value: 'ts', },
+    { label: 'JavaScript', value: 'js', }
+  ]}>
+<TabItem value="ts">
+<CodeBlock className="bash">
+yarn create backyard ./workspace core-aws-typescript
+</CodeBlock>
+</TabItem>
+<TabItem value="js">
+<CodeBlock className="bash">
+yarn create backyard ./workspace core-aws
+</CodeBlock>
+</TabItem>
+</Tabs>
+
+
+## 2. Start the workspace
+```bash
+cd workspace;
+```
+```bash
+yarn backyard local start
+```
+
+## 4. Make a request
+Make a request to the gateway to make sure it's running.
+
+```bash
+curl http://localhost:8000/health
+```
+
+Response
+```bash
+{"message":"awesome :)"}
+```
+
+## 5. Deploy it to AWS
+```bash
+yarn backyard remote deploy --build
+```

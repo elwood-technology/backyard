@@ -12,24 +12,18 @@ Backyard is still under heavy development. The documentation is mostly not avail
 ## Overview
 Backyard eases the development and deployment of microservices by providing an opinionated platform for business tool API & UI.
 
-### Core Services
-- [API Gateway](./packages/service/kong)
-- [Authentication](./packages/service/gotrue)
-- [Database](./packages/service/postgres)
-- [Rest API](./packages/service/postgrest)
-
 ## Installation
 
 ```bash
-# typescript
-yarn create backyard ./my-app typescript
+# core services hosted on AWS using TypeScript
+yarn create backyard ./my-app core-aws-typescript
 
-# javascript
-yarn create backyard ./my-app
+# core services hosted on AWS
+yarn create backyard ./my-app core-aws
 ```
 
 ## Usage
-See the [docs](./docs) for more information.
+See the [docs](./docs) for more information. Get information about how it works in [architecture.md](./docs/architecture.md)
 
 ## Contributing
 [Contributions](./CONTRIBUTING.md) are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are greatly appreciated. Look for [Good First Issue](https://github.com/elwood-technology/backyard/labels/good%20first%20issue)!
