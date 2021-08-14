@@ -4,7 +4,6 @@ module.exports = {
   plugins: ['@typescript-eslint', 'react'],
   extends: ['plugin:prettier/recommended'],
   ignorePatterns: ['./examples/*'],
-
   env: {
     node: true,
     browser: true,
