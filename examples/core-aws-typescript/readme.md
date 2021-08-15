@@ -1,4 +1,4 @@
-# Backyard Typescript Example Workspace 
+# Backyard Typescript Example Workspace
 
 ## Overview
 

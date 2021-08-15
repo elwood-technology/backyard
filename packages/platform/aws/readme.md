@@ -40,10 +40,10 @@ This platform can be used as both your Workspace Remote Platform and a Service R
 
 ### Workspace Remote Platform
 ```typescript
-import { createConfiguration } from '@backyard/common';
+import { createWorkspaceConfiguration } from '@backyard/common';
 import { useAwsRemotePlatform } from '@backyard/platform-aws';
 
-export default createConfiguration({
+export default createWorkspaceConfiguration({
   platform: {
     remote: useAwsRemotePlatform({
       profile: 'elwood',
@@ -68,10 +68,10 @@ export default createConfiguration({
 
 ### Service Remote Platform
 ```typescript
-import { createConfiguration } from '@backyard/common';
+import { createWorkspaceConfiguration } from '@backyard/common';
 import { useAwsRemoteEcsPlatform, useAwsRemotePlatform } from '@backyard/platform-aws';
 
-export default createConfiguration({
+export default createWorkspaceConfiguration({
   platform: {
     remote: useAwsRemotePlatform({
       profile: 'elwood',

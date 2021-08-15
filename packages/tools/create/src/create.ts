@@ -1,7 +1,8 @@
 import { promises as fs } from 'fs';
-import { dirname, join } from 'path';
+import { dirname, extname, join, basename } from 'path';
 import { EOL } from 'os';
 import { randomBytes } from 'crypto';
+import { spawn } from 'child_process';
 
 import which from 'which';
 import unzip from 'unzipper';
@@ -13,45 +14,52 @@ import {
   createWriteStream,
   dir,
   removeAsync,
+  findAsync,
 } from 'fs-jetpack';
+import { prompt } from 'enquirer';
+import { Ora } from 'ora';
 
+import type { JsonObject, Json } from '@backyard/types';
+import { isFunction } from '@backyard/common';
+
+import type { BackyardFile, CreateAppAttributes } from './types';
 import { WriteAccessError } from './error';
-import { spawn } from 'child_process';
 
 export type CreateBackyardOptions = {
   projectDir: string;
-  template: string;
+  example: string;
   useNpm?: boolean;
   runInstall?: boolean;
   runInit?: boolean;
+  examplesBranch?: string;
 };
 
 export type CreateBackyardTools = {
-  spin?: (text: string) => void;
+  spin: Ora;
   log?: (...string: any[]) => void;
   errorLog?: (...string: any[]) => void;
 };
 
-const templates: Record<string, string> = {
-  default:
-    'https://github.com/elwood-technology/backyard-workspace/archive/refs/heads/main.zip',
-  ts: 'https://github.com/elwood-technology/backyard-workspace-ts/archive/refs/heads/main.zip',
-  typescript:
-    'https://github.com/elwood-technology/backyard-workspace-ts/archive/refs/heads/main.zip',
+const exampleShortcuts: Record<string, string> = {
+  default: 'core',
+  js: 'core',
+  typescript: 'core-typescript',
+  ts: 'core-typescript',
 };
 
 export async function createBackyard(
   options: CreateBackyardOptions,
-  tools: CreateBackyardTools = {},
+  tools: CreateBackyardTools,
 ): Promise<void> {
   const {
     projectDir,
-    template,
+    example,
+    examplesBranch = 'main',
     useNpm = false,
     runInit = true,
     runInstall = true,
   } = options;
-  const { spin = () => {}, errorLog = () => {} } = tools;
+  const { spin, errorLog = () => {} } = tools;
 
   if (exists(projectDir)) {
     throw new Error('Project Dir already exists');
@@ -61,7 +69,7 @@ export async function createBackyard(
 
   const rootDir = dirname(projectDir);
 
-  spin(`Checking access to ${rootDir}`);
+  spin.text = `Checking access to ${rootDir}`;
 
   try {
     await fs.access(rootDir);
@@ -69,17 +77,18 @@ export async function createBackyard(
     throw new WriteAccessError(rootDir);
   }
 
-  const templateUrl = templates[template] ?? template;
+  const exampleDir = exampleShortcuts[example] ?? example;
+  const sourceUrl = `https://github.com/elwood-technology/backyard/archive/refs/heads/${examplesBranch}.zip`;
 
-  errorLog(`Downloading template from ${templateUrl}`);
+  errorLog(`Downloading examples from ${sourceUrl}`);
 
-  if (!templateUrl.includes('http')) {
-    throw new Error(`Invalid Template Url "${templateUrl}"`);
+  if (!sourceUrl.includes('http')) {
+    throw new Error(`Invalid Template Url "${sourceUrl}"`);
   }
 
-  spin(`Downloading template from ${templateUrl}`);
+  spin.text = `Downloading template from ${sourceUrl}`;
 
-  const response = await fetch(templateUrl);
+  const response = await fetch(sourceUrl);
 
   if (!response.ok) {
     throw new Error(`Unexpected response: ${response.statusText}`);
@@ -89,47 +98,30 @@ export async function createBackyard(
 
   await dirAsync(projectDir);
 
-  spin(`Unpacking template`);
+  spin.text = `Unpacking template`;
 
   await new Promise((resolve, reject) => {
     response.body
       .pipe(unzip.Parse())
       .on('entry', function (entry) {
-        const root = entry.path.split('/').shift();
-        const out = join(projectDir, entry.path.replace(root, ''));
-        dir(dirname(out));
+        const [_, subDir, exampleName, ...restPath] = entry.path.split('/');
 
-        if (entry.type === 'File') {
-          entry.pipe(createWriteStream(out));
+        if (subDir === 'examples' && exampleName === exampleDir) {
+          const out = join(projectDir, ...restPath);
+          dir(dirname(out));
+          if (entry.type === 'File') {
+            entry.pipe(createWriteStream(out));
+            return;
+          }
         }
+
+        entry.autodrain();
       })
       .on('close', resolve)
       .on('error', reject);
   });
 
-  spin(`Writing local.env`);
-
-  await writeAsync(
-    join(projectDir, 'local.env'),
-    [
-      `MODE = local`,
-      `OPERATOR_TOKEN = ${randomBytes(100).toString('hex')}`,
-      `JWT_SECRET = ${randomBytes(32).toString('hex')}`,
-      `JWT_IAT = ${Date.now()}`,
-    ].join(EOL),
-  );
-
-  spin(`Writing remote.env.example`);
-
-  await writeAsync(
-    join(projectDir, 'remote.env.example'),
-    [
-      `MODE = remote`,
-      `OPERATOR_TOKEN = ${randomBytes(100).toString('hex')}`,
-      `JWT_SECRET = ${randomBytes(32).toString('hex')}`,
-      `JWT_IAT = ${Date.now()}`,
-    ].join(EOL),
-  );
+  spin.text = `Reading backyard.* file`;
 
   await removeAsync(join(projectDir, 'yarn.lock'));
   await removeAsync(join(projectDir, 'package-lock.json'));
@@ -137,12 +129,27 @@ export async function createBackyard(
   const cmd = useNpm ? await which('npm') : await which('yarn');
 
   if (runInstall !== false) {
-    spin(`Running ${useNpm ? 'npm' : 'yarn'} install`);
+    spin.text = `Running ${useNpm ? 'npm' : 'yarn'} install`;
     await run(cmd, ['install', '--ignore-scripts'], projectDir, errorLog);
   }
 
+  // finding any possible
+  const backyardFile = await readBackyardFile(projectDir);
+
+  spin.stopAndPersist();
+
+  if (isFunction(backyardFile?.createAppAttributes)) {
+    const attr = backyardFile?.createAppAttributes() || [];
+    const promptValues = await promptForAttributes(attr);
+
+    await createEnvFile(join(projectDir, '.env.local'), promptValues, attr);
+    await createEnvFile(join(projectDir, '.env.remote'), promptValues, attr);
+  }
+
+  spin.start();
+
   if (runInit !== false) {
-    spin(`Initalizing Backyard`);
+    spin.text = `Initalizing Backyard`;
     await run(cmd, ['run', 'backyard', 'init'], projectDir, errorLog);
   }
 }
@@ -181,4 +188,71 @@ export async function run(
       resolve();
     });
   });
+}
+
+export async function readBackyardFile(
+  dir: string,
+): Promise<BackyardFile | undefined> {
+  const possibleBackyardFiles = await findAsync(dir, {
+    matching: 'backyard.*',
+  });
+
+  if (possibleBackyardFiles.length === 0) {
+    return undefined;
+  }
+
+  if (extname(possibleBackyardFiles[0]) === '.ts') {
+    require('ts-node').register({});
+  }
+
+  return require(join(dir, basename(possibleBackyardFiles[0]))) as BackyardFile;
+}
+
+export function autofillValue(fill: CreateAppAttributes['autofill']): Json {
+  if (fill?.random) {
+    return randomBytes(fill.random * 2)
+      .toString('hex')
+      .substr(0, fill.random);
+  }
+
+  return fill?.default;
+}
+
+export async function promptForAttributes(
+  attributes: CreateAppAttributes[],
+): Promise<JsonObject> {
+  const questions: JsonObject[] = [];
+
+  for (const attr of attributes) {
+    if (attr.prompt) {
+      questions.push({
+        type: 'input',
+        name: attr.env,
+        message: attr.prompt,
+        initial: autofillValue(attr.autofill),
+      });
+    }
+  }
+
+  // @ts-ignore
+  return await prompt(questions);
+}
+
+export async function createEnvFile(
+  file: string,
+  env: JsonObject,
+  attributes: CreateAppAttributes[],
+): Promise<void> {
+  for (const attr of attributes) {
+    if (!attr.prompt) {
+      env[attr.env] = autofillValue(attr.autofill);
+    }
+  }
+
+  await writeAsync(
+    file,
+    Object.keys(env)
+      .map((key) => `${key}=${env[key]}`)
+      .join(EOL),
+  );
 }

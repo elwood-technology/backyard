@@ -14,32 +14,30 @@ Backyard is an opinioned microservices platform
  - [Repo](https://github.com/netlify/gotrue)
 
 ## Install
-![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-gotrue)
+[![npm (scoped)](https://img.shields.io/npm/v/@backyard/service-gotrue)](https://www.npmjs.com/package/@backyard/service-gotrue)
 
 ## Usage
 
 ```typescript
-import { createConfiguration } from '@backyard/common';
+import { createWorkspaceConfiguration } from '@backyard/common';
+import { usePostgreSqlService } from '@backyard/service-postgresql';
 import { useGoTrueService } from '@backyard/service-gotrue';
 
-export default createConfiguration({
+export default createWorkspaceConfiguration({
   services: [
     useGoTrueService({
       name: 'auth',
       settings: {
-        db: 'db',
+        db: 'auth-database',
         operatorToken: 'a',
       }
     }),
 
     // GoTrue requires a PostgreSQL database.
     // The database "name" and "settings.db" must match
-    {
-      name: 'db',
-      provider: ['@backyard/service-postgresql'],
-      enabled: true,
-      settings: {},
-    },
+    usePostgreSqlService({
+      name: 'auth-database',
+    }),
   ],
 });
 ```

@@ -3,7 +3,6 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'react'],
   extends: ['plugin:prettier/recommended'],
-  ignorePatterns: ['./examples/*'],
   env: {
     node: true,
     browser: true,
