@@ -136,7 +136,9 @@ export async function createBackyard(
   // finding any possible
   const backyardFile = await readBackyardFile(projectDir);
 
-  spin.stopAndPersist();
+  spin.stop();
+
+  console.log('xx', backyardFile?.createAppAttributes);
 
   if (isFunction(backyardFile?.createAppAttributes)) {
     const attr = backyardFile?.createAppAttributes() || [];

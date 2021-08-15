@@ -9,7 +9,7 @@ import { useKongService } from '@backyard/service-kong';
 import { usePostgRestService } from '@backyard/service-postgrest';
 import { usePostgreSqlService } from '@backyard/service-postgresql';
 
-export default createWorkspaceConfiguration({
+export default createWorkspaceConfiguration(() => ({
   platform: {
     remote: useAwsRemotePlatform({
       profile: useEnvValue('AWS_PROFILE'),
@@ -95,7 +95,7 @@ export default createWorkspaceConfiguration({
       },
     }),
   ],
-});
+}));
 
 export function createAppAttributes(): JsonObject[] {
   return [
