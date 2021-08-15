@@ -1,16 +1,19 @@
-import { createConfiguration } from '@backyard/common';
+import { createWorkspaceConfiguration, useEnvValue } from '@backyard/common';
 import { JsonObject } from '@backyard/types';
 import {
   useAwsRemoteEcsPlatform,
   useAwsRemotePlatform,
 } from '@backyard/platform-aws';
 import { useGoTrueService } from '@backyard/service-gotrue';
+import { useKongService } from '@backyard/service-kong';
+import { usePostgRestService } from '@backyard/service-postgrest';
+import { usePostgreSqlService } from '@backyard/service-postgresql';
 
-export default createConfiguration({
+export default createWorkspaceConfiguration({
   platform: {
     remote: useAwsRemotePlatform({
-      profile: String(process.env.AWS_PROFILE),
-      region: String(process.env.AWS_REGION),
+      profile: useEnvValue('AWS_PROFILE'),
+      region: useEnvValue('AWS_REGION'),
       ecs: {
         clusters: [
           {
@@ -23,13 +26,17 @@ export default createConfiguration({
     }),
   },
   services: [
-    {
+    // GATEWAY
+    // https://backyard.io/docs/services/gateway
+    useKongService({
       name: 'gateway',
       settings: {
         jwt: {
-          secret: process.env.JWT_SECRET,
-          iat: process.env.JWT_IAT,
+          secret: useEnvValue('JWT_SECRET'),
+          iat: Number(useEnvValue('JWT_IAT')),
         },
+        anonymousKey: '',
+        serviceKey: '',
       },
       platform: {
         remote: useAwsRemoteEcsPlatform({
@@ -38,13 +45,47 @@ export default createConfiguration({
           containerMemory: 0.25,
         }),
       },
-    },
+    }),
+
+    // AUTH
+    // https://backyard.io/docs/services/auth
     useGoTrueService({
       name: 'auth',
       settings: {
-        operatorToken: String(process.env.OPERATOR_TOKEN),
+        operatorToken: useEnvValue('OPERATOR_TOKEN'),
         db: 'database',
       },
+      platform: {
+        remote: useAwsRemoteEcsPlatform({
+          cluster: 'main',
+          containerCpu: 0.25,
+          containerMemory: 0.25,
+        }),
+      },
+    }),
+
+    // REST
+    // https://backyard.io/docs/services/rest
+    usePostgRestService({
+      name: 'rest',
+      settings: {
+        db: 'database',
+        schema: 'public',
+        anonRole: 'anon',
+      },
+      platform: {
+        remote: useAwsRemoteEcsPlatform({
+          cluster: 'main',
+          containerCpu: 0.25,
+          containerMemory: 0.25,
+        }),
+      },
+    }),
+
+    // DATABASE
+    // https://backyard.io/docs/services/database
+    usePostgreSqlService({
+      name: 'database',
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',
@@ -73,10 +114,9 @@ export function createAppAttributes(): JsonObject[] {
     },
     {
       env: 'JWT_IAT',
-      autofill: { default: '' },
+      autofill: { default: Math.floor(Date.now() / 1000) },
     },
     {
-      prompt: 'Operator Token',
       env: 'OPERATOR_TOKEN',
       autofill: { random: 55 },
     },

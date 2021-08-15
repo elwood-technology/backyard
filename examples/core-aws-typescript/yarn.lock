@@ -31,12 +31,12 @@
     js-tokens "^4.0.0"
 
 "@backyard/cli@latest":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/cli/-/cli-0.2.17.tgz#a0015570b7dd1c3d1e7c006cc1f6ad4b0ba9e15c"
-  integrity sha512-JF2DZw6Pxn4OiVHoH2A9LMqc7LkqF17kW1+EndZtXlkiRniwWL/Xpmtl13E7AjxqVe1dbj7a9he1e16Ex6lO8w==
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/cli/-/cli-0.2.18.tgz#55924c7557103eddd47687900094edf3033a0d27"
+  integrity sha512-SplRw2QBSqgi2FXFfBgwNK0ibh1RYR8FExzK03GVQiBWyuhS66IVfJ71IICyb6vjN0lUKs8X6LIErDeP9sYsCw==
   dependencies:
-    "@backyard/common" "^0.2.17"
-    "@backyard/context" "^0.2.17"
+    "@backyard/common" "^0.2.18"
+    "@backyard/context" "^0.2.18"
     dotenv "^10.0.0"
     find-up "^5.0.0"
     gluegun "^4.6.1"
@@ -45,24 +45,24 @@
     package-json "^7.0.0"
     yaml "^1.10.2"
 
-"@backyard/common@^0.2.17", "@backyard/common@latest":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/common/-/common-0.2.17.tgz#f5d1174c187ee99be03223b25f1d925379bcaadf"
-  integrity sha512-bW4oKypiU+UrcpQemOC+hc0nbJpVQUFVIC6oB+mMYCgBx2gPfRMcVGmNCLcuekcgxTR/miNoU+6XEp84bb4iBQ==
+"@backyard/common@^0.2.18", "@backyard/common@latest":
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/common/-/common-0.2.18.tgz#3711d9a03abe776620195b866690d87d5cb9b7cc"
+  integrity sha512-vcaX2W0zBHm+iYXV/NKOEBoGYWpcp6yB9Gh+Mukv1T8sFk+xI5U85xNG11cE3VOTSlEj1h6+XUSdTSSzFlnOkQ==
   dependencies:
-    "@backyard/types" "^0.2.17"
+    "@backyard/types" "^0.2.18"
     "@types/debug" "^4.1.5"
     "@types/uuid" "^8.3.0"
     debug "^4.2.0"
     ts-invariant "^0.9.0"
     uuid "^8.3.1"
 
-"@backyard/context@^0.2.17":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/context/-/context-0.2.17.tgz#566c39b90a5a2b5412c78871eacfba6f19da4c22"
-  integrity sha512-h785RZ97VAowyCbki7qV0pMS+AdVrRVJVfnMJf+48uFwrTBaqmuOazMP2PziwDEsO5BmXbgqiGrBU8C0scnD0g==
+"@backyard/context@^0.2.18":
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/context/-/context-0.2.18.tgz#08add0db6fa605f974172b99526c62bb2e49241e"
+  integrity sha512-dKYk80zoQGZeld6tAE0kiol4lOqFbpHShsUrXMGcLi7tX/rB6EoVk5uLqcNE1OJuf2DEYVIFdacAXQo9NG4MLQ==
   dependencies:
-    "@backyard/common" "^0.2.17"
+    "@backyard/common" "^0.2.18"
     deepmerge "^4.2.2"
     ejs "^3.1.6"
     find-up "^5.0.0"
@@ -73,61 +73,61 @@
     yaml "^1.10.2"
 
 "@backyard/platform-aws@latest":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/platform-aws/-/platform-aws-0.2.17.tgz#d01b27d33f282c8dd0c1422106ad310326e15eb9"
-  integrity sha512-xLluU3cPxor2npfq/9Qa+gqQDkXnQfoWMFc3rIPImkVUM87wJVH9KK6V8NaV6pxSJ65ysnXPohB6CLJNVun/Pw==
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/platform-aws/-/platform-aws-0.2.18.tgz#b9637f218b88edca87b981f9596ab39ff36ebfff"
+  integrity sha512-Ue8g7Vcg/TlzEcZ3jXh2G2G8vw84YVBbV0kxsxMWm07p7UgphTCk0KTz0VM7GvjLUZFaQLOP9g9Bna2//mC60w==
   dependencies:
-    "@backyard/common" "^0.2.17"
-    "@backyard/plugin-terraform" "^0.2.17"
+    "@backyard/common" "^0.2.18"
+    "@backyard/plugin-terraform" "^0.2.18"
 
-"@backyard/plugin-terraform@^0.2.17":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/plugin-terraform/-/plugin-terraform-0.2.17.tgz#cde33b936f6c404ef1c3643f534cf0c74c06f4aa"
-  integrity sha512-+99Mg5iCIsieAvOtUCHBwAPsfYu2C6XKaCIBtN6Yk49Ya4xkaWV86IhczjXcwdTRoEtdAWQ8NqZajl3fPf1J7A==
+"@backyard/plugin-terraform@^0.2.18":
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/plugin-terraform/-/plugin-terraform-0.2.18.tgz#c85ccd47d7027306b1a11706803279a99f730cc1"
+  integrity sha512-xNHkbyLkKreWbGKOLF+T6YmmI6FH4+t9QM9DIywKq6b+cBNtu7YWwavLITzBfsmALShe9yuAC5rJa53MPylW2Q==
   dependencies:
-    "@backyard/common" "^0.2.17"
+    "@backyard/common" "^0.2.18"
     terraform-generator "^5.0.0"
 
 "@backyard/service-gotrue@latest":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/service-gotrue/-/service-gotrue-0.2.17.tgz#4c4d0e6647c4bbb239cbe9bc9a94ef6163ccc8ae"
-  integrity sha512-THpedjocV051ZvcDnO5HYgNgkSIXbOzA/kn/xNFc30aSlOGuQ7xaDs8wDRYUQg4ksmJSkZk7+QOJ2pRGpRlPBg==
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/service-gotrue/-/service-gotrue-0.2.18.tgz#9d0d7d55b37d1a43fe60abd39632c9d1dfcca87f"
+  integrity sha512-qiWW7L+Yhjx66bV0J6+WZzx+fvR5sZFnIPJ1LYUAD1+D+Bi4KGoZWqiXvRzUCaz2c8XWbfkvt0HGk4baXwM97A==
   dependencies:
-    "@backyard/common" "^0.2.17"
+    "@backyard/common" "^0.2.18"
     fs-jetpack "^4.1.0"
     lodash.defaultsdeep "^4.6.1"
     lodash.get "^4.4.2"
     yaml "^1.10.2"
 
 "@backyard/service-kong@latest":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/service-kong/-/service-kong-0.2.17.tgz#3de3ecb9f9b918af77dd2cf962d7ea4281507744"
-  integrity sha512-HCvejUsjEvu7xpZZzTWPOBJP+Hq5rAgFecjuWBUSKz96s23q1lMHrJYRkftfYFsTLVKZwD5xB0vLaFJEFeJKSQ==
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/service-kong/-/service-kong-0.2.18.tgz#555ca1f3b8033065590fc2838b7e2dd62edf4deb"
+  integrity sha512-cxH2u9cZWuxciZR8Ho4YMJSJO2tEotn1xWut8/6RJZ1scuT27gu6C2142Q6wSRqaMaiPdc3yYhUk/UlJhiLyaw==
   dependencies:
-    "@backyard/common" "^0.2.17"
+    "@backyard/common" "^0.2.18"
     fs-jetpack "^4.1.0"
     lodash.defaultsdeep "^4.6.1"
     lodash.get "^4.4.2"
     yaml "^1.10.2"
 
 "@backyard/service-postgresql@latest":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/service-postgresql/-/service-postgresql-0.2.17.tgz#bccdbd27eba30b9ceedbcb5321ec841c57d6dcbc"
-  integrity sha512-pgymEXoJPp+4/QKonR3lRV0pExntqW2IqcIGyfousTImXpjrSgKgK/Q9FmW86OnS74Q1Z/k80z/zAERVy1h4PQ==
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/service-postgresql/-/service-postgresql-0.2.18.tgz#02ac90c5dd457d1ff1d3d418b283c7fe38c8a55b"
+  integrity sha512-D+HFCPioaCiRtFSHUoNv3qC0NilcoJU8709qA57msDF7pYcpONZC8em1HK330L+wh88rR2pkhVCcWnaPSHFZQQ==
   dependencies:
-    "@backyard/common" "^0.2.17"
+    "@backyard/common" "^0.2.18"
 
 "@backyard/service-postgrest@latest":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/service-postgrest/-/service-postgrest-0.2.17.tgz#1340bf1d9aaee81cf186287d9d17faf7df3bbf0d"
-  integrity sha512-wbnGeAwSkWEhNDBOzyuELMveIBnMI0Abe35wwmBBiOhSfghqwXwXD89FiF23kTXTxMznyxWCh6bFNZytpAqW8A==
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/service-postgrest/-/service-postgrest-0.2.18.tgz#db62323ff5909db1f61bd328351f411e5e2ee427"
+  integrity sha512-fE3nuHUwMQksBszLrD3i+uoH/YUyV0bSVHNEKJFRpVdxXKyWMwSPhPj1UVjMzNUH5gBYN0OV9H/gRliq1Ab7Xw==
   dependencies:
-    "@backyard/common" "^0.2.17"
+    "@backyard/common" "^0.2.18"
 
-"@backyard/types@^0.2.17", "@backyard/types@latest":
-  version "0.2.17"
-  resolved "https://registry.yarnpkg.com/@backyard/types/-/types-0.2.17.tgz#4cd74357903e1e88aa69f1871e7ab88e0ad7d225"
-  integrity sha512-sNB1FhDuQ9PBbfoC8H19S2lxCjjONruhmzzQygyq+EnckE7o8tXhbMan2VWVsXh1I735ZVM9G61sJyAjGb7hzQ==
+"@backyard/types@^0.2.18", "@backyard/types@latest":
+  version "0.2.18"
+  resolved "https://registry.yarnpkg.com/@backyard/types/-/types-0.2.18.tgz#72c643f7448a920b146dff81ffa8a1b315dd5de2"
+  integrity sha512-wjyXj+QtQKb2mTtjpHlQd5stWKW4l768KVTF/1VWnuUGxNlfBeuR/7u0eTy0Q9r4vOypjXsCnrTZSeB8moA+Kg==
   dependencies:
     fs-jetpack "^4.1.0"
     ts-essentials "^7.0.1"
