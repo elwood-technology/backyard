@@ -14,6 +14,7 @@ type Options = {
   npm?: boolean;
   install?: boolean;
   init?: boolean;
+  branch?: string;
 };
 
 const pkg = require('../package.json');
@@ -32,13 +33,14 @@ async function main(): Promise<void> {
     .option('-n, --npm', 'Use NPM instead of Yarn')
     .option('--install', 'Run yarn|npm install')
     .option('--init', 'Run backyard init')
+    .option('-b, --branch <branch>', 'Branch to look for examples in')
     .action((dir, tpl) => {
       projectDir = dir;
       template = tpl ?? 'default';
     })
     .parse(process.argv);
 
-  const { typescript, npm, install, init } = prog.opts() as Options;
+  const { typescript, npm, install, init, branch } = prog.opts() as Options;
 
   if (!projectDir) {
     console.log();
@@ -57,9 +59,7 @@ async function main(): Promise<void> {
   spin.start();
 
   const tools: CreateBackyardTools = {
-    spin(text: string) {
-      spin.text = text;
-    },
+    spin,
     log: console.log,
     errorLog(...args: string[]) {
       errorLogBuffer.push(...args);
@@ -69,7 +69,8 @@ async function main(): Promise<void> {
   await createBackyard(
     {
       projectDir: absoluteProjectDir,
-      template: typescript ? 'ts' : template,
+      example: typescript ? 'ts' : template,
+      examplesBranch: branch,
       useNpm: npm,
       runInit: init,
       runInstall: install,
@@ -107,6 +108,8 @@ main().catch((err) => {
   spin.stop();
 
   const errorLogFile = join(process.cwd(), 'create-backyard-error.log');
+
+  errorLogBuffer.push(err.message, err.stack);
 
   if (errorLogBuffer.length > 0) {
     writeFileSync(errorLogFile, errorLogBuffer.join(EOL));

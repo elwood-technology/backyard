@@ -74,7 +74,7 @@ export function config(
       },
       meta: {
         dockerCompose: {
-          depends_on: ['db'],
+          depends_on: [config.settings!.db],
         },
       },
     },

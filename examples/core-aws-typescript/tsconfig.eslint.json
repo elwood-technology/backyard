@@ -8,19 +8,8 @@
     "**/server.d.ts",
     "**/backyard-api.*",
     "**/backyard-service.*",
-    "**/dev-server.d.ts",
     "**/backyard-ui.*",
-    "**/config/*",
-    "**/packages/platform/aws/*.d.ts",
-    "**/packages/platform/aws/*.js"
+    "**/config/*"
   ],
-  "exclude": [
-    "tmp",
-    "temp",
-    "build",
-    "templates",
-    "docs",
-    "node_modules",
-    "examples"
-  ]
+  "exclude": ["tmp", "temp", "build", "templates", "docs", "node_modules"]
 }

@@ -14,6 +14,10 @@ export function isEmptyObject(obj: Json): boolean {
 }
 
 export function useEnvValue(name: string, description?: string): string {
+  if (process.env.BY_SKIP_USE_ENV_CHECK === 'true') {
+    return String(process.env[name]);
+  }
+
   invariant(
     process.env[name],
     description ?? `${name} environment variable is not set`,

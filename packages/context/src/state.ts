@@ -60,7 +60,10 @@ export class ContextState implements Context {
   ): Promise<ContextService> {
     log('adding %s to context', config.name);
 
-    invariant(config.name, 'Configuration must have a name');
+    invariant(
+      config.name,
+      `Configuration must have a name. Provider give: "${config.provider}"`,
+    );
 
     invariant(
       !this.#services.has(config.name),

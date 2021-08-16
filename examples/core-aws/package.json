@@ -1,0 +1,41 @@
+{
+  "name": "by-example-core-aws",
+  "private": true,
+  "version": "0.0.1",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint -c ./.eslintrc.js",
+    "clean:all": "git clean -dfqX -- ./node_modules **/node_modules/ **/lib/ **/dist/ **/*.zip **/*.log **/.DS_Store",
+    "test": "wsrun -m test --passWithNoTests",
+    "build": "wsrun -m build",
+    "postinstall": "husky install",
+    "by": "backyard"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/**/*"
+    ]
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix -c ./.eslintrc.js"
+    ]
+  },
+  "dependencies": {
+    "@backyard/cli": "latest",
+    "@backyard/common": "latest",
+    "@backyard/platform-aws": "latest",
+    "@backyard/service-kong": "latest",
+    "@backyard/service-gotrue": "latest",
+    "@backyard/service-postgresql": "latest",
+    "@backyard/service-postgrest": "latest",
+    "eslint": "^7.19.0",
+    "eslint-config-prettier": "^8.0.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-react": "^7.19.0",
+    "husky": "^7.0.0",
+    "lint-staged": "^11.0.0",
+    "prettier": "^2.0.2",
+    "wsrun": "^5.2.4"
+  }
+}

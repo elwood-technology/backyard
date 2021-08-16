@@ -28,6 +28,7 @@ export interface Toolbox extends GluegunToolbox {
   appendDockerComposeToStage: (
     services: ConfigurationServiceContainer[],
   ) => Promise<void>;
+  errorBox(err: Error): void;
   rc: {
     dir: string;
     config: JsonObject & {
