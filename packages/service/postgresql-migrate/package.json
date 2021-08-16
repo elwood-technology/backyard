@@ -1,6 +1,6 @@
 {
   "name": "@backyard/service-postgresql-migrate",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
@@ -9,10 +9,10 @@
     "compile": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@backyard/common": "^0.2.19"
+    "@backyard/common": "^0.2.20"
   },
   "devDependencies": {
-    "@backyard/types": "^0.2.19"
+    "@backyard/types": "^0.2.20"
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [

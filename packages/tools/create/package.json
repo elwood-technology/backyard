@@ -1,6 +1,6 @@
 {
   "name": "create-backyard",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "main": "lib/index.js",
   "repository": "git@github.com:elwood-technology/backyard.git",
   "author": "Travis Kuhl <travis@elwood.technology>",
@@ -9,7 +9,7 @@
     "create-backyard": "./bin/create.js"
   },
   "dependencies": {
-    "@backyard/common": "^0.2.19",
+    "@backyard/common": "^0.2.20",
     "chalk": "^4.1.1",
     "cli-table3": "^0.6.0",
     "commander": "^8.0.0",
@@ -26,7 +26,7 @@
     "package.json"
   ],
   "devDependencies": {
-    "@backyard/types": "^0.2.19",
+    "@backyard/types": "^0.2.20",
     "@types/node-fetch": "^2.5.12",
     "@types/unzipper": "^0.10.4"
   }

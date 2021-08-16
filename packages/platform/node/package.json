@@ -1,6 +1,6 @@
 {
   "name": "@backyard/platform-node",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
@@ -18,8 +18,8 @@
   "devDependencies": {
     "@backyard/platform-aws-ecs": "^0.2.15",
     "@backyard/platform-terraform": "^0.2.15",
-    "@backyard/tools-typescript": "^0.2.19",
-    "@backyard/types": "^0.2.19",
+    "@backyard/tools-typescript": "^0.2.20",
+    "@backyard/types": "^0.2.20",
     "@types/aws-lambda": "^8.10.77",
     "@types/koa": "^2.13.3",
     "@types/koa__router": "^8.0.4",
