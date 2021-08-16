@@ -53,7 +53,7 @@ export default createWorkspaceConfiguration(() => ({
       name: 'auth',
       settings: {
         operatorToken: process.env.OPERATOR_TOKEN!,
-        db: 'database',
+        db: 'db',
       },
       platform: {
         remote: useAwsRemoteEcsPlatform({
@@ -69,7 +69,7 @@ export default createWorkspaceConfiguration(() => ({
     usePostgRestService({
       name: 'rest',
       settings: {
-        db: 'database',
+        db: 'db',
         schema: 'public',
         anonRole: 'anon',
       },
@@ -85,7 +85,7 @@ export default createWorkspaceConfiguration(() => ({
     // DATABASE
     // https://backyard.io/docs/services/database
     usePostgreSqlService({
-      name: 'database',
+      name: 'db',
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',

@@ -1,15 +1,8 @@
-// import { join } from 'path';
-// import { EOL } from 'os';
-
-// import Table from 'cli-table3';
-import {
-  invariant,
-  ContextModeLocal,
-  // getServices,
-  // serviceHasGateway,
-} from '@backyard/common';
+import { invariant, debug, ContextModeLocal } from '@backyard/common';
 
 import { Toolbox } from '../types';
+
+const log = debug('backyard:cli');
 
 export const SUB_COMMANDS = [
   'build',
@@ -61,9 +54,9 @@ export default {
       process.exit(1);
     }
 
-    await tools.createContext(ContextModeLocal);
-
     try {
+      await tools.createContext(ContextModeLocal);
+
       if (subCommand !== 'help') {
         await tools.context.platforms.local.executeHook('before', {
           context: tools.context,
@@ -101,8 +94,9 @@ export default {
         });
       }
     } catch (err) {
-      tools.print.error(err.message);
-      tools.print.info(err.stack);
+      log(err.message);
+      log(err.stack);
+      tools.errorBox(err);
       process.exit(1);
     }
   },

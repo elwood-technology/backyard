@@ -1,4 +1,5 @@
 .backyard
+.env*
 
 # build folders
 dist/
