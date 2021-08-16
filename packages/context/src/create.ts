@@ -4,7 +4,7 @@ import which from 'which';
 import * as filesystem from 'fs-jetpack';
 import { config as loadDotEnv } from 'dotenv';
 
-import { invariant, debug } from '@backyard/common';
+import { invariant, debug, ContextModeLocal } from '@backyard/common';
 import type {
   Configuration,
   Context,
@@ -39,17 +39,30 @@ enum EnvName {
 const log = debug('backyard:context:create');
 
 export async function createContext(args: CreateContextArgs): Promise<Context> {
-  log('start');
-
   const { mode, settings = {}, initialConfig = {} } = args;
-  const { BACKYARD_CWD } = process.env ?? {};
-
+  const envName = mode === ContextModeLocal ? '.env.local' : '.env.remote';
+  const { BACKYARD_CWD, BACKYARD_ENV_FILE, BACKYARD_IGNORE_ENV_FILE } =
+    process.env ?? {};
   const cwd = resolve(BACKYARD_CWD ?? args.cwd ?? process.cwd());
+
+  log('start');
 
   invariant(
     filesystem.exists(cwd),
     `Current working directory ("${cwd}") does not exist`,
   );
+
+  if (BACKYARD_ENV_FILE) {
+    loadDotEnv({
+      path: BACKYARD_ENV_FILE,
+    });
+  }
+
+  if (BACKYARD_IGNORE_ENV_FILE !== 'true') {
+    loadDotEnv({
+      path: join(cwd, envName),
+    });
+  }
 
   if (filesystem.exists(join(cwd, '.env'))) {
     loadDotEnv({

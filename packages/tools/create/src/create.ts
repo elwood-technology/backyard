@@ -207,6 +207,9 @@ export async function readBackyardFile(
     require('ts-node').register({});
   }
 
+  // don't force env to be set
+  process.env.BY_SKIP_USE_ENV_CHECK = 'true';
+
   return require(join(dir, basename(possibleBackyardFiles[0]))) as BackyardFile;
 }
 
