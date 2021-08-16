@@ -54,5 +54,4 @@ jobs:
           else
             npm i
           fi
-          echo "backyard.io" > ./build/CNAME
           npm run deploy
