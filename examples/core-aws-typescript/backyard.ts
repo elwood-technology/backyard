@@ -12,8 +12,8 @@ import { usePostgreSqlService } from '@backyard/service-postgresql';
 export default createWorkspaceConfiguration(() => ({
   platform: {
     remote: useAwsRemotePlatform({
-      profile: useEnvValue('AWS_PROFILE'),
-      region: useEnvValue('AWS_REGION'),
+      profile: process.env.AWS_PROFILE!,
+      region: process.env.AWS_REGION!,
       ecs: {
         clusters: [
           {
@@ -32,8 +32,8 @@ export default createWorkspaceConfiguration(() => ({
       name: 'gateway',
       settings: {
         jwt: {
-          secret: useEnvValue('JWT_SECRET'),
-          iat: Number(useEnvValue('JWT_IAT')),
+          secret: process.env.JWT_SECRET!,
+          iat: Number(process.env.JWT_IAT),
         },
         anonymousKey: '',
         serviceKey: '',
@@ -52,7 +52,7 @@ export default createWorkspaceConfiguration(() => ({
     useGoTrueService({
       name: 'auth',
       settings: {
-        operatorToken: useEnvValue('OPERATOR_TOKEN'),
+        operatorToken: process.env.OPERATOR_TOKEN!,
         db: 'database',
       },
       platform: {
