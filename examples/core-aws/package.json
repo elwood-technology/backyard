@@ -1,22 +1,15 @@
 {
-  "name": "by-example-core-aws-typescript",
+  "name": "by-example-core-aws",
   "private": true,
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
     "lint": "eslint -c ./.eslintrc.js",
-    "clean:all": "git clean -dfqX -- ./node_modules **/node_modules/ **/lib/ **/dist/ **/tsconfig.tsbuildinfo **/*.zip **/*.log **/.DS_Store",
-    "clean:ts": "git clean -dfqX -- **/{lib,dist}/ **/tsconfig.tsbuildinfo",
-    "compile": "tsc -b ./packages/tsconfig.json",
-    "watch": "yarn compile --watch",
+    "clean:all": "git clean -dfqX -- ./node_modules **/node_modules/ **/lib/ **/dist/ **/*.zip **/*.log **/.DS_Store",
     "test": "wsrun -m test --passWithNoTests",
     "build": "wsrun -m build",
     "postinstall": "husky install",
-    "lerna": "lerna",
     "by": "backyard"
-  },
-  "resolutions": {
-    "typescript": "^4.2.3"
   },
   "workspaces": {
     "packages": [
@@ -36,20 +29,13 @@
     "@backyard/service-gotrue": "latest",
     "@backyard/service-postgresql": "latest",
     "@backyard/service-postgrest": "latest",
-    "@types/jest": "^26.0.15",
-    "@types/node": "^12.7.11",
-    "@typescript-eslint/eslint-plugin": "^4.15.0",
-    "@typescript-eslint/parser": "^4.15.0",
     "eslint": "^7.19.0",
     "eslint-config-prettier": "^8.0.0",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.19.0",
     "husky": "^7.0.0",
-    "lerna": "^4.0.0",
     "lint-staged": "^11.0.0",
     "prettier": "^2.0.2",
-    "ts-node": "^10.1.0",
-    "typescript": "^4.2.3",
     "wsrun": "^5.2.4"
   }
 }
