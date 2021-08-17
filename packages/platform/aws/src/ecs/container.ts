@@ -54,7 +54,7 @@ export async function awsEcsContainerTaskDef(
     );
 
     const img = state.add('module', `${service.name}_ecr_image`, {
-      source: 'github.com/backyardjs/terraform-aws-ecr-image',
+      source: 'github.com/elwood-technology/terraform-aws-ecr-image',
       dockerfile_dir: join(context.dir.stage, service.name),
       ecr_repository_url: ecr.attr('repository_url'),
       aws_profile: profile,

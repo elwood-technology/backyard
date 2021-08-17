@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join, isAbsolute } from 'path';
 
 import { stringify as yaml } from 'yaml';
 
@@ -36,7 +36,13 @@ export function createDockerCompose(
         [service.name]: {
           ...imageName(container),
           ...createVolumes(
-            container.volumes?.map((v) => [join(serviceDir, v[0]), v[1]]),
+            container.volumes?.map((v) => {
+              if (isAbsolute(v[0])) {
+                return v;
+              }
+
+              return [join(serviceDir, v[0]), v[1]];
+            }),
           ),
           container_name: container.name ?? `by-${service.name}`,
           environment: container.environment ?? {},

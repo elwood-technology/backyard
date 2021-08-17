@@ -27,6 +27,7 @@ export async function createKongConfig(
   service: KongContextService,
 ): Promise<KongConfig> {
   const key = await keys({ context, service });
+  const { routePrefix = 'api/' } = service.settings;
 
   const coreServices = await Promise.all(
     getServices(context).map(async (service) => {
@@ -45,7 +46,7 @@ export async function createKongConfig(
         {
           name: `${prefix}-all`,
           strip_path: stripPath,
-          paths: [`/${prefix}/v${version}`],
+          paths: [`/${routePrefix}${prefix}/v${version}`],
         },
       ];
 
@@ -76,7 +77,13 @@ export async function createKongConfig(
         name: 'health',
         _comment: 'Health',
         url: 'http://localhost:8000/',
-        routes: [{ name: 'health-all', strip_path: true, paths: ['/health'] }],
+        routes: [
+          {
+            name: 'health-all',
+            strip_path: true,
+            paths: [`/${routePrefix}health`],
+          },
+        ],
         plugins: [
           {
             name: 'request-termination',

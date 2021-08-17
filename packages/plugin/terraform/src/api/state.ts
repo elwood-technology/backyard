@@ -42,7 +42,9 @@ export function addModuleTo<T extends TerraformAddTypeName>(
         name as JsonObject,
       )) as TerraformAddType<T>;
     default:
-      throw new Error(`Unknown type "${moduleType}"`);
+      throw new Error(
+        `Unknown type "${moduleType}" trying to add "${type}:${name}"`,
+      );
   }
 }
 
@@ -59,14 +61,20 @@ export function getModuleFrom<T extends TerraformAddTypeName>(
       if (storeName in state.resources) {
         return state.resources[storeName] as TerraformAddType<T>;
       }
+
+      throw new Error(`Unable to find "resource.${storeName}`);
     }
     case 'data': {
       if (storeName in state.data) {
         return state.data[storeName] as TerraformAddType<T>;
       }
+
+      throw new Error(`Unable to find "data.${storeName}`);
     }
     default:
-      throw new Error('');
+      throw new Error(
+        `Unknown module type "${moduleType}" trying to get "${type}:${name}"`,
+      );
   }
 }
 

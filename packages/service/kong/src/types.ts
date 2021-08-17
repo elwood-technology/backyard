@@ -27,14 +27,13 @@ export interface KongKeys {
 }
 
 export interface KongServiceSettings extends ConfigurationServiceSettings {
+  routePrefix?: string;
   jwt: {
     iat?: number;
-    secret?: string;
+    secret: string;
     groupName?: string;
     exp?: number;
   };
-  anonymousKey: string;
-  serviceKey: string;
 }
 
 export type KongContextService = ContextService<KongServiceSettings>;

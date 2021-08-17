@@ -43,6 +43,20 @@ export async function addGatewayEcs(
     security_groups: [albSecurityGroup.id],
   });
 
+  state.add('resource', 'aws_alb_listener', 'alb-listen', {
+    load_balancer_arn: alb.id,
+    port: 80,
+    protocol: 'HTTP',
+    default_action: {
+      type: 'fixed-response',
+      fixed_response: {
+        content_type: 'text/plain',
+        message_body: ':)',
+        status_code: '200',
+      },
+    },
+  });
+
   const assumePolicy = state.add(
     'data',
     'aws_iam_policy_document',
@@ -100,24 +114,29 @@ export async function addGatewayEcs(
   });
 
   const target = state.add('resource', 'aws_alb_target_group', 'alb-target', {
-    name: 'BackyardTarget',
+    name: 'BackyardGatewayTarget',
     port: gateway?.container?.externalPort,
     protocol: 'HTTP',
     vpc_id: vpc?.id,
     target_type: 'ip',
     health_check: {
-      path: '/health',
+      path: '/api/health',
       port: gateway?.container?.port,
     },
   });
+  state.add('resource', 'aws_lb_listener_rule', 'alb-ecs-target', {
+    listener_arn: alb.attr('arn'),
+    priority: 100,
 
-  state.add('resource', 'aws_alb_listener', 'alb-listen', {
-    load_balancer_arn: alb.id,
-    port: 80,
-    protocol: 'HTTP',
-    default_action: {
-      target_group_arn: target.id,
+    action: {
       type: 'forward',
+      target_group_arn: target.attr('arn'),
+    },
+
+    condition: {
+      path_pattern: {
+        values: ['/api/*'],
+      },
     },
   });
 
@@ -163,6 +182,13 @@ export async function addGatewayEcs(
     },
     depends_on: [alb],
   });
+
+  for (const service of getServices(context)) {
+    await service.hook('awsAlb', {
+      ...args,
+      service,
+    });
+  }
 }
 
 export async function createGatewayTaskDef(
