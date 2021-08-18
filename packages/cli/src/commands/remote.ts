@@ -96,11 +96,14 @@ export async function build(tools: Toolbox): Promise<void> {
 
   spin.text = 'Sending to remote platform...';
 
+  spin.stop();
+
   await tools.context.platforms.remote!.executeHook('build', {
     context: tools.context,
     commandOptions: tools.parameters.options,
   });
 
+  spin.start();
   spin.succeed('Build Complete!');
 }
 

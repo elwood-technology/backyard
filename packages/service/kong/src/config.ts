@@ -27,7 +27,7 @@ export async function createKongConfig(
   service: KongContextService,
 ): Promise<KongConfig> {
   const key = await keys({ context, service });
-  const { routePrefix = 'api/' } = service.settings;
+  const { routePrefix = '' } = service.settings;
 
   const coreServices = await Promise.all(
     getServices(context).map(async (service) => {
