@@ -46,6 +46,7 @@ export function createDockerCompose(
           ),
           container_name: container.name ?? `by-${service.name}`,
           environment: container.environment ?? {},
+          ...(container.restart ? { restart: container.restart } : {}),
           ...more,
           ...createPorts(container),
         },

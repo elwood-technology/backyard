@@ -29,6 +29,10 @@
     {
       "path": "./nextjs",
       "prepend": false
+    },
+    {
+      "path": "./postgresql-realtime",
+      "prepend": false
     }
   ]
 }

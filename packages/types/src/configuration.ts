@@ -41,6 +41,7 @@ export interface ConfigurationServiceContainer {
   host?: string;
   name?: string;
   imageName?: string;
+  restart?: 'on-failure' | 'always' | 'no' | 'unless-stopped';
   environment?: Record<string, string>;
   volumes?: Array<[string, string]>;
   command?: string[];

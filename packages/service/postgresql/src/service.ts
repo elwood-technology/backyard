@@ -52,6 +52,44 @@ export async function uri({
   return `postgres://${user}:${password}@${service.container.host}:${service.container.port}/${name}?sslmode=disable`;
 }
 
+export async function host({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  invariant(service.container?.host, 'Missing db[container.host]');
+  return service.container?.host;
+}
+
+export async function name({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  const { name } = service.config?.settings || {};
+  invariant(name, 'No name in db settings');
+  return name;
+}
+
+export async function user({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  const { user } = service.config?.settings || {};
+  invariant(user, 'No user in db settings');
+  return user;
+}
+
+export async function password({
+  service,
+}: ServiceHookProviderArgs): Promise<string> {
+  const { password } = service.config?.settings || {};
+  invariant(password, 'No password in db settings');
+  return password;
+}
+
+export async function port({
+  service,
+}: ServiceHookProviderArgs): Promise<number> {
+  invariant(service.container?.port, 'Missing db[container.port]');
+  return service.container?.port;
+}
+
 export async function awsEcsContainerTaskDef(
   args: ServiceHookProviderArgs,
 ): Promise<JsonObject> {
