@@ -59,8 +59,6 @@ export async function createKongConfig(
         },
       ];
 
-      console.log(routes);
-
       const container = service.container;
       const host = container?.host ?? service.name;
       const port = container?.port ?? 3000;
