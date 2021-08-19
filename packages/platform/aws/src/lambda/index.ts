@@ -1,4 +1,2 @@
-export * from './config';
-export * from './stage';
+export * as remote from './remote';
 export * from './types';
-export * from './terraform';

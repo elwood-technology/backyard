@@ -43,6 +43,20 @@ export async function addGatewayEcs(
     security_groups: [albSecurityGroup.id],
   });
 
+  const albListener = state.add('resource', 'aws_alb_listener', 'alb-listen', {
+    load_balancer_arn: alb.id,
+    port: 80,
+    protocol: 'HTTP',
+    default_action: {
+      type: 'fixed-response',
+      fixed_response: {
+        content_type: 'text/plain',
+        message_body: ':)',
+        status_code: '200',
+      },
+    },
+  });
+
   const assumePolicy = state.add(
     'data',
     'aws_iam_policy_document',
@@ -99,25 +113,31 @@ export async function addGatewayEcs(
     container_definitions: new state.Heredoc(taskDef),
   });
 
+  const routePrefix = gateway.settings.routePrefix || '';
   const target = state.add('resource', 'aws_alb_target_group', 'alb-target', {
-    name: 'BackyardTarget',
+    name: 'BackyardGatewayTarget',
     port: gateway?.container?.externalPort,
     protocol: 'HTTP',
     vpc_id: vpc?.id,
     target_type: 'ip',
     health_check: {
-      path: '/health',
+      path: `/${routePrefix}health`,
       port: gateway?.container?.port,
     },
   });
+  state.add('resource', 'aws_lb_listener_rule', 'alb-ecs-target', {
+    listener_arn: albListener.attr('arn'),
+    priority: 1,
 
-  state.add('resource', 'aws_alb_listener', 'alb-listen', {
-    load_balancer_arn: alb.id,
-    port: 80,
-    protocol: 'HTTP',
-    default_action: {
-      target_group_arn: target.id,
+    action: {
       type: 'forward',
+      target_group_arn: target.attr('arn'),
+    },
+
+    condition: {
+      path_pattern: {
+        values: [`/${routePrefix}*`],
+      },
     },
   });
 
@@ -132,8 +152,8 @@ export async function addGatewayEcs(
 
       ingress: {
         protocol: 'tcp',
-        from_port: gateway?.container?.port,
-        to_port: gateway?.container?.port,
+        from_port: 0,
+        to_port: 65535,
         security_groups: [albSecurityGroup.id],
       },
 
@@ -146,6 +166,25 @@ export async function addGatewayEcs(
     },
   );
 
+  const loadBalancer: JsonObject[] = [
+    {
+      target_group_arn: target.attr('arn'),
+      container_name: 'gateway',
+      container_port: gateway?.container?.port,
+    },
+  ];
+
+  for (const service of getServices(context)) {
+    const result = await service.hook('awsEcsServiceLoadBalancer', {
+      ...args,
+      service,
+    });
+
+    if (result && Object.keys(result).length > 0) {
+      loadBalancer.push(result);
+    }
+  }
+
   state.add('resource', 'aws_ecs_service', 'ecs-service', {
     name: 'Backyard',
     cluster: cluster.id,
@@ -156,13 +195,16 @@ export async function addGatewayEcs(
       security_groups: [securityGroup.id],
       subnets: privateSubnets.attr('*.id'),
     },
-    load_balancer: {
-      target_group_arn: target.id,
-      container_name: 'gateway',
-      container_port: gateway?.container?.port,
-    },
+    load_balancer: loadBalancer,
     depends_on: [alb],
   });
+
+  for (const service of getServices(context)) {
+    await service.hook('awsAlb', {
+      ...args,
+      service,
+    });
+  }
 }
 
 export async function createGatewayTaskDef(

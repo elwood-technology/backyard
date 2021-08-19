@@ -7,6 +7,7 @@ import {
   Data,
   Resource,
   Module,
+  List,
 } from 'terraform-generator';
 
 import { ServiceHookProviderArgs, JsonObject } from '@backyard/types';
@@ -36,6 +37,7 @@ export type TerraformState = {
   resources: Record<string, Resource>;
   modules: Record<string, Module>;
   data: Record<string, Data>;
+  List: typeof List;
   Map: typeof Map;
   Heredoc: typeof Heredoc;
   Argument: typeof Argument;

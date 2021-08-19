@@ -149,6 +149,8 @@ export async function build(tools: Toolbox): Promise<void> {
 
   spin.text = 'Initializing platform';
 
+  spin.stop();
+
   try {
     await platform.executeHook('build', {
       context,
@@ -238,7 +240,7 @@ export async function start(tools: Toolbox): Promise<void> {
   const { context } = tools;
   const platform = context.platforms.local;
 
-  if (tools.parameters.options['build'] === true) {
+  if (tools.parameters.options['build'] !== false) {
     await build(tools);
   }
 
@@ -257,6 +259,7 @@ export async function start(tools: Toolbox): Promise<void> {
 
   try {
     spin.start('Starting...');
+    spin.stop();
 
     await platform.executeHook('start', {
       context,
@@ -280,6 +283,7 @@ export async function stop(tools: Toolbox): Promise<void> {
     invariant(filesystem.exists(context.dir.stage), 'Stage does not exist');
 
     spin.start('Stopping...');
+    spin.stop();
 
     await platform.executeHook('stop', {
       context,
@@ -308,6 +312,7 @@ export async function clean(tools: Toolbox): Promise<void> {
     });
 
     spin.text = 'Cleaning stage...';
+    spin.stop();
 
     await tools.filesystem.removeAsync(context.dir.stage);
 

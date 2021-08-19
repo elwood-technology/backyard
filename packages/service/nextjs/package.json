@@ -1,0 +1,33 @@
+{
+  "name": "@backyard/service-nextjs",
+  "version": "0.2.20",
+  "main": "lib/index.js",
+  "author": "Travis Kuhl <travis@elwood.technology>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json"
+  },
+  "dependencies": {
+    "@backyard/common": "^0.2.20",
+    "fs-jetpack": "^4.1.0",
+    "lodash.defaultsdeep": "^4.6.1",
+    "lodash.get": "^4.4.2",
+    "yaml": "^1.10.2"
+  },
+  "devDependencies": {
+    "@backyard/types": "^0.2.20",
+    "@backyard/platform-aws": "*",
+    "@types/lodash.defaultsdeep": "^4.6.6",
+    "@types/lodash.get": "^4.4.6"
+  },
+  "repository": "git@github.com:elwood-technology/backyard.git",
+  "files": [
+    "lib",
+    "backyard-service.js",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

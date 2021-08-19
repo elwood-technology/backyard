@@ -25,6 +25,10 @@
     {
       "path": "./postgrest",
       "prepend": false
+    },
+    {
+      "path": "./nextjs",
+      "prepend": false
     }
   ]
 }

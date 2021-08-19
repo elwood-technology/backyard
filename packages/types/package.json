@@ -10,12 +10,11 @@
   },
   "dependencies": {
     "fs-jetpack": "^4.1.0",
-    "ts-essentials": "^7.0.1",
+    "ts-essentials": "^8.0.0",
     "webpack": "*"
   },
   "devDependencies": {
-    "@backyard/tools-typescript": "^0.2.20",
-    "ts-essentials": "^7.0.1"
+    "@backyard/tools-typescript": "^0.2.20"
   },
   "homepage": "https://github.com/elwood-technology/backyard/tree/main/packages/types",
   "repository": "git@github.com:elwood-technology/backyard.git",

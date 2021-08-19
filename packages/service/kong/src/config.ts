@@ -1,9 +1,16 @@
 import type { Context, ContextService, JsonObject } from '@backyard/types';
-import { ContextModeLocal, getServices, invariant } from '@backyard/common';
+import {
+  ContextModeLocal,
+  getServices,
+  invariant,
+  debug,
+} from '@backyard/common';
 
 import { KongConfig, KongContextService, KongService } from './types';
 
 import { keys } from './service';
+
+const log = debug('backyard:service:kong:config');
 
 export function shouldEnableService(
   context: Context,
@@ -27,6 +34,7 @@ export async function createKongConfig(
   service: KongContextService,
 ): Promise<KongConfig> {
   const key = await keys({ context, service });
+  const { routePrefix = '' } = service.settings;
 
   const coreServices = await Promise.all(
     getServices(context).map(async (service) => {
@@ -35,6 +43,8 @@ export async function createKongConfig(
       if (!shouldEnableService(context, service)) {
         return;
       }
+
+      log(`gateway service "${service.name}"`);
 
       invariant(gateway, 'Gateway is not defined');
 
@@ -45,9 +55,11 @@ export async function createKongConfig(
         {
           name: `${prefix}-all`,
           strip_path: stripPath,
-          paths: [`/${prefix}/v${version}`],
+          paths: [`/${routePrefix}${prefix}/v${version}`],
         },
       ];
+
+      console.log(routes);
 
       const container = service.container;
       const host = container?.host ?? service.name;
@@ -76,7 +88,13 @@ export async function createKongConfig(
         name: 'health',
         _comment: 'Health',
         url: 'http://localhost:8000/',
-        routes: [{ name: 'health-all', strip_path: true, paths: ['/health'] }],
+        routes: [
+          {
+            name: 'health-all',
+            strip_path: true,
+            paths: [`/${routePrefix}health`],
+          },
+        ],
         plugins: [
           {
             name: 'request-termination',
