@@ -22,21 +22,34 @@ export async function resolveServiceConfig(
   args: ResolveServiceConfigArgs,
 ): Promise<ConfigurationService> {
   const { initialConfig, context, hooks, platform } = args;
-  let config = deepMerge(initialConfig, {
-    settings: {},
-    gateway: {},
-    container: {},
-  }) as ConfigurationService;
+  let config = deepMerge(
+    initialConfig,
+    {
+      settings: {},
+      gateway: {},
+      container: {},
+    },
+    {
+      arrayMerge(_target, source) {
+        return source;
+      },
+    },
+  ) as ConfigurationService;
 
   if (isFunction(hooks.config)) {
-    config = deepMerge.all([
-      await hooks.config(context, config),
-      initialConfig,
-    ]);
+    config = deepMerge(await hooks.config(context, config), initialConfig, {
+      arrayMerge(_target, source) {
+        return source;
+      },
+    });
   }
 
   if (platform && isFunction(platform.config)) {
-    config = deepMerge(config, await platform.config(context, config));
+    config = deepMerge(config, await platform.config(context, config), {
+      arrayMerge(_target, source) {
+        return source;
+      },
+    });
   }
 
   return config;

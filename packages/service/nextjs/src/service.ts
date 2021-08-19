@@ -34,7 +34,7 @@ export function config(
         {
           name: `${prefix}-all`,
           strip_path: true,
-          paths: [`/${routePrefix}${prefix}/v1/(?<rest>\w+)`],
+          paths: [`/${routePrefix}${prefix}/v1/(?<rest>\\\S+)`],
         },
       ],
       plugins: [
@@ -62,6 +62,48 @@ export function config(
         context: `./${config.name}`,
       },
     },
+  };
+}
+
+export async function awsEcsServiceLoadBalancer(
+  args: ServiceHookProviderArgs & AwsRemoteTerraformHookArgs,
+): Promise<JsonObject> {
+  const { state, service } = args;
+  const vpc = args.vpc();
+  const alb = state.get('resource', 'aws_alb_listener', 'alb-listen');
+
+  const target = state.add(
+    'resource',
+    'aws_alb_target_group',
+    `alb-${service.name}-target`,
+    {
+      name: 'BackyardWebTarget',
+      port: service?.container?.externalPort,
+      protocol: 'HTTP',
+      vpc_id: vpc?.id,
+      target_type: 'ip',
+    },
+  );
+  state.add('resource', 'aws_lb_listener_rule', `alb-${service.name}-target`, {
+    listener_arn: alb.attr('arn'),
+    priority: 2,
+
+    action: {
+      type: 'forward',
+      target_group_arn: target.attr('arn'),
+    },
+
+    condition: {
+      path_pattern: {
+        values: ['*'],
+      },
+    },
+  });
+
+  return {
+    target_group_arn: target.attr('arn'),
+    container_name: service.name,
+    container_port: service?.container?.port,
   };
 }
 
@@ -113,43 +155,43 @@ export function config(
 // }
 // }
 
-export async function awsEcsContainerTaskDef(
-  _args: ServiceHookProviderArgs & AwsRemoteTerraformHookArgs,
-): Promise<JsonObject | undefined> {
-  return undefined;
+// export async function awsEcsContainerTaskDef(
+//   _args: ServiceHookProviderArgs & AwsRemoteTerraformHookArgs,
+// ): Promise<JsonObject | undefined> {
+//   return undefined;
 
-  // const { parent, service, state } = args;
-  // const vpc = args.vpc();
-  // const listen = state.get('resource', 'aws_alb_listener', 'alb-listen');
+// const { parent, service, state } = args;
+// const vpc = args.vpc();
+// const listen = state.get('resource', 'aws_alb_listener', 'alb-listen');
 
-  // const target = state.add(
-  //   'resource',
-  //   'aws_alb_target_group',
-  //   'alb-web-target',
-  //   {
-  //     name: 'BackyardWebTarget',
-  //     port: service.container?.port ?? 3000,
-  //     protocol: 'HTTP',
-  //     vpc_id: vpc?.id,
-  //     target_type: 'ip',
-  //   },
-  // );
+// const target = state.add(
+//   'resource',
+//   'aws_alb_target_group',
+//   'alb-web-target',
+//   {
+//     name: 'BackyardWebTarget',
+//     port: service.container?.port ?? 3000,
+//     protocol: 'HTTP',
+//     vpc_id: vpc?.id,
+//     target_type: 'ip',
+//   },
+// );
 
-  // state.add('resource', 'aws_lb_listener_rule', 'alb-web-listen', {
-  //   listener_arn: listen.attr('arn'),
-  //   priority: 90,
+// state.add('resource', 'aws_lb_listener_rule', 'alb-web-listen', {
+//   listener_arn: listen.attr('arn'),
+//   priority: 90,
 
-  //   action: {
-  //     type: 'forward',
-  //     target_group_arn: target.attr('arn'),
-  //   },
+//   action: {
+//     type: 'forward',
+//     target_group_arn: target.attr('arn'),
+//   },
 
-  //   condition: {
-  //     path_pattern: {
-  //       values: ['/*'],
-  //     },
-  //   },
-  // });
+//   condition: {
+//     path_pattern: {
+//       values: ['/*'],
+//     },
+//   },
+// });
 
-  // return parent;
-}
+// return parent;
+// }

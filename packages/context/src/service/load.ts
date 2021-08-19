@@ -80,15 +80,21 @@ export async function loadService(
     config = deepMerge(
       config,
       await providerExtendHooks.config(context, config),
+      {
+        arrayMerge(_target, source) {
+          return source;
+        },
+      },
     ) as ConfigWithType;
   }
 
   // give the platform hooks a chance to update config
   if (platform && isFunction(platform.config)) {
-    config = deepMerge(
-      config,
-      await platform.config(context, config),
-    ) as ConfigWithType;
+    config = deepMerge(config, await platform.config(context, config), {
+      arrayMerge(_target, source) {
+        return source;
+      },
+    }) as ConfigWithType;
   }
 
   const input: ContextServiceStateInput = {

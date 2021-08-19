@@ -4,6 +4,7 @@ import {
   Heredoc,
   Argument,
   Function,
+  List,
 } from 'terraform-generator';
 
 import { JsonObject } from '@backyard/types';
@@ -81,6 +82,7 @@ export function getModuleFrom<T extends TerraformAddTypeName>(
 export async function createState(): Promise<TerraformState> {
   const tf = new TerraformGenerator();
   const state: TerraformState = {
+    List,
     Map,
     Heredoc,
     Argument,

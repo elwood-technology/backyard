@@ -108,7 +108,7 @@ export async function build(tools: Toolbox): Promise<void> {
 }
 
 export async function deploy(tools: Toolbox): Promise<void> {
-  if (tools.parameters.options.build === true) {
+  if (tools.parameters.options.build !== false) {
     await build(tools);
   }
 

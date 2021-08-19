@@ -1,9 +1,16 @@
 import type { Context, ContextService, JsonObject } from '@backyard/types';
-import { ContextModeLocal, getServices, invariant } from '@backyard/common';
+import {
+  ContextModeLocal,
+  getServices,
+  invariant,
+  debug,
+} from '@backyard/common';
 
 import { KongConfig, KongContextService, KongService } from './types';
 
 import { keys } from './service';
+
+const log = debug('backyard:service:kong:config');
 
 export function shouldEnableService(
   context: Context,
@@ -37,6 +44,8 @@ export async function createKongConfig(
         return;
       }
 
+      log(`gateway service "${service.name}"`);
+
       invariant(gateway, 'Gateway is not defined');
 
       const prefix = service.gateway?.prefix ?? service.name;
@@ -49,6 +58,8 @@ export async function createKongConfig(
           paths: [`/${routePrefix}${prefix}/v${version}`],
         },
       ];
+
+      console.log(routes);
 
       const container = service.container;
       const host = container?.host ?? service.name;
