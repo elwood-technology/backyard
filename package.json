@@ -32,7 +32,7 @@
     ]
   },
   "lint-staged": {
-    "packages/*.{ts,tsx}": [
+    "packages/**/*.{ts,tsx}": [
       "eslint --fix -c ./.eslintrc.js"
     ]
   },
