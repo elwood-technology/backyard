@@ -23,7 +23,6 @@ export function config(
       essential: false,
       host: '0.0.0.0',
       port: 4000,
-      externalPort: 4000,
       restart: 'on-failure',
       imageName: 'supabase/realtime:latest',
       environment: {

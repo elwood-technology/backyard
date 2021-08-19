@@ -53,7 +53,7 @@ export interface Context {
     root: string;
     backyard: string;
     stage: string;
-    source: string;
+    source?: string;
     state: string;
   };
   config: FullConfiguration;

@@ -149,7 +149,7 @@ ___
 
 ### getSourceDir
 
-▸ **getSourceDir**(`config`, `rootDir`): `string`
+▸ **getSourceDir**(`config`, `rootDir`): `string` \| `undefined`
 
 #### Parameters
 
@@ -160,7 +160,7 @@ ___
 
 #### Returns
 
-`string`
+`string` \| `undefined`
 
 #### Defined in
 

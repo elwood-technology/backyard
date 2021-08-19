@@ -24,3 +24,7 @@ export function useEnvValue(name: string, description?: string): string {
   );
   return String(process.env[name]);
 }
+
+export function useOptionalEnvValue(name: string): string | undefined {
+  return process.env[name] ? String(process.env[name]) : undefined;
+}
