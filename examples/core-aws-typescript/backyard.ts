@@ -8,6 +8,8 @@ import { useGoTrueService } from '@backyard/service-gotrue';
 import { useKongService } from '@backyard/service-kong';
 import { usePostgRestService } from '@backyard/service-postgrest';
 import { usePostgreSqlService } from '@backyard/service-postgresql';
+import { usePostgreSqlRealtimeService } from '@backyard/service-postgresql-realtime';
+import { useNextJsService } from '@backyard/service-nextjs';
 
 export default createWorkspaceConfiguration(() => ({
   platform: {
@@ -27,7 +29,7 @@ export default createWorkspaceConfiguration(() => ({
   },
   services: [
     // GATEWAY
-    // https://backyard.io/docs/services/gateway
+    // https://backyard.io/docs/services/kong
     useKongService({
       name: 'gateway',
       settings: {
@@ -35,20 +37,65 @@ export default createWorkspaceConfiguration(() => ({
           secret: process.env.JWT_SECRET!,
           iat: Number(process.env.JWT_IAT),
         },
-        anonymousKey: '',
-        serviceKey: '',
+      },
+      container: {
+        externalPort: 8000,
       },
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',
-          containerCpu: 0.25,
-          containerMemory: 0.25,
+          containerCpu: 0.2,
+          containerMemory: 0.2,
+        }),
+      },
+    }),
+
+    // DATABASE
+    // https://backyard.io/docs/services/postgresql
+    usePostgreSqlService({
+      name: 'db',
+      platform: {
+        remote: useAwsRemoteEcsPlatform({
+          cluster: 'main',
+          containerCpu: 0.24,
+          containerMemory: 0.24,
+        }),
+      },
+    }),
+
+    // WEB
+    // https://backyard.io/docs/services/nextjs
+    useNextJsService({
+      name: 'web',
+      settings: {
+        src: './src/web',
+      },
+      container: {
+        externalPort: 8080,
+        environment: {
+          NEXT_PUBLIC_AUTH_URL:
+            '<%= context.getService("auth").getGatewayUrl() %>',
+          NEXT_PUBLIC_REALTIME_URL:
+            '<%= context.getService("realtime").getGatewayUrl() %>',
+          NEXT_PUBLIC_REST_URL:
+            '<%= context.getService("rest").getGatewayUrl() %>',
+          NEXT_PUBLIC_WEB_URL:
+            '<%= context.getService("web").getGatewayUrl() %>',
+          NEXT_PUBLIC_ANONYMOUS_KEY:
+            '<%= await context.getService("gateway").hook("anonymousKey") %>',
+        },
+      },
+      platform: {
+        remote: useAwsRemoteEcsPlatform({
+          cluster: 'main',
+          containerCpu: 0.15,
+          containerMemory: 0.15,
         }),
       },
     }),
 
     // AUTH
-    // https://backyard.io/docs/services/auth
+    // https://backyard.io/docs/services/gotrue
     useGoTrueService({
       name: 'auth',
       settings: {
@@ -58,14 +105,14 @@ export default createWorkspaceConfiguration(() => ({
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',
-          containerCpu: 0.25,
-          containerMemory: 0.25,
+          containerCpu: 0.15,
+          containerMemory: 0.15,
         }),
       },
     }),
 
     // REST
-    // https://backyard.io/docs/services/rest
+    // https://backyard.io/docs/services/postgrest
     usePostgRestService({
       name: 'rest',
       settings: {
@@ -73,27 +120,56 @@ export default createWorkspaceConfiguration(() => ({
         schema: 'public',
         anonRole: 'anon',
       },
+      container: {
+        externalPort: 4000,
+      },
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',
-          containerCpu: 0.25,
-          containerMemory: 0.25,
+          containerCpu: 0.15,
+          containerMemory: 0.15,
         }),
       },
     }),
 
-    // DATABASE
-    // https://backyard.io/docs/services/database
-    usePostgreSqlService({
-      name: 'db',
+    // REALTIME
+    // httsps://backyard.io/docs/services/postgresql-realtime
+    usePostgreSqlRealtimeService({
+      name: 'realtime',
+      settings: {
+        db: 'db',
+      },
+      container: {
+        externalPort: 4001,
+      },
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',
-          containerCpu: 0.25,
-          containerMemory: 0.25,
+          containerCpu: 0.1,
+          containerMemory: 0.1,
         }),
       },
     }),
+
+    // MIGRATE
+    // https://backyard.io/docs/services/postgresql-migrate
+    {
+      name: 'db-migrate',
+      provider: '@backyard/service-postgresql-realtime',
+      settings: {
+        db: 'db',
+      },
+      container: {
+        externalPort: 4002,
+      },
+      platform: {
+        remote: useAwsRemoteEcsPlatform({
+          cluster: 'main',
+          containerCpu: 0.01,
+          containerMemory: 0.01,
+        }),
+      },
+    },
   ],
 }));
 
