@@ -1,5 +1,5 @@
 {
-  "name": "@backyard/service-postgresql",
+  "name": "@backyard/service-postgresql-realtime",
   "version": "0.2.22",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
