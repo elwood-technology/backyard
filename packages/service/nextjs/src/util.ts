@@ -1,4 +1,14 @@
 import { spawn, SpawnOptions } from 'child_process';
+import { Context } from '@backyard/types';
+import { isAbsolute, join } from 'path';
+
+export function getSourceDir(context: Context, src: string): string {
+  if (isAbsolute(src)) {
+    return src;
+  }
+
+  return join(context.dir.root, src);
+}
 
 export function run(
   cmd: string,

@@ -1,5 +1,4 @@
 import { join } from 'path';
-import { randomBytes, createHash } from 'crypto';
 
 import { stringify as yaml } from 'yaml';
 
@@ -15,6 +14,8 @@ import { createKongConfig } from './config';
 import { generateKeys } from './keys';
 import { KongContextService, KongKeys, KongServiceSettings } from './types';
 
+export const defaultIat = 384584607;
+
 export const kongPlugins = [
   'request-transformer',
   'cors',
@@ -26,17 +27,21 @@ export const kongPlugins = [
 
 export function config(
   context: Context,
-  _config: ConfigurationService<KongServiceSettings>,
+  config: ConfigurationService<KongServiceSettings>,
 ): Partial<ConfigurationService> {
-  const iat = 384584607;
+  invariant(
+    config.settings?.jwt.secret,
+    `Must provide ${config.name}.settings.jwt.secret`,
+  );
+
+  console.log('poop');
 
   return {
     settings: {
       jwt: {
-        iat,
+        iat: defaultIat,
         groupName: 'backyard',
-        exp: iat + 60 * 60 * 24 * 365 * 50,
-        secret: createHash('md5').update(randomBytes(64)).digest('hex'),
+        exp: defaultIat + 60 * 60 * 24 * 365 * 50,
       },
     },
     gateway: {
@@ -93,6 +98,8 @@ EXPOSE 8000`,
 export async function keys({
   service,
 }: ServiceHookProviderArgs): Promise<KongKeys> {
+  console.log(service.config);
+
   return generateKeys(
     service.config as ConfigurationService<KongServiceSettings>,
   );

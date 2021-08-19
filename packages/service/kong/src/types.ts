@@ -29,10 +29,10 @@ export interface KongKeys {
 export interface KongServiceSettings extends ConfigurationServiceSettings {
   routePrefix?: string;
   jwt: {
-    iat?: number;
+    iat?: string;
     secret: string;
     groupName?: string;
-    exp?: number;
+    exp?: string;
   };
 }
 

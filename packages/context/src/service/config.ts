@@ -8,6 +8,7 @@ import type {
   Json,
   ContextPlatform,
   ContextPlatformTypeName,
+  JsonObject,
 } from '@backyard/types';
 import { isFunction } from '@backyard/common';
 
@@ -18,38 +19,52 @@ export type ResolveServiceConfigArgs = {
   platform?: ContextPlatform<ContextPlatformTypeName, string>;
 };
 
+function cleanObject(obj: JsonObject): JsonObject {
+  let newObj = {} as JsonObject;
+  Object.keys(obj).forEach((key) => {
+    if (!Array.isArray(obj[key]) && typeof obj[key] === 'object') {
+      newObj[key] = cleanObject(obj[key] as JsonObject);
+    } else if (obj[key] !== undefined) {
+      newObj[key] = obj[key];
+    }
+  });
+
+  return newObj;
+}
+
+export function mergeConfigurationService(
+  src: Partial<ConfigurationService>,
+  dest: Partial<ConfigurationService>,
+): ConfigurationService {
+  return deepMerge(cleanObject(src), cleanObject(dest), {
+    arrayMerge(_target, source) {
+      return source;
+    },
+  }) as ConfigurationService;
+}
+
 export async function resolveServiceConfig(
   args: ResolveServiceConfigArgs,
 ): Promise<ConfigurationService> {
   const { initialConfig, context, hooks, platform } = args;
-  let config = deepMerge(
-    initialConfig,
-    {
-      settings: {},
-      gateway: {},
-      container: {},
-    },
-    {
-      arrayMerge(_target, source) {
-        return source;
-      },
-    },
-  ) as ConfigurationService;
+  let config = mergeConfigurationService(initialConfig, {
+    settings: {},
+    gateway: { enabled: false },
+    container: {},
+  });
 
   if (isFunction(hooks.config)) {
-    config = deepMerge(await hooks.config(context, config), initialConfig, {
-      arrayMerge(_target, source) {
-        return source;
-      },
-    });
+    config = mergeConfigurationService(
+      await hooks.config(context, config),
+      initialConfig,
+    );
   }
 
   if (platform && isFunction(platform.config)) {
-    config = deepMerge(config, await platform.config(context, config), {
-      arrayMerge(_target, source) {
-        return source;
-      },
-    });
+    config = mergeConfigurationService(
+      config,
+      await platform.config(context, config),
+    );
   }
 
   return config;

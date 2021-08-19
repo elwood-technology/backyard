@@ -14,12 +14,12 @@ export function config(
 ): Partial<ConfigurationService> {
   invariant(
     config.settings?.db,
-    'You must provide the name of the database service in settings.db',
+    `You must provide the name of the database service in ${config.name}.settings.db`,
   );
 
   invariant(
     config.settings?.operatorToken,
-    'You must provide an operatorToken in settings.operatorToken',
+    `You must provide an operatorToken in ${config.name}.settings.operatorToken`,
   );
 
   return {
@@ -43,7 +43,6 @@ export function config(
     },
     container: {
       enabled: true,
-      externalPort: 9999,
       port: 9999,
       imageName: 'supabase/gotrue:latest',
       host: context.mode === ContextModeLocal ? config.name : '0.0.0.0',

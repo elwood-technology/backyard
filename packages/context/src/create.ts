@@ -138,15 +138,11 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
 export function getSourceDir(
   config: FullConfiguration,
   rootDir: string,
-): string {
+): string | undefined {
   const { BACKYARD_SRC_DIR } = process.env;
 
   if (BACKYARD_SRC_DIR) {
     return resolve(rootDir, BACKYARD_SRC_DIR);
-  }
-
-  if (config.resolve?.source === 'skip') {
-    return 'skip';
   }
 
   if (config.resolve?.source) {
@@ -157,11 +153,7 @@ export function getSourceDir(
     return join(rootDir, 'src');
   }
 
-  if (filesystem.exists(join(rootDir, 'packages'))) {
-    return join(rootDir, 'packages');
-  }
-
-  return rootDir;
+  return undefined;
 }
 
 export function getRootDir(config: FullConfiguration, cwd: string): string {
