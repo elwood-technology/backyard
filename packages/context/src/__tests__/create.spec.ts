@@ -53,7 +53,7 @@ describe('create', () => {
 
       expect(ctx.dir.root).toEqual(process.cwd());
       expect(ctx.dir.backyard).toEqual(join(process.cwd(), '.backyard'));
-      expect(ctx.dir.source).toEqual(join(process.cwd()));
+      expect(ctx.dir.source).toBeUndefined();
       expect(ctx.dir.stage).toEqual(join(process.cwd(), '.backyard/local'));
     });
 

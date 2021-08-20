@@ -23,7 +23,6 @@ export function config(
     container: {
       enabled: true,
       port: 5432,
-      externalPort: 5432,
       host: context.mode === ContextModeLocal ? config.name : '0.0.0.0',
       imageName: 'supabase/postgres:0.13.0',
       environment: {

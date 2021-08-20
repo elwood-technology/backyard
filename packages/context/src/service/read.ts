@@ -69,8 +69,12 @@ export async function readCoreServicesFromConfiguration(
 }
 
 export async function readServicesFromSource(
-  sourceDir: string,
+  sourceDir: string | undefined,
 ): Promise<ConfigurationService[]> {
+  if (!sourceDir) {
+    return [];
+  }
+
   if (!filesystem.exists(sourceDir)) {
     return [];
   }

@@ -113,6 +113,8 @@ export class ContextServiceState implements ContextService {
     this.#hasInitialized = true;
 
     await this.executeHook('init');
+
+    // console.log(this.#config);
   }
 
   async finalize(): Promise<void> {
@@ -169,11 +171,12 @@ export class ContextServiceState implements ContextService {
   getGatewayUrl(): string {
     const gateway = this.getContext().services.get('gateway');
     const host = gateway?.container?.externalHost ?? '0.0.0.0';
+    const routePrefix = gateway?.settings?.routePrefix ?? '';
 
     if (this.name === 'gateway') {
       return `http://${host}:${gateway?.container?.externalPort}`;
     }
 
-    return `http://${host}:${gateway?.container?.externalPort}/${this.name}/v1`;
+    return `http://${host}:${gateway?.container?.externalPort}/${routePrefix}${this.name}/v1`;
   }
 }

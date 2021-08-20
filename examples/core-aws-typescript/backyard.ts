@@ -34,8 +34,7 @@ export default createWorkspaceConfiguration(() => ({
       name: 'gateway',
       settings: {
         jwt: {
-          secret: process.env.JWT_SECRET!,
-          iat: Number(process.env.JWT_IAT),
+          secret: useEnvValue('JWT_SECRET'),
         },
       },
       container: {
@@ -99,7 +98,7 @@ export default createWorkspaceConfiguration(() => ({
     useGoTrueService({
       name: 'auth',
       settings: {
-        operatorToken: process.env.OPERATOR_TOKEN!,
+        operatorToken: useEnvValue('OPERATOR_TOKEN'),
         db: 'db',
       },
       platform: {
@@ -184,13 +183,8 @@ export function createAppAttributes(): JsonObject[] {
       env: 'AWS_REGION',
     },
     {
-      prompt: 'JWT Secret',
       env: 'JWT_SECRET',
       autofill: { random: 32 },
-    },
-    {
-      env: 'JWT_IAT',
-      autofill: { default: Math.floor(Date.now() / 1000) },
     },
     {
       env: 'OPERATOR_TOKEN',

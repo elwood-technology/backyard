@@ -10,10 +10,13 @@ export function generateKeys(
   const { settings } = config;
   const secret = settings?.jwt.secret;
 
-  invariant(secret, 'No secret provided to Kong');
+  invariant(secret, 'No jwt.secret provided to Kong');
+  invariant(settings?.jwt?.iat, 'No jwt.iat provided to Kong');
 
-  const iat = Number(settings?.jwt?.iat ?? new Date().getTime() / 1000);
-  const exp = Number(settings?.jwt?.exp ?? iat + 60 * 60 * 24 * 365 * 50);
+  console.log(secret, settings?.jwt?.iat);
+
+  const iat = Number(settings?.jwt?.iat);
+  const exp = Number(settings?.jwt?.exp);
 
   const anonymousKey = jwt.sign(
     {

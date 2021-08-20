@@ -32,12 +32,6 @@ module.exports = {
           position: 'left',
           label: 'Docs',
         },
-        // {
-        //   type: 'doc',
-        //   docId: 'guides',
-        //   position: 'left',
-        //   label: 'Guides',
-        // },
         {
           href: 'https://github.com/elwood-technology/backyard/discussions',
           label: 'Support',
@@ -82,21 +76,6 @@ module.exports = {
           remarkPlugins: [
             [require('@docusaurus/remark-plugin-npm2yarn'), { sync: true }],
           ],
-        },
-      },
-    ],
-  ],
-  plugins: [
-    [
-      'docusaurus-plugin-typedoc',
-      {
-
-        entryPoints: ['../../context/src/index.ts'],
-        tsconfig: '../../tsconfig.json',
-        sidebar: {
-          categoryLabel: 'Reference',
-          position: 0,
-          fullNames: true
         },
       },
     ],

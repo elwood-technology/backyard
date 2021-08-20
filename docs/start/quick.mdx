@@ -4,49 +4,66 @@ import CodeBlock from '@theme/CodeBlock';
 
 # Quick Start
 
-
 ## 1. Create a workspace
 
 <Tabs
   defaultValue="ts"
   values={[
-    { label: 'TypeScript', value: 'ts', },
-    { label: 'JavaScript', value: 'js', }
-  ]}>
-<TabItem value="ts">
-<CodeBlock className="bash">
-yarn create backyard ./workspace core-aws-typescript
-</CodeBlock>
-</TabItem>
-<TabItem value="js">
-<CodeBlock className="bash">
-yarn create backyard ./workspace core-aws
-</CodeBlock>
-</TabItem>
+    { label: 'TypeScript', value: 'ts' },
+    { label: 'JavaScript', value: 'js' },
+  ]}
+>
+  <TabItem value="ts">
+    <CodeBlock className="bash">
+      yarn create backyard ./workspace core-aws-typescript
+    </CodeBlock>
+  </TabItem>
+  <TabItem value="js">
+    <CodeBlock className="bash">
+      yarn create backyard ./workspace core-aws
+    </CodeBlock>
+  </TabItem>
 </Tabs>
 
+You will be asked for the following variables. You will need to complete these before you can deploy to AWS in step 5
+
+- **AWS Profile:** name of your AWS profile. Must be available in ~/.aws/credentials
+- **AWS Region:** name of your AWS region
 
 ## 2. Start the workspace
+
 ```bash
 cd workspace;
 ```
+
 ```bash
 yarn backyard local start
 ```
 
 ## 4. Make a request
+
 Make a request to the gateway to make sure it's running.
 
 ```bash
-curl http://localhost:8000/health
+curl http://localhost:8000/api/health
 ```
 
 Response
+
 ```bash
 {"message":"awesome :)"}
 ```
 
+Open [http://localhost:8080](http://localhost:8080) in your browser to view the site. You can edit your Next.js app in `./src/web`
+
 ## 5. Deploy it to AWS
+
 ```bash
-yarn backyard remote deploy --build
+yarn backyard remote deploy
+```
+
+## 6. Teardown AWS resources
+
+```bash
+yarn backyard remote teardown
 ```
