@@ -1,4 +1,8 @@
-import { createWorkspaceConfiguration, useEnvValue } from '@backyard/common';
+import {
+  createWorkspaceConfiguration,
+  useEnvValue,
+  useOptionalEnvValue,
+} from '@backyard/common';
 import { JsonObject } from '@backyard/types';
 import {
   useAwsRemoteEcsPlatform,
@@ -6,16 +10,15 @@ import {
 } from '@backyard/platform-aws';
 import { useGoTrueService } from '@backyard/service-gotrue';
 import { useKongService } from '@backyard/service-kong';
-import { usePostgRestService } from '@backyard/service-postgrest';
 import { usePostgreSqlService } from '@backyard/service-postgresql';
-import { usePostgreSqlRealtimeService } from '@backyard/service-postgresql-realtime';
+import { usePostgreSqlMigrateService } from '@backyard/service-postgresql-migrate';
 import { useNextJsService } from '@backyard/service-nextjs';
 
 export default createWorkspaceConfiguration(() => ({
   platform: {
     remote: useAwsRemotePlatform({
-      profile: process.env.AWS_PROFILE!,
-      region: process.env.AWS_REGION!,
+      profile: useEnvValue('AWS_PROFILE'),
+      region: useEnvValue('AWS_REGION'),
       ecs: {
         clusters: [
           {
@@ -33,12 +36,11 @@ export default createWorkspaceConfiguration(() => ({
     useKongService({
       name: 'gateway',
       settings: {
+        routePrefix: 'api/',
         jwt: {
           secret: useEnvValue('JWT_SECRET'),
+          iat: useOptionalEnvValue('JWT_IAT'),
         },
-      },
-      container: {
-        externalPort: 8000,
       },
       platform: {
         remote: useAwsRemoteEcsPlatform({
@@ -56,8 +58,8 @@ export default createWorkspaceConfiguration(() => ({
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',
-          containerCpu: 0.24,
-          containerMemory: 0.24,
+          containerCpu: 0.39,
+          containerMemory: 0.39,
         }),
       },
     }),
@@ -67,10 +69,9 @@ export default createWorkspaceConfiguration(() => ({
     useNextJsService({
       name: 'web',
       settings: {
-        src: './src/web',
+        src: './tmp',
       },
       container: {
-        externalPort: 8080,
         environment: {
           NEXT_PUBLIC_AUTH_URL:
             '<%= context.getService("auth").getGatewayUrl() %>',
@@ -87,8 +88,8 @@ export default createWorkspaceConfiguration(() => ({
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',
-          containerCpu: 0.15,
-          containerMemory: 0.15,
+          containerCpu: 0.2,
+          containerMemory: 0.2,
         }),
       },
     }),
@@ -104,63 +105,20 @@ export default createWorkspaceConfiguration(() => ({
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',
-          containerCpu: 0.15,
-          containerMemory: 0.15,
+          containerCpu: 0.2,
+          containerMemory: 0.2,
         }),
       },
     }),
 
-    // REST
-    // https://backyard.io/docs/services/postgrest
-    usePostgRestService({
-      name: 'rest',
-      settings: {
-        db: 'db',
-        schema: 'public',
-        anonRole: 'anon',
-      },
-      container: {
-        externalPort: 4000,
-      },
-      platform: {
-        remote: useAwsRemoteEcsPlatform({
-          cluster: 'main',
-          containerCpu: 0.15,
-          containerMemory: 0.15,
-        }),
-      },
-    }),
-
-    // REALTIME
-    // httsps://backyard.io/docs/services/postgresql-realtime
-    usePostgreSqlRealtimeService({
-      name: 'realtime',
-      settings: {
-        db: 'db',
-      },
-      container: {
-        externalPort: 4001,
-      },
-      platform: {
-        remote: useAwsRemoteEcsPlatform({
-          cluster: 'main',
-          containerCpu: 0.1,
-          containerMemory: 0.1,
-        }),
-      },
-    }),
-
-    // MIGRATE
+    // DATABASE MIGRATE
     // https://backyard.io/docs/services/postgresql-migrate
-    {
+    usePostgreSqlMigrateService({
       name: 'db-migrate',
-      provider: '@backyard/service-postgresql-realtime',
       settings: {
         db: 'db',
       },
-      container: {
-        externalPort: 4002,
-      },
+
       platform: {
         remote: useAwsRemoteEcsPlatform({
           cluster: 'main',
@@ -168,7 +126,7 @@ export default createWorkspaceConfiguration(() => ({
           containerMemory: 0.01,
         }),
       },
-    },
+    }),
   ],
 }));
 

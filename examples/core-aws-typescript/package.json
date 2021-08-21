@@ -35,8 +35,6 @@
     "@backyard/service-kong": "latest",
     "@backyard/service-gotrue": "latest",
     "@backyard/service-postgresql": "latest",
-    "@backyard/service-postgrest": "latest",
-    "@backyard/service-postgresql-realtime": "latest",
     "@backyard/service-postgresql-migrate": "latest",
     "@backyard/service-nextjs": "latest",
     "@types/jest": "^26.0.15",

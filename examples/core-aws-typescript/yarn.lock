@@ -128,24 +128,10 @@
   dependencies:
     "@backyard/common" "^0.2.22"
 
-"@backyard/service-postgresql-realtime@latest":
-  version "0.2.22"
-  resolved "https://registry.yarnpkg.com/@backyard/service-postgresql-realtime/-/service-postgresql-realtime-0.2.22.tgz#230c9af8b914659d0b9336ca4880b012657d3d45"
-  integrity sha512-crfpIZ5mCCbXZXv1Dzvijy8TsLIg2NvY25n4ETFadS8QjqQvukSWBLWKfHmLJv4R+D+Y1K7hyO3O6mdzuJ+o3g==
-  dependencies:
-    "@backyard/common" "^0.2.22"
-
 "@backyard/service-postgresql@latest":
   version "0.2.22"
   resolved "https://registry.yarnpkg.com/@backyard/service-postgresql/-/service-postgresql-0.2.22.tgz#33f9ad88e766f34f9f5f16a6bfdb7d4b6df05f8e"
   integrity sha512-NqnpqRiVQwR5/s0fsmimNSDHwHItKw/3reiazLMcupwWvuaLe2NjOMTtuxSB4Bcd+JdoGKdS9PoSmFmxnBmoNg==
-  dependencies:
-    "@backyard/common" "^0.2.22"
-
-"@backyard/service-postgrest@latest":
-  version "0.2.22"
-  resolved "https://registry.yarnpkg.com/@backyard/service-postgrest/-/service-postgrest-0.2.22.tgz#b10a2ab8ea1a2e085db4a4d4f79a84837fc12742"
-  integrity sha512-FYckwh2k9Ygu+SQDwU0A1dcMhY3sQ0aQGxTLgliKiLFQDFZ0Ty2RYwdv0qEY/2GySMqsbz+Vdxx5K1lnAJrEGg==
   dependencies:
     "@backyard/common" "^0.2.22"
 
