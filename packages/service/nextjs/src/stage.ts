@@ -1,10 +1,12 @@
-import { join } from 'path';
+import { join, relative } from 'path';
 import { randomBytes } from 'crypto';
 
 import { ServiceHookProviderArgs } from '@backyard/types';
-import { ContextModeLocal } from '@backyard/common';
+import { ContextModeLocal, debug, invariant } from '@backyard/common';
 
 import { run } from './util';
+
+const log = debug('backyard:service:nextjs:stage');
 
 export async function stage(
   args: ServiceHookProviderArgs & { dir: string },
@@ -15,22 +17,48 @@ export async function stage(
   const port = service.container?.port ?? 3000;
 
   if (context.mode == ContextModeLocal) {
-    await run('yarn', [], {
-      cwd: srcDir,
-    });
+    log(`running yarn in src dir ${srcDir}`);
+
+    invariant(
+      filesystem.exists(join(srcDir, 'package.json')),
+      `No "package.json" in "${srcDir}"`,
+    );
+
+    const hasYarnLock = filesystem.exists(join(srcDir, 'yarn.lock'));
+    const contextDir = service.settings?.context ?? service.settings?.src;
+    const rel = relative(contextDir, srcDir);
 
     await filesystem.writeAsync(
       join(dir, 'Dockerfile'),
-      `FROM node:alpine
-  ENV PORT ${port}
-  WORKDIR /usr/src/app
-  EXPOSE ${port}
-  CMD [ "yarn", "dev", "-p", "$PORT" ]
-    `,
+      [
+        `FROM node:alpine`,
+        `RUN apk add --no-cache libc6-compat`,
+        `RUN mkdir -p /app/src`,
+        `COPY ${rel}/package.json /app`,
+        hasYarnLock && `COPY ${rel}/yarn.lock /app`,
+        `RUN cd /app && yarn install && ls`,
+        `ENV NODE_PATH /app/node_modules`,
+        `WORKDIR ${join('/app/src/', rel)}`,
+        `EXPOSE ${port}`,
+        `CMD [ "/app/node_modules/.bin/next", "dev", "-p", "${port}" ]`,
+      ]
+        .filter(Boolean)
+        .join('\n'),
     );
 
     return;
   }
+
+  await stageRemote(args);
+}
+
+export async function stageRemote(
+  args: ServiceHookProviderArgs & { dir: string },
+): Promise<void> {
+  const { dir, service, context } = args;
+  const { filesystem } = context.tools;
+  const srcDir = join(context.dir.root, service.settings?.src!);
+  const port = service.container?.port ?? 3000;
 
   const buildTag = `build-${service.name}-${randomBytes(5).toString('hex')}`;
   const hasNextConfig = filesystem.exists(join(dir, 'next.config.js'));

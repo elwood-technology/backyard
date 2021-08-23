@@ -138,8 +138,6 @@ export async function createBackyard(
 
   spin.stop();
 
-  console.log('xx', backyardFile?.createAppAttributes);
-
   if (isFunction(backyardFile?.createAppAttributes)) {
     const attr = backyardFile?.createAppAttributes() || [];
     const promptValues = await promptForAttributes(attr);

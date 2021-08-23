@@ -8,6 +8,7 @@ tmp/
 .dev-db
 .backyard
 /backyard.ts
+examples/*/.git
 
 # Logs
 logs

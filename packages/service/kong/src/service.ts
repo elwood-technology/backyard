@@ -34,8 +34,6 @@ export function config(
     `Must provide ${config.name}.settings.jwt.secret`,
   );
 
-  console.log('poop');
-
   return {
     settings: {
       jwt: {
@@ -98,8 +96,6 @@ EXPOSE 8000`,
 export async function keys({
   service,
 }: ServiceHookProviderArgs): Promise<KongKeys> {
-  console.log(service.config);
-
   return generateKeys(
     service.config as ConfigurationService<KongServiceSettings>,
   );

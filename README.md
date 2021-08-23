@@ -16,10 +16,10 @@ Backyard eases the development and deployment of microservices by providing an o
 
 ```bash
 # core services hosted on AWS using TypeScript
-yarn create backyard ./my-app core-aws-typescript
+yarn create backyard ./workspace core-aws-typescript
 
 # core services hosted on AWS
-yarn create backyard ./my-app core-aws
+yarn create backyard ./workspace core-aws
 ```
 
 ## Usage
