@@ -31,6 +31,7 @@
   "dependencies": {
     "@backyard/cli": "latest",
     "@backyard/common": "latest",
+    "@backyard/platform-docker": "latest",
     "@backyard/platform-aws": "latest",
     "@backyard/service-kong": "latest",
     "@backyard/service-gotrue": "latest",

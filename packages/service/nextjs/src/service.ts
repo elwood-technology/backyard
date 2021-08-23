@@ -27,6 +27,10 @@ export function config(
 
   const gateway = context.getService('gateway');
   const routePrefix = gateway.settings.routePrefix ?? '';
+  const contextDir = join(
+    context.dir.root,
+    config.settings?.context ?? config.settings?.src,
+  );
 
   return {
     settings: {},
@@ -57,13 +61,14 @@ export function config(
       port: 3000,
       host: context.mode === ContextModeRemote ? '0.0.0.0' : config.name,
       externalPort: context.mode === ContextModeRemote ? 80 : 8080,
-      volumes: [[join(context.dir.root, config.settings?.src), '/usr/src/app']],
+      volumes: [[contextDir, '/app/src']],
       environment: {
         NODE_ENV:
           context.mode === ContextModeRemote ? 'production' : 'development',
       },
       build: {
-        context: `./${config.name}`,
+        dockerfile: join(context.dir.stage, `./${config.name}/Dockerfile`),
+        context: contextDir,
       },
     },
   };

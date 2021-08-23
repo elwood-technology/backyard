@@ -13,21 +13,21 @@ export function getSourceDir(context: Context, src: string): string {
 export function run(
   cmd: string,
   args: string[],
-  options: SpawnOptions,
-): Promise<void> {
+  options: SpawnOptions & { log?(msg: string): void },
+): Promise<number> {
   return new Promise((resolve, reject) => {
     const proc = spawn(cmd, args, {
       stdio: 'inherit',
       ...options,
     });
 
-    // proc.stdout?.on('data', (data) => {
-    //   log(data.toString());
-    // });
+    proc.stdout?.on('data', (data) => {
+      options.log && options.log(data.toString());
+    });
 
-    // proc.stderr?.on('data', (data) => {
-    //   log(data.toString());
-    // });
+    proc.stderr?.on('data', (data) => {
+      options.log && options.log(data.toString());
+    });
 
     proc.on('error', reject);
     proc.on('close', resolve);

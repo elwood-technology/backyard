@@ -47,7 +47,7 @@ export interface ConfigurationServiceContainer {
   command?: string[];
   build?: {
     context: string;
-  };
+  } & JsonObject;
   essential?: boolean;
   meta?: JsonObject;
 }

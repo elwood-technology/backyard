@@ -13,8 +13,6 @@ export function generateKeys(
   invariant(secret, 'No jwt.secret provided to Kong');
   invariant(settings?.jwt?.iat, 'No jwt.iat provided to Kong');
 
-  console.log(secret, settings?.jwt?.iat);
-
   const iat = Number(settings?.jwt?.iat);
   const exp = Number(settings?.jwt?.exp);
 

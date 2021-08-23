@@ -69,16 +69,12 @@ export default createWorkspaceConfiguration(() => ({
     useNextJsService({
       name: 'web',
       settings: {
-        src: './tmp',
+        src: './src/web',
       },
       container: {
         environment: {
           NEXT_PUBLIC_AUTH_URL:
             '<%= context.getService("auth").getGatewayUrl() %>',
-          NEXT_PUBLIC_REALTIME_URL:
-            '<%= context.getService("realtime").getGatewayUrl() %>',
-          NEXT_PUBLIC_REST_URL:
-            '<%= context.getService("rest").getGatewayUrl() %>',
           NEXT_PUBLIC_WEB_URL:
             '<%= context.getService("web").getGatewayUrl() %>',
           NEXT_PUBLIC_ANONYMOUS_KEY:
