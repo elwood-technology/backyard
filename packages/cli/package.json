@@ -1,6 +1,6 @@
 {
   "name": "@backyard/cli",
-  "version": "0.2.23",
+  "version": "0.2.24",
   "main": "lib/index.js",
   "author": "Travis Kuhl <travis@elwood.technology>",
   "license": "MIT",
@@ -13,8 +13,8 @@
     "compile": "tsc -b ./tsconfig.json"
   },
   "dependencies": {
-    "@backyard/common": "^0.2.23",
-    "@backyard/context": "^0.2.23",
+    "@backyard/common": "^0.2.24",
+    "@backyard/context": "^0.2.24",
     "dotenv": "^10.0.0",
     "find-up": "^5.0.0",
     "gluegun": "^4.6.1",
@@ -24,8 +24,8 @@
     "yaml": "^1.10.2"
   },
   "devDependencies": {
-    "@backyard/tools-typescript": "^0.2.23",
-    "@backyard/types": "^0.2.23",
+    "@backyard/tools-typescript": "^0.2.24",
+    "@backyard/types": "^0.2.24",
     "@types/jsonwebtoken": "^8.5.1"
   },
   "homepage": "https://github.com/elwood-technology/backyard/tree/main/packages/cli",
