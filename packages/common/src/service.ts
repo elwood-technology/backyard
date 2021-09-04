@@ -37,5 +37,5 @@ export function getServices(context: Context): ContextService[] {
 }
 
 export function serviceHasGateway(service: ContextService): boolean {
-  return !!(service.gateway && service.gateway?.enabled === true);
+  return !!service.gateway;
 }

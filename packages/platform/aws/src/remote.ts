@@ -12,7 +12,8 @@ import type {
   AwsRemotePlugins,
   AwsRemoteTerraformHookArgs,
 } from './types';
-import { addVpc } from './vpc';
+import { addVpc } from './helpers/vpc';
+import { addAlb } from './helpers/alb';
 
 export class AwsRemotePlatform extends AbstractRemotePlatform<
   AwsRemoteOptions,
@@ -24,7 +25,7 @@ export class AwsRemotePlatform extends AbstractRemotePlatform<
 
   async build(args: PlatformCommandHookArgs<AwsRemotePlugins>) {
     const { context, plugins, commandOptions } = args;
-    const { profile, region, vpc } = this.getOptions();
+    const { profile, region, vpc, alb } = this.getOptions();
 
     const state = await plugins.terraform.createState();
 
@@ -40,15 +41,30 @@ export class AwsRemotePlatform extends AbstractRemotePlatform<
     const hookArgs: AwsRemoteTerraformHookArgs = {
       options: this.getOptions(),
       state,
-      vpc() {
+      vpc(name = 'default') {
         if (vpc) {
-          return state.get('resource', 'aws_vpc', vpc.name);
+          const vpcs = Array.isArray(vpc) ? vpc : [vpc];
+          const item = vpcs?.find((v) => v.name === name);
+          if (item) {
+            return state.get('resource', 'aws_vpc', name);
+          }
+        }
+        return undefined;
+      },
+      alb(name = 'default') {
+        if (alb) {
+          const albs = Array.isArray(alb) ? alb : [alb];
+          const item = albs.find((a) => a.name === name);
+          if (item) {
+            return state.get('resource', 'aws_alb', name);
+          }
         }
         return undefined;
       },
     };
 
     addVpc(hookArgs);
+    addAlb(hookArgs);
 
     const services = getServices(context);
 

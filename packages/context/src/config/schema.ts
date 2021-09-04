@@ -1,29 +1,28 @@
-import { string, number, object, array, alternatives } from 'joi';
+import joi from 'joi';
 
 import { Configuration, ConfigurationResolve } from '@backyard/types';
 
-export const configurationProviderSchema = alternatives().try(
-  string(),
-  array().ordered(string(), object()),
-);
+export const configurationProviderSchema = joi
+  .alternatives()
+  .try(joi.string(), joi.array().ordered(joi.string(), joi.object()));
 
-export const configurationServiceSchema = object({
-  mode: string(),
-  name: string().required(),
+export const configurationServiceSchema = joi.object({
+  mode: joi.string(),
+  name: joi.string().required(),
   provider: configurationProviderSchema,
-  version: number().default(1).min(0).max(Infinity),
-  comment: string(),
-  settings: object(),
+  version: joi.number().default(1).min(0).max(Infinity),
+  comment: joi.string(),
+  settings: joi.object(),
 });
 
-export const configurationResolveSchema = object<ConfigurationResolve>({
-  backyard: string(),
-  source: string(),
-  modules: array().items(string()),
+export const configurationResolveSchema = joi.object<ConfigurationResolve>({
+  backyard: joi.string(),
+  source: joi.string(),
+  modules: joi.array().items(joi.string()),
 });
 
-export const configurationSchema = object<Configuration>({
-  root: string(),
+export const configurationSchema = joi.object<Configuration>({
+  root: joi.string(),
   resolve: configurationResolveSchema.default({}),
-  services: array().items(configurationServiceSchema).default([]),
+  services: joi.array().items(configurationServiceSchema).default([]),
 });

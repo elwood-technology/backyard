@@ -13,10 +13,6 @@
     {
       "path": "./docker",
       "prepend": false
-    },
-    {
-      "path": "./node",
-      "prepend": false
     }
   ]
 }
