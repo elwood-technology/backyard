@@ -11,12 +11,12 @@ export function config(
   );
 
   const port = String(config.container?.port ?? 4000);
-  const host = config.container?.host ?? 'localhost';
+  const host = config.container?.host ?? config.name ?? 'localhost';
 
   return {
     gateway: {
       enabled: true,
-      url: `http://${host}:${port}/socket`,
+      url: `http://${host}:${port}/socket/`,
     },
     container: {
       enabled: true,
@@ -32,7 +32,6 @@ export function config(
         DB_PASSWORD: `<%= await context.getService("${config.settings.db}").hook("password") %>`,
         DB_PORT: `<%= await context.getService("${config.settings.db}").hook("port") %>`,
         PORT: String(config.container?.port ?? 4000),
-        HOSTNAME: config.container?.host ?? 'localhost',
         SECURE_CHANNELS: 'false',
         JWT_SECRET: `<%= await context.getService("gateway").hook("jwtSecret") %>`,
       },
