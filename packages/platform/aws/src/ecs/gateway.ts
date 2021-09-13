@@ -73,20 +73,22 @@ export async function addGatewayEcs(
   const routePrefix = gateway.settings.routePrefix || '';
   const target = state.add('resource', 'aws_alb_target_group', 'alb-target', {
     name: 'BackyardGatewayTarget',
-    port: gateway?.container?.externalPort,
+    port: gateway?.container?.port,
     protocol: 'HTTP',
     vpc_id: vpc?.id,
     target_type: 'ip',
     health_check: {
       path: `/${routePrefix}health`,
       port: gateway?.container?.port,
+      unhealthy_threshold: 5,
+      interval: 60,
     },
   });
   state.add('resource', 'aws_lb_listener_rule', 'alb-ecs-target', {
     listener_arn: state
       .get('resource', 'aws_alb_listener', `default-listen`)
       .attr('arn'),
-    priority: 1,
+    priority: 9999,
 
     action: {
       type: 'forward',
@@ -120,8 +122,8 @@ export async function addGatewayEcs(
 
       egress: {
         from_port: 0,
-        to_port: 0,
-        protocol: '-1',
+        to_port: 65535,
+        protocol: 'tcp',
         cidr_blocks: ['0.0.0.0/0'],
       },
     },

@@ -8,9 +8,12 @@ import {
   Resource,
   Module,
   List,
+  Block,
 } from 'terraform-generator';
 
 import { ServiceHookProviderArgs, JsonObject } from '@backyard/types';
+
+import { TerraformBlock } from './api/terraform-block';
 
 export interface TerraformHookArgs extends ServiceHookProviderArgs {
   tf: TerraformGenerator;
@@ -22,7 +25,7 @@ export interface TerraformHookArgs extends ServiceHookProviderArgs {
 
 export type { TerraformGenerator, Resource, Data } from 'terraform-generator';
 
-export type TerraformAddTypeName = 'resource' | 'data' | 'module';
+export type TerraformAddTypeName = 'resource' | 'data' | 'module' | 'provider';
 
 export type TerraformAddType<T> = T extends 'resource'
   ? Resource
@@ -37,11 +40,13 @@ export type TerraformState = {
   resources: Record<string, Resource>;
   modules: Record<string, Module>;
   data: Record<string, Data>;
+  Block: typeof Block;
   List: typeof List;
   Map: typeof Map;
   Heredoc: typeof Heredoc;
   Argument: typeof Argument;
   Function: typeof Function;
+  TerraformBlock: typeof TerraformBlock;
   get<T extends TerraformAddTypeName>(
     moduleType: T,
     type: string,
@@ -54,6 +59,7 @@ export type TerraformState = {
     args?: JsonObject,
   ): TerraformAddType<T>;
   write(to: string): void;
+  addProvider(type: string, args: JsonObject): void;
 };
 
 export type TerraformStageDirs = {
