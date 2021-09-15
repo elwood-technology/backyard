@@ -23,7 +23,6 @@ export function config(
       essential: false,
       host: '0.0.0.0',
       port: 4000,
-      restart: 'on-failure',
       imageName: 'supabase/realtime:latest',
       environment: {
         DB_HOST: `<%= await context.getService("${config.settings.db}").hook("host") %>`,
@@ -36,6 +35,7 @@ export function config(
         JWT_SECRET: `<%= await context.getService("gateway").hook("jwtSecret") %>`,
       },
       meta: {
+        restart: 'on-failure',
         dockerCompose: {
           depends_on: [config.settings.db],
         },

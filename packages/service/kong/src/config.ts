@@ -51,7 +51,7 @@ export async function createKongConfig(
         {
           name: `${prefix}-all`,
           strip_path: stripPath,
-          paths: [`/${routePrefix}${prefix}/v${version}`],
+          paths: [`${prefix}/v${version}`],
         },
       ];
 
@@ -64,7 +64,12 @@ export async function createKongConfig(
         name: gateway.gatewayName ?? service.name,
         _comment: `Gateway for ${service.name}`,
         url: gateway?.url ?? `http://${host}:${port}${urlPath}`,
-        routes,
+        routes: routes.map((route) => ({
+          ...route,
+          paths: route.paths.map(
+            (path) => `/${routePrefix}${path.replace(/^\//, '')}`,
+          ),
+        })),
         plugins: gateway?.plugins ?? [
           { name: 'cors' },
           { name: 'key-auth', config: { hide_credentials: true } },

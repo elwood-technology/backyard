@@ -33,11 +33,17 @@ export function config(
         PGDATA: '/var/lib/postgresql/data/pgdata',
       },
       volumes: [['', '/var/lib/postgresql/data']],
+      meta: {
+        dockerCompose: {
+          restart: 'on-failure',
+        },
+      },
     },
   };
 }
 
 export async function uri({
+  context,
   service,
 }: ServiceHookProviderArgs): Promise<string> {
   const { user, password, name } = service.config?.settings || {};
@@ -48,7 +54,10 @@ export async function uri({
   invariant(service.container?.host, 'Missing db[container.host]');
   invariant(service.container.port, 'Missing db[container.port]');
 
-  return `postgres://${user}:${password}@${service.container.host}:${service.container.port}/${name}?sslmode=disable`;
+  const host =
+    context.mode === ContextModeLocal ? service.name : service.container.host;
+
+  return `postgres://${user}:${password}@${host}:${service.container.port}/${name}?sslmode=disable`;
 }
 
 export async function host({
