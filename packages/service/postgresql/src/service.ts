@@ -62,9 +62,12 @@ export async function uri({
 
 export async function host({
   service,
+  context,
 }: ServiceHookProviderArgs): Promise<string> {
   invariant(service.container?.host, 'Missing db[container.host]');
-  return service.container?.host;
+  const host =
+    context.mode === ContextModeLocal ? service.name : service.container.host;
+  return host;
 }
 
 export async function name({
