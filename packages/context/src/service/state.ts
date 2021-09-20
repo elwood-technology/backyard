@@ -165,7 +165,8 @@ export class ContextServiceState implements ContextService {
 
   getContainerUrl(): string {
     const gateway = this.getContext().services.get('gateway');
-    return `http://${gateway?.container?.host}:${gateway?.container?.port}/${this.name}/v1`;
+    const routePrefix = gateway?.settings?.routePrefix ?? '';
+    return `http://${gateway?.container?.host}:${gateway?.container?.port}/${routePrefix}${this.name}/v1`;
   }
 
   getGatewayUrl(): string {

@@ -93,7 +93,8 @@ export default {
           context: tools.context,
         });
       }
-    } catch (err) {
+    } catch (e) {
+      const err = e as Error;
       log(err.message);
       log(err.stack);
       tools.errorBox(err);
@@ -156,7 +157,8 @@ export async function build(tools: Toolbox): Promise<void> {
       context,
       commandOptions: tools.parameters.options,
     });
-  } catch (err) {
+  } catch (e) {
+    const err = e as Error;
     spin.fail(err.message);
     console.log(err.stack);
     return;
@@ -267,7 +269,8 @@ export async function start(tools: Toolbox): Promise<void> {
     });
 
     spin.succeed('Started!');
-  } catch (err) {
+  } catch (e) {
+    const err = e as Error;
     spin.fail('Error starting');
     tools.print.debug(err.message);
     process.exit(1);
@@ -291,7 +294,8 @@ export async function stop(tools: Toolbox): Promise<void> {
     });
 
     spin.succeed('Stopped!');
-  } catch (err) {
+  } catch (e) {
+    const err = e as Error;
     spin.fail('Error stopping');
     tools.print.info(err.message);
     process.exit(1);
@@ -317,7 +321,8 @@ export async function clean(tools: Toolbox): Promise<void> {
     await tools.filesystem.removeAsync(context.dir.stage);
 
     spin.succeed('Done!');
-  } catch (err) {
+  } catch (e) {
+    const err = e as Error;
     spin.fail('Error cleanup');
     tools.print.info(err.message);
     process.exit(1);

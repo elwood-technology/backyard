@@ -9,53 +9,10 @@ export async function addGatewayEcs(
 ): Promise<void> {
   const { state } = args;
   const vpc = args.vpc();
+  const alb = args.alb();
   const gateway = getServiceByName('gateway', context);
 
-  const albSecurityGroup = state.add(
-    'resource',
-    'aws_security_group',
-    'gateway-alb',
-    {
-      name: 'BackyardAlbSecurityGroup',
-      description: 'ALB Security Group',
-      vpc_id: vpc?.id,
-      ingress: {
-        protocol: 'tcp',
-        from_port: 80,
-        to_port: 80,
-        cidr_blocks: ['0.0.0.0/0'],
-      },
-      egress: {
-        from_port: 0,
-        to_port: 0,
-        protocol: '-1',
-        cidr_blocks: ['0.0.0.0/0'],
-      },
-    },
-  );
-
-  const publicSubnets = state.get('resource', 'aws_subnet', 'public');
   const privateSubnets = state.get('resource', 'aws_subnet', 'private');
-
-  const alb = state.add('resource', 'aws_alb', 'gateway', {
-    name: 'BackyardTestALB',
-    subnets: publicSubnets.attr('*.id'),
-    security_groups: [albSecurityGroup.id],
-  });
-
-  const albListener = state.add('resource', 'aws_alb_listener', 'alb-listen', {
-    load_balancer_arn: alb.id,
-    port: 80,
-    protocol: 'HTTP',
-    default_action: {
-      type: 'fixed-response',
-      fixed_response: {
-        content_type: 'text/plain',
-        message_body: ':)',
-        status_code: '200',
-      },
-    },
-  });
 
   const assumePolicy = state.add(
     'data',
@@ -116,18 +73,22 @@ export async function addGatewayEcs(
   const routePrefix = gateway.settings.routePrefix || '';
   const target = state.add('resource', 'aws_alb_target_group', 'alb-target', {
     name: 'BackyardGatewayTarget',
-    port: gateway?.container?.externalPort,
+    port: gateway?.container?.port,
     protocol: 'HTTP',
     vpc_id: vpc?.id,
     target_type: 'ip',
     health_check: {
       path: `/${routePrefix}health`,
       port: gateway?.container?.port,
+      unhealthy_threshold: 5,
+      interval: 60,
     },
   });
   state.add('resource', 'aws_lb_listener_rule', 'alb-ecs-target', {
-    listener_arn: albListener.attr('arn'),
-    priority: 1,
+    listener_arn: state
+      .get('resource', 'aws_alb_listener', `default-listen`)
+      .attr('arn'),
+    priority: 9999,
 
     action: {
       type: 'forward',
@@ -154,13 +115,15 @@ export async function addGatewayEcs(
         protocol: 'tcp',
         from_port: 0,
         to_port: 65535,
-        security_groups: [albSecurityGroup.id],
+        security_groups: [
+          state.get('resource', 'aws_security_group', 'default').id,
+        ],
       },
 
       egress: {
         from_port: 0,
-        to_port: 0,
-        protocol: '-1',
+        to_port: 65535,
+        protocol: 'tcp',
         cidr_blocks: ['0.0.0.0/0'],
       },
     },

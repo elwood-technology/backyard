@@ -101,6 +101,10 @@ export async function createBackyard(
   spin.text = `Unpacking template`;
 
   await new Promise((resolve, reject) => {
+    if (!response.body) {
+      return reject(new Error('No response body'));
+    }
+
     response.body
       .pipe(unzip.Parse())
       .on('entry', function (entry) {

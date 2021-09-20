@@ -5,10 +5,12 @@ import {
   Argument,
   Function,
   List,
+  Block,
 } from 'terraform-generator';
 
 import { JsonObject } from '@backyard/types';
 
+import { TerraformBlock } from './terraform-block';
 import {
   TerraformState,
   TerraformAddTypeName,
@@ -63,14 +65,14 @@ export function getModuleFrom<T extends TerraformAddTypeName>(
         return state.resources[storeName] as TerraformAddType<T>;
       }
 
-      throw new Error(`Unable to find "resource.${storeName}`);
+      throw new Error(`Unable to find "resource.${storeName}"`);
     }
     case 'data': {
       if (storeName in state.data) {
         return state.data[storeName] as TerraformAddType<T>;
       }
 
-      throw new Error(`Unable to find "data.${storeName}`);
+      throw new Error(`Unable to find "data.${storeName}"`);
     }
     default:
       throw new Error(
@@ -87,10 +89,15 @@ export async function createState(): Promise<TerraformState> {
     Heredoc,
     Argument,
     Function,
+    Block,
+    TerraformBlock,
     generator: tf,
     modules: {},
     resources: {},
     data: {},
+    addProvider(type: string, args: JsonObject) {
+      state.generator.provider(type, args);
+    },
     get<T extends TerraformAddTypeName>(
       moduleType: T,
       type: string,

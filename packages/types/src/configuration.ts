@@ -18,19 +18,23 @@ export type ConfigurationPlatform = {
 };
 
 export interface ConfigurationServiceGateway {
+  gatewayName?: string;
   enabled: boolean;
   url?: string;
   prefix?: string;
   stripPath?: boolean;
+  urlPath?: string;
   routes?: Array<{
     name: string;
     strip_path: boolean;
     paths: string[];
+    plugins?: JsonObject[];
   }>;
   plugins?: Array<{
     name: string;
     config?: JsonObject;
   }>;
+  additional?: ConfigurationServiceGateway[];
 }
 
 export interface ConfigurationServiceContainer {

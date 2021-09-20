@@ -1,10 +1,10 @@
-import type { Context, ContextService, JsonObject } from '@backyard/types';
-import {
-  ContextModeLocal,
-  getServices,
-  invariant,
-  debug,
-} from '@backyard/common';
+import type {
+  Context,
+  ContextService,
+  JsonObject,
+  ConfigurationServiceGateway,
+} from '@backyard/types';
+import { getServices, invariant, debug } from '@backyard/common';
 
 import { KongConfig, KongContextService, KongService } from './types';
 
@@ -12,35 +12,31 @@ import { keys } from './service';
 
 const log = debug('backyard:service:kong:config');
 
-export function shouldEnableService(
-  context: Context,
-  service: ContextService,
-): boolean {
-  const gateway = service.gateway;
-
-  if (gateway === undefined || gateway?.enabled === false) {
-    return false;
-  }
-
-  if (context.mode === ContextModeLocal && service.name === 'dev-server') {
-    return false;
-  }
-
-  return true;
-}
+type Gateway = [ContextService, ConfigurationServiceGateway];
 
 export async function createKongConfig(
   context: Context,
-  service: KongContextService,
+  kongService: KongContextService,
 ): Promise<KongConfig> {
-  const key = await keys({ context, service });
-  const { routePrefix = '' } = service.settings;
+  const key = await keys({ context, service: kongService });
+  const { routePrefix = '' } = kongService.settings;
+  const gateways: Gateway[] = [];
+
+  for (const service of getServices(context)) {
+    if (service.gateway) {
+      const { additional, ...defaultGateway } = service.gateway;
+
+      if (additional) {
+        gateways.push(...additional.map((item) => [service, item] as Gateway));
+      }
+
+      gateways.push([service, defaultGateway]);
+    }
+  }
 
   const coreServices = await Promise.all(
-    getServices(context).map(async (service) => {
-      const gateway = service.gateway;
-
-      if (!shouldEnableService(context, service)) {
+    gateways.map(async ([service, gateway]) => {
+      if (gateway.enabled === false) {
         return;
       }
 
@@ -48,28 +44,33 @@ export async function createKongConfig(
 
       invariant(gateway, 'Gateway is not defined');
 
-      const prefix = service.gateway?.prefix ?? service.name;
+      const prefix = gateway?.prefix ?? service.name;
       const version = 1;
       const stripPath = gateway.stripPath ?? true;
       const routes = gateway.routes ?? [
         {
           name: `${prefix}-all`,
           strip_path: stripPath,
-          paths: [`/${routePrefix}${prefix}/v${version}`],
+          paths: [`${prefix}/v${version}`],
         },
       ];
 
       const container = service.container;
       const host = container?.host ?? service.name;
       const port = container?.port ?? 3000;
+      const urlPath = gateway.urlPath ?? '';
 
       return {
-        name: service.name,
+        name: gateway.gatewayName ?? service.name,
         _comment: `Gateway for ${service.name}`,
-        url: service.gateway?.url ?? `http://${host}:${port}`,
-        routes,
-        plugins: [
-          ...(gateway?.plugins || []),
+        url: gateway?.url ?? `http://${host}:${port}${urlPath}`,
+        routes: routes.map((route) => ({
+          ...route,
+          paths: route.paths.map(
+            (path) => `/${routePrefix}${path.replace(/^\//, '')}`,
+          ),
+        })),
+        plugins: gateway?.plugins ?? [
           { name: 'cors' },
           { name: 'key-auth', config: { hide_credentials: true } },
         ],

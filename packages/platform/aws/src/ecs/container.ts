@@ -1,11 +1,9 @@
 import { join } from 'path';
 
 import type { JsonObject, ServiceHookProviderArgs } from '@backyard/types';
-
-import { invariant } from '@backyard/common';
+import { invariant, getServices } from '@backyard/common';
 
 import type { AwsRemoteTerraformHookArgs, AwsRemoteOptions } from '../types';
-import { getServices } from 'packages/common/src/service';
 
 export async function awsEcsContainerTaskDef(
   args: ServiceHookProviderArgs & AwsRemoteTerraformHookArgs,

@@ -22,6 +22,11 @@ export function config(
     `You must provide an operatorToken in ${config.name}.settings.operatorToken`,
   );
 
+  const prefix =
+    config.settings?.prefix ?? config.gateway?.prefix ?? config.name;
+
+  const openRoutes = ['verify', 'callback', 'authorize'];
+
   return {
     settings: {
       operatorToken: randomBytes(100).toString('hex'),
@@ -38,8 +43,25 @@ export function config(
     },
     gateway: {
       enabled: true,
-      prefix: config.name,
-      stripPath: true,
+      prefix,
+      additional: openRoutes.map((name) => ({
+        gatewayName: `${config.name}-${name}`,
+        prefix,
+        enabled: true,
+        urlPath: `/${name}`,
+        routes: [
+          {
+            name: `${prefix}-open-${name}`,
+            strip_path: true,
+            paths: [`/${prefix}/v1/${name}`],
+          },
+        ],
+        plugins: [
+          {
+            name: 'cors',
+          },
+        ],
+      })),
     },
     container: {
       enabled: true,
@@ -70,6 +92,9 @@ export function config(
         GOTRUE_LOG_LEVEL: config.settings?.logLevel ?? '',
         GOTRUE_OPERATOR_TOKEN: `<%= await context.getService("${config.name}").hook("operatorToken") %>`,
         DATABASE_URL: `<%= await context.getService("${config.settings.db}").hook("uri") %>`,
+        GOTRUE_MAILER_URLPATHS_INVITE: `/${prefix}/v1/verify`,
+        GOTRUE_MAILER_URLPATHS_CONFIRMATION: `/${prefix}/v1/verify`,
+        GOTRUE_MAILER_URLPATHS_RECOVERY: `/${prefix}/v1/verify`,
       },
       meta: {
         dockerCompose: {
@@ -99,7 +124,34 @@ export async function sql({
   return [
     [
       '01-auth',
-      `CREATE SCHEMA IF NOT EXISTS auth AUTHORIZATION postgres;
+      `
+
+
+-- Extension namespacing
+create schema extensions;
+create extension if not exists "uuid-ossp"      with schema extensions;
+create extension if not exists pgcrypto         with schema extensions;
+create extension if not exists pgjwt            with schema extensions;
+
+-- Developer roles
+create role anon                nologin noinherit;
+create role authenticated       nologin noinherit; -- "logged in" user: web_user, app_user, etc
+create role service_role        nologin noinherit bypassrls; -- allow developers to create JWT's that bypass their policies
+
+create user authenticator noinherit;
+grant anon              to authenticator;
+grant authenticated     to authenticator;
+grant service_role      to authenticator;
+
+grant usage                     on schema public to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant all on functions to postgres, anon, authenticated, service_role;
+alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;
+
+alter role anon set statement_timeout = '3s';
+alter role authenticated set statement_timeout = '8s';
+
+CREATE SCHEMA IF NOT EXISTS auth AUTHORIZATION postgres;
 -- auth.users definition
 CREATE TABLE auth.users (
 	instance_id uuid NULL,
