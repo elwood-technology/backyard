@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "fs-jetpack": "^4.1.0",
-    "ts-essentials": "^8.0.0",
+    "ts-essentials": "^9.0.0",
     "webpack": "*"
   },
   "devDependencies": {
