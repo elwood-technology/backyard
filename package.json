@@ -16,7 +16,7 @@
     "test": "wsrun -m test --passWithNoTests",
     "build": "wsrun -m build",
     "postinstall": "husky install",
-    "dev-cli": "ts-node ./packages/cli/src/cli.ts",
+    "local-cli": "ts-node ./packages/cli/src/cli.ts",
     "lerna": "lerna"
   },
   "resolutions": {
@@ -39,9 +39,9 @@
   "dependencies": {
     "@types/jest": "^27.0.1",
     "@types/node": "^12.7.11",
-    "@typescript-eslint/eslint-plugin": "^4.15.0",
-    "@typescript-eslint/parser": "^4.15.0",
-    "eslint": "^7.19.0",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.0.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.19.0",

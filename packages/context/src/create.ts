@@ -28,6 +28,7 @@ export type CreateContextArgs = {
   log?: Context['log'];
   initialConfig?: Configuration;
   settings?: Context['settings'];
+  only?: string[];
 };
 
 enum EnvName {
@@ -39,7 +40,7 @@ enum EnvName {
 const log = debug('backyard:context:create');
 
 export async function createContext(args: CreateContextArgs): Promise<Context> {
-  const { mode, settings = {}, initialConfig = {} } = args;
+  const { mode, settings = {}, initialConfig = {}, only = undefined } = args;
   const envName = mode === ContextModeLocal ? '.env.local' : '.env.remote';
   const { BACKYARD_CWD, BACKYARD_ENV_FILE, BACKYARD_IGNORE_ENV_FILE } =
     process.env ?? {};
@@ -116,7 +117,18 @@ export async function createContext(args: CreateContextArgs): Promise<Context> {
 
   const services: ContextService[] = [];
 
+  console.log(only);
+
   for (const serviceConfig of allServices) {
+    if (
+      serviceConfig.name !== 'gateway' &&
+      only &&
+      only.length > 0 &&
+      !only.includes(String(serviceConfig.name))
+    ) {
+      continue;
+    }
+
     services.push(await context.addService(serviceConfig, false));
   }
 
