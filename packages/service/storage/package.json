@@ -1,0 +1,29 @@
+{
+  "name": "@backyard/service-storage",
+  "version": "0.2.26",
+  "main": "lib/index.js",
+  "author": "Travis Kuhl <travis@elwood.technology>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "yarn compile --watch",
+    "compile": "tsc -b ./tsconfig.json",
+    "start": "pm2-runtime ./lib/server.js",
+    "dev": "NODE_ENV=development yarn start --watch"
+  },
+  "dependencies": {
+    "@backyard/common": "^0.2.26",
+    "fastify": "^3.22.1"
+  },
+  "devDependencies": {
+    "@backyard/types": "^0.2.26"
+  },
+  "repository": "git@github.com:elwood-technology/backyard.git",
+  "files": [
+    "lib",
+    "backyard-service.js",
+    "package.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
