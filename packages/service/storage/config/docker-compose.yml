@@ -1,0 +1,69 @@
+version: '3.6'
+services:
+  db:
+    image: supabase/postgres:0.13.0
+    volumes:
+      - ./auth.sql:/docker-entrypoint-initdb.d/01_auth.sql
+      - ./local.sql:/docker-entrypoint-initdb.d/03_local.sql
+      - ../sql/structure.sql:/docker-entrypoint-initdb.d/02_access.sql
+      - ../.dev-db:/var/lib/postgresql/data/pgdata
+    environment:
+      POSTGRES_DB: backyard
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: '5432'
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: on-failure
+    ports:
+      - 5432:5432
+
+  auth:
+    image: supabase/gotrue:latest
+    environment:
+      GOTRUE_JWT_SECRET: Rq3TD2HKqkvIBLvveP8lRFjhyFiPBp9z
+      GOTRUE_JWT_EXP: '1961384607'
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: backyard
+      GOTRUE_DB_DRIVER: postgres
+      DB_NAMESPACE: auth
+      API_EXTERNAL_URL: localhost
+      GOTRUE_API_HOST: 0.0.0.0
+      PORT: '9999'
+      GOTRUE_SMTP_HOST: ''
+      GOTRUE_SMTP_PORT: 0
+      GOTRUE_SMTP_USER: ''
+      GOTRUE_SMTP_PASS: ''
+      GOTRUE_DISABLE_SIGNUP: 'false'
+      GOTRUE_SITE_URL: http://localhost:3000
+      GOTRUE_MAILER_AUTOCONFIRM: 'true'
+      GOTRUE_LOG_LEVEL: ''
+      GOTRUE_OPERATOR_TOKEN: asdasdas
+      DATABASE_URL: postgres://postgres:postgres@db:5432/backyard?sslmode=disable
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: 'false'
+      GOTRUE_EXTERNAL_PHONE_ENABLED: 'false'
+      GOTRUE_EXTERNAL_GOOGLE_ENABLED: 'true'
+      GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: 377073572200-ecm9g5e5t6v6sea4qhn8u4kks0ffddp9.apps.googleusercontent.com
+      GOTRUE_EXTERNAL_GOOGLE_SECRET: dXcvw_Yxd14nF5sdWzUUPQgA
+      GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: http://localhost:8000/auth/v1/callback
+    depends_on:
+      - db
+    restart: always
+
+  stroage:
+    build:
+      context: ../
+    volumes:
+      - ../../../../:/var/app
+      - ../:/var/src
+    depends_on:
+      - db
+    environment:
+      NODE_PATH: /var/app/node_modules
+      NODE_ENV: development
+      POSTGRES_URI: postgres://postgres:postgres@db:5432/backyard?sslmode=disable
+      JWT_SECRET: Rq3TD2HKqkvIBLvveP8lRFjhyFiPBp9z
+    restart: on-failure
+    ports:
+      - 3000:3000

@@ -1,6 +1,6 @@
 import { join, basename } from 'path';
 
-import { ContextModeLocal, invariant } from '@backyard/common';
+import { invariant } from '@backyard/common';
 import type {
   ConfigurationService,
   Context,
@@ -20,23 +20,19 @@ export function config(
     },
     container: {
       port: 3000,
-      imageName: 'node',
+      build: {
+        context: join(context.dir.stage, config.name ?? ''),
+      },
       volumes: [[context.dir.root, '/var/app']],
       environment: {
-        REST_URL: '<%= await context.getService("rest").getContainerUrl() %>',
-        REST_SERVICE_KEY:
-          '<%= await context.getService("gateway").hook("serviceKey") %>',
-        TRAFFIC_BASE_URL:
-          '<%= await context.getService("data").getGatewayUrl() %>',
-        CALLBACK_URL: 'https://fe62-97-103-203-220.ngrok.io/api/messages/v1',
-        TWILIO_ACCOUNT_SID: String(process.env.TWILIO_ACCOUNT_SID),
-        TWILIO_AUTH_TOKEN: String(process.env.TWILIO_AUTH_TOKEN),
+        NODE_PATH: '/var/app/node_modules',
+        NODE_ENV: 'development',
+        POSTGRES_URI: `<%= await context.getService("${config.settings.db}").hook("uri") %>`,
+        JWT_SECRET:
+          '<%= await context.getService("gateway").hook("jwtSecret") %>',
       },
       meta: {
-        dockerCompose: {
-          working_dir: '/var/app/packages/messages',
-          command: ['yarn', 'dev'],
-        },
+        dockerCompose: {},
       },
     },
   };
@@ -48,7 +44,7 @@ export async function sql(
   const { context } = args;
 
   const sql = await context.tools.filesystem.findAsync(
-    join(__dirname, './sql'),
+    join(__dirname, '../sql'),
     {
       matching: '**/*.sql',
     },
@@ -62,12 +58,13 @@ export async function sql(
 export async function stage(
   args: ServiceHookProviderArgs & { dir: string },
 ): Promise<void> {
-  if (args.context.mode === ContextModeLocal) {
-    await args.context.tools.filesystem.writeAsync(
-      join(args.dir, './index.js'),
-      `require('@backyard/service-storage/lib/server')`,
-    );
+  await args.context.tools.filesystem.copyAsync(
+    join(__dirname, '../Dockerfile'),
+    join(args.dir, './Dockerfile'),
+  );
 
-    return;
-  }
+  await args.context.tools.filesystem.writeAsync(
+    join(args.dir, './index.js'),
+    `require('@backyard/service-zuul/server')`,
+  );
 }

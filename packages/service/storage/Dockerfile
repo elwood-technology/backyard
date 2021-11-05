@@ -8,8 +8,6 @@ WORKDIR /var/src
 
 RUN npm install -g pm2
 
-RUN ls /usr/local/lib/node_modules
-
 ENTRYPOINT [""]
 
-CMD [ "pm2-runtime", "--watch", "index.js"]
+CMD [ "pm2-runtime", "--watch", "server.js"]
