@@ -33,6 +33,14 @@
     {
       "path": "./postgresql-realtime",
       "prepend": false
+    },
+    {
+      "path": "./storage",
+      "prepend": false
+    },
+    {
+      "path": "./zuul",
+      "prepend": false
     }
   ]
 }
