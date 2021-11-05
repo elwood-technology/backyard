@@ -44,8 +44,6 @@ services:
       GOTRUE_EXTERNAL_EMAIL_ENABLED: 'false'
       GOTRUE_EXTERNAL_PHONE_ENABLED: 'false'
       GOTRUE_EXTERNAL_GOOGLE_ENABLED: 'true'
-      GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: 377073572200-ecm9g5e5t6v6sea4qhn8u4kks0ffddp9.apps.googleusercontent.com
-      GOTRUE_EXTERNAL_GOOGLE_SECRET: dXcvw_Yxd14nF5sdWzUUPQgA
       GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: http://localhost:8000/auth/v1/callback
     depends_on:
       - db
