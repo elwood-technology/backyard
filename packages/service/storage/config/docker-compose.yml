@@ -58,6 +58,7 @@ services:
     depends_on:
       - db
     environment:
+      STORAGE_STATE_FILE: /var/src/config/local-state.js
       NODE_PATH: /var/app/node_modules
       NODE_ENV: development
       POSTGRES_URI: postgres://postgres:postgres@db:5432/backyard?sslmode=disable

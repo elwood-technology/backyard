@@ -67,4 +67,9 @@ export async function stage(
     join(args.dir, './index.js'),
     `require('@backyard/service-zuul/server')`,
   );
+
+  await args.context.tools.filesystem.writeAsync(
+    join(args.dir, 'state.js'),
+    ``,
+  );
 }

@@ -1,10 +1,8 @@
-import { join } from 'path';
-
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import invariant from 'ts-invariant';
 
-import { StorageProvider } from '../types';
-import { getCredentials } from '../utils';
+import type { StorageNode } from '../types';
+import { getBucket, getCredentials, getProvider } from '../utils';
 
 type Next = () => void;
 type Options = {};
@@ -14,25 +12,34 @@ export default function fastifyState(
   _options: Options,
   next: Next,
 ) {
-  function getProvider(name: string): StorageProvider {
-    return require(join(__dirname, '../provider', name)) as StorageProvider;
-  }
-
   async function handler(
     req: FastifyRequest,
     reply: FastifyReply,
   ): Promise<void> {
-    const {
-      provider: providerName,
-      '*': path,
-      bucket,
-    } = req.params as {
-      provider: string;
-      bucket: string;
-      '*': string;
+    const { '*': path = '/', bucket: id } = req.params as {
+      bucket?: string;
+      '*'?: string;
     };
 
-    const provider = getProvider(providerName);
+    if (!id) {
+      console.log(app.state.buckets);
+
+      const resp: { nodes: StorageNode[] } = {
+        nodes: app.state.buckets.map((item) => {
+          return {
+            type: 'folder',
+            bucket_id: item.id,
+            display_name: item.displayName,
+            path: '/',
+          };
+        }),
+      };
+
+      return reply.send(resp);
+    }
+
+    const bucket = getBucket(id, app.state);
+    const provider = getProvider(bucket);
     const credentials = getCredentials(bucket, app.state);
 
     invariant(credentials, 'Credentials not found');
@@ -57,7 +64,13 @@ export default function fastifyState(
 
   app.route({
     method: 'GET',
-    url: '/folder/:provider/:bucket/*?',
+    url: '/folder',
+    handler,
+  });
+
+  app.route({
+    method: 'GET',
+    url: '/folder/:bucket/*?',
     handler,
   });
 

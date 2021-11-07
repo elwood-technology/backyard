@@ -1,8 +1,20 @@
+import { existsSync } from 'fs';
+
 import fastify from 'fastify';
 import fastifyPostgres from 'fastify-postgres';
 import fastifyJtw from 'fastify-jwt';
 
 import registerNodes from './handler/folder';
+import invariant from 'ts-invariant';
+import { StorageState } from '.';
+
+const { STORAGE_STATE_FILE } = process.env;
+
+invariant(STORAGE_STATE_FILE, 'STORAGE_STATE_FILE is required');
+invariant(
+  existsSync(STORAGE_STATE_FILE),
+  `STORAGE_STATE_FILE ${STORAGE_STATE_FILE} does not exist`,
+);
 
 const app = fastify({
   ignoreTrailingSlash: true,
@@ -33,25 +45,7 @@ app.addHook('onRequest', async (req, reply) => {
   }
 });
 
-app.decorate('state', {
-  buckets: [
-    {
-      name: 'backyard-public',
-      displayName: 'Bucket',
-      credential: 't',
-    },
-  ],
-  credentials: [
-    {
-      name: 't',
-      credentials: {
-        region: 'us-west-1',
-        accessKeyId: process.env.AWS_KEY,
-        secretAccessKey: process.env.AWS_SECRET,
-      },
-    },
-  ],
-});
+app.decorate('state', require(STORAGE_STATE_FILE) as StorageState);
 
 app.register(fastifyPostgres, {
   connectionString: process.env.POSTGRES_URI,

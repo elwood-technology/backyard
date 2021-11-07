@@ -1,6 +1,11 @@
 import { FastifyRequest } from 'fastify';
 import { invariant } from 'ts-invariant';
-import { StorageCredential, StorageState } from '.';
+import {
+  StorageCredential,
+  StorageProvider,
+  StorageState,
+  StorageBucket,
+} from './types';
 
 import { User } from './types';
 
@@ -10,11 +15,20 @@ export function getUser(req: FastifyRequest): User {
   return req.user as User;
 }
 
+export function getBucket(id: string, state: StorageState): StorageBucket {
+  const bucket = state.buckets.find((b) => b.id === id);
+  invariant(bucket, 'No bucket');
+  return bucket;
+}
+
 export function getCredentials(
-  bucketName: string,
+  bucket: StorageBucket,
   state: StorageState,
 ): StorageCredential['credentials'] | undefined {
-  const bucket = state.buckets.find((b) => b.name === bucketName);
-  return state.credentials.find((c) => c.name === bucket?.credential)
+  return state.credentials.find((c) => c.name === bucket.credential)
     ?.credentials;
+}
+
+export function getProvider(bucket: StorageBucket): StorageProvider {
+  return require(`./provider/${bucket.provider}`) as StorageProvider;
 }
