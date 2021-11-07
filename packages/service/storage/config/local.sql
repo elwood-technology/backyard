@@ -37,23 +37,17 @@ INSERT INTO "auth"."users" (
 );
 
 
-INSERT INTO "zuul"."nodes" (
-  "service",
-  "uri",
+INSERT INTO "storage"."access" (
+  "bucket",
+  "path",
+  "folder_tree",
   "user_id"
 ) VALUES (
-  'test',
-  'this/is/a/thing',
+  'xx',
+  'objects/9f8f979374969429263495ffcaac832cd603b1efe4c66a05fafd6729dffef9af',
+  CONCAT_WS('.', MD5('objects'), MD5('9f8f979374969429263495ffcaac832cd603b1efe4c66a05fafd6729dffef9af')),
   'd8d6b1cd-ad6a-46be-81b2-564df447158b'
 );
 
 
-INSERT INTO "zuul"."nodes" (
-  "service",
-  "uri",
-  "user_id"
-) VALUES (
-  'test',
-  'this/is/another/thing',
-  'd8d6b1cd-ad6a-46be-81b2-564df447158b'
-);
+

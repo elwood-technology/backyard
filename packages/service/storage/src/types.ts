@@ -4,17 +4,22 @@ import type { JsonObject } from '@backyard/types';
 
 export type StorageNodeTypeName = 'folder' | 'file' | string;
 export type StorageNode = {
-  bucket_id: string;
+  bucket: string;
   display_name: string;
   path: string;
   type: StorageNodeTypeName;
 };
+
+export interface StorageProviderStatOutputMetaData extends JsonObject {
+  contentType?: string;
+}
 
 export interface StorageProviderStatOutput extends StorageNode {
   size?: number;
   downloadUrl: string | null;
   playbackUrl: string | null;
   previewUrl: string | null;
+  metaData?: StorageProviderStatOutputMetaData;
 }
 
 export type StorageProviderStatInput = {

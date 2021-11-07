@@ -2,7 +2,8 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import invariant from 'ts-invariant';
 
 import type { StorageNode } from '../types';
-import { getBucket, getCredentials, getProvider } from '../utils';
+import { getBucket, getCredentials, getProvider, getUser } from '../utils';
+import { hasAccess } from '../access';
 
 type Next = () => void;
 type Options = {};
@@ -16,24 +17,29 @@ export default function fastifyState(
     req: FastifyRequest,
     reply: FastifyReply,
   ): Promise<void> {
+    const userId = getUser(req).sub;
     const { '*': path = '/', bucket: id } = req.params as {
       bucket?: string;
       '*'?: string;
     };
 
     if (!id) {
-      console.log(app.state.buckets);
-
       const resp: { nodes: StorageNode[] } = {
-        nodes: app.state.buckets.map((item) => {
-          return {
-            type: 'folder',
-            bucket_id: item.id,
-            display_name: item.displayName,
-            path: '/',
-          };
-        }),
+        nodes: [],
       };
+
+      for (const bucket of app.state.buckets) {
+        if (
+          await hasAccess({ app, userId, bucket, path: '/', type: 'folder' })
+        ) {
+          resp.nodes.push({
+            type: 'folder',
+            bucket: bucket.id,
+            display_name: bucket.displayName,
+            path: '/',
+          });
+        }
+      }
 
       return reply.send(resp);
     }

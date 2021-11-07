@@ -1,10 +1,7 @@
-import { join } from 'path';
-
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import invariant from 'ts-invariant';
 
-import { StorageProvider } from '../types';
-import { getBucket, getCredentials } from '../utils';
+import { getBucket, getCredentials, getProvider } from '../utils';
 
 type Next = () => void;
 type Options = {};
@@ -14,31 +11,22 @@ export default function fastifyState(
   _options: Options,
   next: Next,
 ) {
-  function getProvider(name: string): StorageProvider {
-    return require(join(__dirname, '../provider', name)) as StorageProvider;
-  }
-
   async function handler(
     req: FastifyRequest,
     reply: FastifyReply,
   ): Promise<void> {
-    const {
-      provider: providerName,
-      '*': path,
-      bucket: id,
-    } = req.params as {
-      provider: string;
+    const { '*': path, bucket: id } = req.params as {
       bucket: string;
       '*': string;
     };
 
     const bucket = getBucket(id, app.state);
-    const provider = getProvider(providerName);
+    const provider = getProvider(bucket);
     const credentials = getCredentials(bucket, app.state);
 
     invariant(credentials, 'Credentials not found');
 
-    const { nodes } = await provider.list({
+    const stat = await provider.stat({
       credentials,
       bucket,
       path,
@@ -51,9 +39,7 @@ export default function fastifyState(
     //   [getUser(req).sub],
     // );
 
-    reply.send({
-      nodes,
-    });
+    reply.send(stat);
   }
 
   app.route({

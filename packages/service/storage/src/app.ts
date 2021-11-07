@@ -4,9 +4,12 @@ import fastify from 'fastify';
 import fastifyPostgres from 'fastify-postgres';
 import fastifyJtw from 'fastify-jwt';
 
-import registerNodes from './handler/folder';
 import invariant from 'ts-invariant';
-import { StorageState } from '.';
+
+import registerFolderHandle from './handler/folder';
+import registerFileHandler from './handler/file';
+
+import type { StorageState } from './types';
 
 const { STORAGE_STATE_FILE } = process.env;
 
@@ -55,6 +58,7 @@ app.register(fastifyJtw, {
   secret: String(process.env.JWT_SECRET),
 });
 
-app.register(registerNodes, {});
+app.register(registerFileHandler, {});
+app.register(registerFolderHandle, {});
 
 export default app;

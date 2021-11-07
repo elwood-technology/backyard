@@ -1,6 +1,10 @@
+import { basename } from 'path';
+
 import { S3 } from '@aws-sdk/client-s3';
 import invariant from 'ts-invariant';
 import { StorageBucket } from '../types';
+
+import { StorageMetaDataName } from '../constants';
 
 import {
   StorageProviderListInput,
@@ -32,22 +36,23 @@ export async function list(
   const result = await client.listObjects({
     Bucket: bucketName,
     Prefix: path,
+    Delimiter: '/',
   });
 
   return {
     nodes: [
       ...(result.CommonPrefixes ?? []).map((item) => {
         return {
-          bucket_id: bucket.id,
-          display_name: String(item.Prefix),
+          bucket: bucket.id,
+          display_name: basename(String(item.Prefix)),
           path: String(item.Prefix),
           type: 'folder',
         };
       }),
       ...(result.Contents ?? []).map((item) => {
         return {
-          bucket_id: bucket.id,
-          display_name: String(item.Key),
+          bucket: bucket.id,
+          display_name: basename(String(item.Key)),
           path: String(item.Key),
           type: 'file',
         };
@@ -70,13 +75,20 @@ export async function stat(
 
   return {
     type: 'file',
-    bucket_id: bucket.id,
-    display_name: path,
+    bucket: bucket.id,
+    display_name: basename(path),
     path,
     size: Number(result.ContentLength),
     downloadUrl: null,
     previewUrl: null,
     playbackUrl: null,
+    metaData: {
+      [StorageMetaDataName.Type]: result.ContentType,
+      [StorageMetaDataName.Disposition]: result.ContentDisposition,
+      [StorageMetaDataName.Language]: result.ContentLanguage,
+      [StorageMetaDataName.Encoding]: result.ContentEncoding,
+      [StorageMetaDataName.LastModified]: result.LastModified,
+    },
   };
 }
 
@@ -87,6 +99,8 @@ export async function read(
   const client = createClient(credentials as Credentials);
   const { bucketName } = bucket as StorageBucket & { bucketName: string };
 
+  const base = await stat({ bucket, path, credentials });
+
   const result = await client.getObject({
     Bucket: bucketName,
     Key: path,
@@ -95,14 +109,7 @@ export async function read(
   invariant(result.Body instanceof ReadableStream, 'Body is required');
 
   return {
-    type: 'file',
-    bucket_id: bucket.id,
-    display_name: path,
-    path,
-    size: Number(result.ContentLength),
+    ...base,
     content: result.Body,
-    downloadUrl: null,
-    playbackUrl: null,
-    previewUrl: null,
   };
 }
