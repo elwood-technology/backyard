@@ -9,6 +9,8 @@ import invariant from 'ts-invariant';
 import registerFolderHandle from './handler/folder';
 import registerFileHandler from './handler/file';
 
+import registerSyncBuckets from './utils/sync-buckets';
+
 import type { StorageState } from './types';
 
 const { STORAGE_STATE_FILE } = process.env;
@@ -57,6 +59,8 @@ app.register(fastifyPostgres, {
 app.register(fastifyJtw, {
   secret: String(process.env.JWT_SECRET),
 });
+
+app.register(registerSyncBuckets, {});
 
 app.register(registerFileHandler, {});
 app.register(registerFolderHandle, {});

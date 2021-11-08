@@ -21,8 +21,10 @@ type Credentials = {
   secretAccessKey: string;
 };
 
-export function createClient(credentials: Credentials): S3 {
-  const { region, accessKeyId, secretAccessKey } = credentials;
+export function createClient(credentials: Credentials, region: string): S3 {
+  const { accessKeyId, secretAccessKey } = credentials;
+  invariant(accessKeyId, 'Missing accessKeyId');
+  invariant(secretAccessKey, 'Missing secretAccessKey');
   return new S3({ region, credentials: { accessKeyId, secretAccessKey } });
 }
 
@@ -30,12 +32,15 @@ export async function list(
   input: StorageProviderListInput,
 ): Promise<StorageProviderListOutput> {
   const { bucket, path, credentials } = input;
-  const client = createClient(credentials as Credentials);
-  const { bucketName } = bucket as StorageBucket & { bucketName: string };
+  const { bucketName, region } = bucket as StorageBucket & {
+    bucketName: string;
+  };
+
+  const client = createClient(credentials as Credentials, region);
 
   const result = await client.listObjects({
     Bucket: bucketName,
-    Prefix: path,
+    Prefix: path ?? '',
     Delimiter: '/',
   });
 
@@ -65,8 +70,10 @@ export async function stat(
   input: StorageProviderStatInput,
 ): Promise<StorageProviderStatOutput> {
   const { bucket, path, credentials } = input;
-  const client = createClient(credentials as Credentials);
-  const { bucketName } = bucket as StorageBucket & { bucketName: string };
+  const { bucketName, region } = bucket as StorageBucket & {
+    bucketName: string;
+  };
+  const client = createClient(credentials as Credentials, region);
 
   const result = await client.headObject({
     Bucket: bucketName,
@@ -96,8 +103,10 @@ export async function read(
   input: StorageProviderReadInput,
 ): Promise<StorageProviderReadOutput> {
   const { bucket, path, credentials } = input;
-  const client = createClient(credentials as Credentials);
-  const { bucketName } = bucket as StorageBucket & { bucketName: string };
+  const { bucketName, region } = bucket as StorageBucket & {
+    bucketName: string;
+  };
+  const client = createClient(credentials as Credentials, region);
 
   const base = await stat({ bucket, path, credentials });
 

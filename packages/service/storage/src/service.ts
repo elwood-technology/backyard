@@ -46,7 +46,7 @@ export async function sql(
   const sql = await context.tools.filesystem.findAsync(
     join(__dirname, '../sql'),
     {
-      matching: '**/*.sql',
+      matching: ['**/*.sql', '!*.local.sql'],
     },
   );
 

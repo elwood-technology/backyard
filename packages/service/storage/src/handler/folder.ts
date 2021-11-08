@@ -2,8 +2,11 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import invariant from 'ts-invariant';
 
 import type { StorageNode } from '../types';
-import { getBucket, getCredentials, getProvider, getUser } from '../utils';
-import { hasAccess } from '../access';
+import { getBucket } from '../utils/get-bucket';
+import { getCredentials } from '../utils/get-credentials';
+import { getProvider } from '../utils/get-provider';
+import { getUser } from '../utils/get-user';
+import { hasAccess, getBucketAccess } from '../utils/access';
 
 type Next = () => void;
 type Options = {};
@@ -25,21 +28,15 @@ export default function fastifyState(
 
     if (!id) {
       const resp: { nodes: StorageNode[] } = {
-        nodes: [],
-      };
-
-      for (const bucket of app.state.buckets) {
-        if (
-          await hasAccess({ app, userId, bucket, path: '/', type: 'folder' })
-        ) {
-          resp.nodes.push({
+        nodes: (await getBucketAccess(app)).map((bucket) => {
+          return {
             type: 'folder',
             bucket: bucket.id,
-            display_name: bucket.displayName,
+            display_name: bucket.display_name,
             path: '/',
-          });
-        }
-      }
+          };
+        }),
+      };
 
       return reply.send(resp);
     }
@@ -50,18 +47,26 @@ export default function fastifyState(
 
     invariant(credentials, 'Credentials not found');
 
-    const { nodes } = await provider.list({
+    const nodes: StorageNode[] = [];
+    const results = await provider.list({
       credentials,
       bucket,
       path,
     });
 
-    // const client = await app.pg.connect();
-
-    // const { rows } = await client.query(
-    //   'SELECT "n"."service" FROM "zuul"."nodes" as "n" WHERE "user_id" = $1 GROUP BY "n"."service"',
-    //   [getUser(req).sub],
-    // );
+    for (const node of results.nodes) {
+      if (
+        await hasAccess({
+          app,
+          userId,
+          bucket,
+          path: node.path,
+          type: node.type,
+        })
+      ) {
+        nodes.push(node);
+      }
+    }
 
     reply.send({
       nodes,

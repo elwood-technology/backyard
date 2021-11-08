@@ -1,7 +1,9 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import invariant from 'ts-invariant';
 
-import { getBucket, getCredentials, getProvider } from '../utils';
+import { getBucket } from '../utils/get-bucket';
+import { getCredentials } from '../utils/get-credentials';
+import { getProvider } from '../utils/get-provider';
 
 type Next = () => void;
 type Options = {};

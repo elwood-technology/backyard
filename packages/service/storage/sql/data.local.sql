@@ -38,14 +38,16 @@ INSERT INTO "auth"."users" (
 
 
 INSERT INTO "storage"."access" (
+  "entity_type",
   "bucket",
   "path",
   "folder_tree",
   "user_id"
 ) VALUES (
+  'FILE',
   'xx',
   'objects/9f8f979374969429263495ffcaac832cd603b1efe4c66a05fafd6729dffef9af',
-  CONCAT_WS('.', MD5('objects'), MD5('9f8f979374969429263495ffcaac832cd603b1efe4c66a05fafd6729dffef9af')),
+  CONCAT_WS('.', MD5('objects'), MD5('9f8f979374969429263495ffcaac832cd603b1efe4c66a05fafd6729dffef9af'))::ltree,
   'd8d6b1cd-ad6a-46be-81b2-564df447158b'
 );
 
