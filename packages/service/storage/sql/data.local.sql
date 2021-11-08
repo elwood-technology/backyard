@@ -36,19 +36,52 @@ INSERT INTO "auth"."users" (
     '{}'
 );
 
+INSERT INTO "storage"."buckets" (
+  "id",
+  "display_name",
+  "provider",
+  "credentials",
+  "attributes"
+) VALUES (
+  'xx',
+  'S3 Bucket',
+  's3',
+  't',
+  '{}'
+);
 
 INSERT INTO "storage"."access" (
   "entity_type",
-  "bucket",
+  "bucket_id",
   "path",
   "folder_tree",
   "user_id"
 ) VALUES (
+  'FOLDER',
+  'xx',
+  'inbound/',
+  CONCAT_WS('.', MD5('inbound'))::ltree,
+  'd8d6b1cd-ad6a-46be-81b2-564df447158b'
+);
+
+
+
+
+
+INSERT INTO "storage"."access" (
+  "entity_type",
+  "bucket_id",
+  "path",
+  "folder_tree",
+  "user_id",
+  "permission"
+) VALUES (
   'FILE',
   'xx',
-  'objects/9f8f979374969429263495ffcaac832cd603b1efe4c66a05fafd6729dffef9af',
-  CONCAT_WS('.', MD5('objects'), MD5('9f8f979374969429263495ffcaac832cd603b1efe4c66a05fafd6729dffef9af'))::ltree,
-  'd8d6b1cd-ad6a-46be-81b2-564df447158b'
+  'inbound/1/18--57a8c59f-1f5e-464f-a6a9-34b467d47e13.webm',
+  '',
+  'd8d6b1cd-ad6a-46be-81b2-564df447158b',
+  'NONE'
 );
 
 

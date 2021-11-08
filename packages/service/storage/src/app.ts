@@ -8,8 +8,9 @@ import invariant from 'ts-invariant';
 
 import registerFolderHandle from './handler/folder';
 import registerFileHandler from './handler/file';
+import registerAccessHandler from './handler/access';
 
-import registerSyncBuckets from './utils/sync-buckets';
+import registerSyncBucketsPlugin from './plugins/sync-buckets';
 
 import type { StorageState } from './types';
 
@@ -44,10 +45,15 @@ app.addContentTypeParser('*', function (_request, payload, done) {
 
 app.addHook('onRequest', async (req, reply) => {
   try {
+    req.client = await app.pg.connect();
     await req.jwtVerify();
   } catch (err) {
     reply.send(err);
   }
+});
+
+app.addHook('onResponse', async (req) => {
+  req.client.release();
 });
 
 app.decorate('state', require(STORAGE_STATE_FILE) as StorageState);
@@ -60,9 +66,9 @@ app.register(fastifyJtw, {
   secret: String(process.env.JWT_SECRET),
 });
 
-app.register(registerSyncBuckets, {});
-
+app.register(registerSyncBucketsPlugin, {});
 app.register(registerFileHandler, {});
 app.register(registerFolderHandle, {});
+app.register(registerAccessHandler, {});
 
 export default app;

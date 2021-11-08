@@ -1,17 +1,20 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import invariant from 'ts-invariant';
+import debug from 'debug';
 
 import type { StorageNode } from '../types';
-import { getBucket } from '../utils/get-bucket';
-import { getCredentials } from '../utils/get-credentials';
-import { getProvider } from '../utils/get-provider';
-import { getUser } from '../utils/get-user';
-import { hasAccess, getBucketAccess } from '../utils/access';
+import { getBucket } from '../library/get-bucket';
+import { getCredentials } from '../library/get-credentials';
+import { getProvider } from '../library/get-provider';
+import { hasAccess, getBucketAccess } from '../library/access';
+import { normalizeFolderPath, normalizePath } from '../library/normalize-path';
 
 type Next = () => void;
 type Options = {};
 
-export default function fastifyState(
+const log = debug('by:handler:folder');
+
+export default function fastifyHandleFolder(
   app: FastifyInstance,
   _options: Options,
   next: Next,
@@ -20,15 +23,17 @@ export default function fastifyState(
     req: FastifyRequest,
     reply: FastifyReply,
   ): Promise<void> {
-    const userId = getUser(req).sub;
-    const { '*': path = '/', bucket: id } = req.params as {
+    const { '*': rawPath = '/', bucket: id } = req.params as {
       bucket?: string;
       '*'?: string;
     };
+    const path = normalizeFolderPath(rawPath);
+
+    log('path %s', path);
 
     if (!id) {
       const resp: { nodes: StorageNode[] } = {
-        nodes: (await getBucketAccess(app)).map((bucket) => {
+        nodes: (await getBucketAccess(req)).map((bucket) => {
           return {
             type: 'folder',
             bucket: bucket.id,
@@ -37,6 +42,8 @@ export default function fastifyState(
           };
         }),
       };
+
+      log('found %i nodes', resp.nodes.length);
 
       return reply.send(resp);
     }
@@ -55,18 +62,21 @@ export default function fastifyState(
     });
 
     for (const node of results.nodes) {
+      log('found node %s', node.path);
+
       if (
         await hasAccess({
-          app,
-          userId,
+          req,
           bucket,
-          path: node.path,
+          path: normalizePath(node.type, node.path),
           type: node.type,
         })
       ) {
         nodes.push(node);
       }
     }
+
+    log('found total nodes %i', nodes.length);
 
     reply.send({
       nodes,

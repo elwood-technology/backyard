@@ -1,8 +1,10 @@
-import { Readable } from 'stream';
+import type { Readable } from 'stream';
+
+import type { PoolClient } from 'pg';
 
 import type { JsonObject } from '@backyard/types';
 
-export type StorageNodeTypeName = 'folder' | 'file' | string;
+export type StorageNodeTypeName = 'folder' | 'file';
 export type StorageNode = {
   bucket: string;
   display_name: string;
@@ -38,7 +40,7 @@ export type StorageProviderReadInput = {
   path: string;
 };
 
-export type User = {
+export type StorageRequestUser = {
   exp: number;
   sub: string;
   email: string;
@@ -83,5 +85,9 @@ export type StorageCredential = {
 declare module 'fastify' {
   export interface FastifyInstance {
     state: StorageState;
+  }
+
+  export interface FastifyRequest {
+    client: PoolClient;
   }
 }

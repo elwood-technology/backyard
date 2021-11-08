@@ -6,3 +6,9 @@ export enum StorageMetaDataName {
   ETag = 'etag',
   LastModified = 'lastModified',
 }
+
+export enum StoragePermissionName {
+  None = 'NONE',
+  Read = 'READ',
+  Write = 'WRITE',
+}

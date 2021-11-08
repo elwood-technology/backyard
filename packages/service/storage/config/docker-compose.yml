@@ -58,6 +58,7 @@ services:
     depends_on:
       - db
     environment:
+      DEBUG: 'by:*'
       STORAGE_STATE_FILE: /var/src/config/local-state.js
       NODE_PATH: /var/app/node_modules
       NODE_ENV: development
