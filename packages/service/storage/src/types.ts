@@ -20,7 +20,7 @@ export interface StorageProviderStatOutput extends StorageNode {
   size?: number;
   downloadUrl: string | null;
   playbackUrl: string | null;
-  previewUrl: string | null;
+  openUrl: string | null;
   metaData?: StorageProviderStatOutputMetaData;
 }
 

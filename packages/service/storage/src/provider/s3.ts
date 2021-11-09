@@ -1,6 +1,8 @@
 import { basename } from 'path';
 
-import { S3 } from '@aws-sdk/client-s3';
+import { S3, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
 import invariant from 'ts-invariant';
 import debug from 'debug';
 
@@ -100,6 +102,11 @@ export async function stat(
   log('headObject(%o)', params);
 
   const result = await client.headObject(params);
+  const downloadCommand = new GetObjectCommand({
+    ...params,
+    ResponseContentDisposition: `attachment; filename="${basename(path)}"`,
+  });
+  const openCommand = new GetObjectCommand(params);
 
   return {
     type: 'file',
@@ -107,8 +114,8 @@ export async function stat(
     display_name: basename(path),
     path,
     size: Number(result.ContentLength),
-    downloadUrl: null,
-    previewUrl: null,
+    downloadUrl: await getSignedUrl(client, downloadCommand, {}),
+    openUrl: await getSignedUrl(client, openCommand, {}),
     playbackUrl: null,
     metaData: {
       [StorageMetaDataName.Type]: result.ContentType,

@@ -11,6 +11,7 @@ import {
   normalizeFolderPath,
 } from '../library/normalize-path';
 import { dbProvider } from '../library/db';
+import { getUser } from '../library/get-user';
 
 type Next = () => void;
 type Options = {};
@@ -29,6 +30,7 @@ export default function fastifyHandleAccess(
       permission: { type: 'string' },
       user_id: { type: 'string' },
       type: { type: 'string' },
+      email: { type: 'string' },
     },
   });
 
@@ -58,7 +60,7 @@ export default function fastifyHandleAccess(
       });
 
       if (!access) {
-        return;
+        continue;
       }
 
       if (type === 'FILE') {
@@ -70,6 +72,11 @@ export default function fastifyHandleAccess(
       }
 
       const tree = path.split('/').map(md5).join('.');
+
+      const user_id = await getUser({
+        user_id: item.user_id,
+        email: item.email,
+      });
 
       await query(
         `
@@ -85,7 +92,7 @@ export default function fastifyHandleAccess(
             )
           VALUES ($1, $2, $3, $4, $5, $6)
         `,
-        [type, bucket.id, path, tree, item.user_id, item.permission],
+        [type, bucket.id, path, tree, user_id, item.permission],
       );
     }
 
