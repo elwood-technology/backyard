@@ -1,6 +1,6 @@
 import { join, basename } from 'path';
 
-import { invariant } from '@backyard/common';
+import { invariant, ContextModeLocal } from '@backyard/common';
 import type {
   ConfigurationService,
   Context,
@@ -26,7 +26,8 @@ export function config(
       volumes: [[context.dir.root, '/var/app']],
       environment: {
         NODE_PATH: '/var/app/node_modules',
-        NODE_ENV: 'development',
+        NODE_ENV:
+          ContextModeLocal === context.mode ? 'development' : 'production',
         POSTGRES_URI: `<%= await context.getService("${config.settings.db}").hook("uri") %>`,
         JWT_SECRET:
           '<%= await context.getService("gateway").hook("jwtSecret") %>',
@@ -64,12 +65,18 @@ export async function stage(
   );
 
   await args.context.tools.filesystem.writeAsync(
-    join(args.dir, './index.js'),
-    `require('@backyard/service-zuul/server')`,
+    join(args.dir, './server.js'),
+    `require('@backyard/service-storage/server')`,
   );
+
+  const stateFileContent = args.service.settings.stateFile
+    ? (args.context.tools.filesystem.read(
+        args.service.settings.stateFile,
+      ) as string)
+    : 'module.exports = {}';
 
   await args.context.tools.filesystem.writeAsync(
     join(args.dir, 'state.js'),
-    ``,
+    stateFileContent,
   );
 }

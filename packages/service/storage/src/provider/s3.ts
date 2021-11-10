@@ -59,13 +59,19 @@ export async function list(
 
   const params = {
     Bucket: getBucketName(input),
-    Prefix: path ?? '',
+    Prefix: path === '/' ? '' : path,
     Delimiter: '/',
   };
 
   log('listObjects(%o)', params);
 
   const result = await client.listObjects(params);
+
+  log(
+    'listObjects fround %i folders and %i files',
+    result.CommonPrefixes?.length,
+    result.Contents?.length,
+  );
 
   return {
     nodes: [

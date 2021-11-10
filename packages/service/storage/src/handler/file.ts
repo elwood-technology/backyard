@@ -26,7 +26,7 @@ export default function fastifyHandleFile(
 
     const path = normalizeFilePath(rawPath);
     const bucket = getBucket(id, app.state);
-    const provider = getProvider(bucket);
+    const provider = getProvider(bucket, app.state);
     const credentials = getCredentials(bucket, app.state);
 
     invariant(credentials, 'Credentials not found');

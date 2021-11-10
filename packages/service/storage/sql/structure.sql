@@ -40,5 +40,5 @@ CREATE TABLE "storage"."access" (
 );
 
 CREATE UNIQUE INDEX storage_access_idx ON "storage"."access" USING btree ("bucket_id", "path", "user_id");
-CREATE INDEX storage_access_folder_tree_idx ON "storage"."access" USING GIST ("folder_tree");
+CREATE INDEX storage_access_foldewr_tree_idx ON "storage"."access" USING GIST ("folder_tree");
 

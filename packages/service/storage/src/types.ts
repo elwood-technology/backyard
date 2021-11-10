@@ -75,6 +75,7 @@ export interface StorageBucket extends JsonObject {
 export type StorageState = {
   credentials: StorageCredential[];
   buckets: StorageBucket[];
+  providers: Record<string, string>;
 };
 
 export type StorageCredential = {
