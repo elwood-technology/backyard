@@ -29,8 +29,9 @@
   },
   "repository": "git@github.com:elwood-technology/backyard.git",
   "files": [
-    "Dockerfile",
     "lib",
+    "sql",
+    "Dockerfile",
     "server.js",
     "backyard-service.js",
     "package.json"

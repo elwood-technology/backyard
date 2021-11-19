@@ -38,7 +38,7 @@ export function config(
     settings: {
       jwt: {
         iat: defaultIat,
-        groupName: 'backyard',
+        groupName: 'authenticated',
         exp: defaultIat + 60 * 60 * 24 * 365 * 50,
       },
     },
